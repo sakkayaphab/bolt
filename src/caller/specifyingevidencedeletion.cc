@@ -1,0 +1,443 @@
+#include "specifyingevidencedeletion.h"
+
+SpecifyingEvidenceDeletion::SpecifyingEvidenceDeletion()
+{
+    svtype = "DEL";
+}
+
+void SpecifyingEvidenceDeletion::updateRead()
+{
+    currentPos = read->core.pos + 1;
+    currentMPos = read->core.mpos + 1;
+
+    // if (!readparser.isPairOnSameChromosome())
+    // {
+    //     return;
+    // }
+
+    // if (readparser.getPos() > readparser.getMatePos())
+    // {
+    //     return;
+    // }
+
+    if (read->core.flag & BAM_FREAD2)
+    {
+        return;
+    }
+
+    // if (!(read->core.flag & BAM_FMREVERSE))
+    // {
+    //     return;
+    // }
+
+    // if (read->core.flag & BAM_FREVERSE)
+    // {
+    //     return;
+    // }
+
+    // int32_t diff = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+
+    // if (diff < 0)
+    // {
+    //     return;
+    // }
+
+    // //Limit SVLEN
+    // if (diff > 50000)
+    // {
+    //     return;
+    // }
+
+    // if (diff > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
+    // {
+    //     //Pass filter
+    //     checkRange();
+    // }
+
+    int32_t insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+
+    if (readparser.isMateUnmapped())
+    {
+        return;
+    }
+
+    if (!readparser.isPairOnSameChromosome())
+    {
+        return;
+    }
+
+    if (insertSizeFirstRead < 0)
+    {
+        return;
+    }
+
+    if (readparser.isReverse() && readparser.isMateReverse())
+    {
+        return;
+    }
+
+    if (!readparser.isReverse() && !readparser.isMateReverse())
+    {
+        return;
+    }
+
+    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
+    {
+        checkRange();
+        return;
+    }
+}
+
+int32_t SpecifyingEvidenceDeletion::getSVLength()
+{
+    return currentMPos - currentPos - (samplestat->getMedianSampleStat() + samplestat->getSDSampleStat());
+}
+
+void SpecifyingEvidenceDeletion::checkRange()
+{
+    bool added = false;
+    // int32_t diff = currentMPos-currentPos+samplestat->getReadLength()-samplestat->getMedianSampleStat()+(2*currentPos+samplestat->getReadLength())+(2* samplestat->getSDSampleStat());
+
+    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    // std::cout << "merge : " << merge  << ", " << samplestat->getMedianSampleStat() << " , " << int32_t(samplestat->getSDSampleStat()) << " , "
+    // << samplestat->getReadLength()
+    // << std::endl;
+    // if (getSVLength() < 500)
+    // {
+    //     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    // }
+    // else if (getSVLength() >= 500 && getSVLength() < 1000)
+    // {
+    //     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    // }
+    // else if (getSVLength() >= 1000 && getSVLength() < 2000)
+    // {
+    //     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    // }
+    // else if (getSVLength() >= 2000)
+    // {
+        added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    // }
+
+    // int positionOverlapped = findOverlapped(2000, currentPos, currentMPos);
+    // if (positionOverlapped >= 0)
+    // {
+    //     preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
+
+    //     if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
+    //     }
+
+    //     if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
+    //     }
+
+    //     if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
+    //     }
+
+    //     preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+    //     added = true;
+    //     preCollectSV.at(positionOverlapped).incrementFrequency();
+    // }
+    // else
+    // {
+    //     int positionOverlappedOnlyPos = findOverlappedOnlyPos(1000, currentPos);
+    //     if (positionOverlappedOnlyPos >= 0)
+    //     {
+    //         preCollectSV.at(positionOverlappedOnlyPos).addAssociateRead(currentPos, currentMPos);
+    //     }
+    // }
+
+    checkProveEvidence();
+
+    if (!added)
+    {
+        Evidence evidence;
+        evidence.setVariantType(svtype);
+        evidence.setChr(readparser.getChromosomeNameString());
+        evidence.setEndChr(readparser.getChromosomeNameString());
+        evidence.setPosDiscordantRead(currentPos);
+        evidence.setEndDiscordantRead(currentMPos);
+        evidence.setLastPosDiscordantRead(currentPos);
+        evidence.setLastEndDiscordantRead(currentMPos);
+
+        evidence.incrementFrequency();
+        evidence.setForwardDirection(true);
+        evidence.addAssociateRead(currentPos, currentMPos);
+
+        evidence.addMapQ(readparser.getMapQuality());
+        preCollectSV.push_back(evidence);
+    }
+}
+
+bool SpecifyingEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+{
+    bool added;
+    for (int i = 0; i < preCollectSV.size(); i++)
+    {
+        if (checkBetween(pos, preCollectSV.at(i).getPosDiscordantRead(), overlappedpos) && checkBetween(mpos,
+                                                                                                        preCollectSV.at(i).getEndDiscordantRead(),
+                                                                                                        overlappedsvlength))
+        {
+            preCollectSV.at(i).addAssociateRead(currentPos, currentMPos);
+
+            if (preCollectSV.at(i).getLastPosDiscordantRead() < currentPos)
+            {
+                preCollectSV.at(i).setLastPosDiscordantRead(currentPos);
+            }
+
+            if (preCollectSV.at(i).getEndDiscordantRead() > currentMPos)
+            {
+                preCollectSV.at(i).setEndDiscordantRead(currentMPos);
+            }
+
+            if (preCollectSV.at(i).getLastEndDiscordantRead() < currentMPos)
+            {
+                preCollectSV.at(i).setLastEndDiscordantRead(currentMPos);
+            }
+
+            preCollectSV.at(i).addMapQ(readparser.getMapQuality());
+            added = true;
+            preCollectSV.at(i).incrementFrequency();
+        }
+    }
+
+    return added;
+}
+
+void SpecifyingEvidenceDeletion::proveEvidence(int index)
+{
+    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
+    {
+        if (filterEvidence(&preCollectSV.at(index)))
+        {
+            calculateVCF(&preCollectSV.at(index));
+
+            if (preCollectSV.at(index).getSvLength() > 10 && preCollectSV.at(index).getSvLength() < 500000)
+            {
+                finalEvidence.push_back(preCollectSV.at(index));
+            }
+
+            preCollectSV.erase(preCollectSV.begin() + index);
+            writeBufferEvidenceFile();
+        }
+        else
+        {
+            preCollectSV.erase(preCollectSV.begin() + index);
+        }
+    }
+}
+
+void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
+{
+
+    int32_t firstPos = 0;
+    int32_t lastPos = 0;
+    int32_t avgPos = 0;
+    int32_t firstEndDis = 0;
+    int32_t firstEnd = 0;
+    int32_t lastEnd = 0;
+    int32_t avgEnd = 0;
+    // int32_t svlength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    if (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead() < 0)
+    {
+        std::cout << "getLastPosDiscordantRead" << std::endl;
+        std::cout << evidence->getLastPosDiscordantRead() << " == " << evidence->getPosDiscordantRead() << std::endl;
+    }
+    if (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead() < 0)
+    {
+        std::cout << "getLastEndDiscordantRead" << std::endl;
+        std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
+    }
+
+    int32_t difflengthPos = ((evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthEnd = ((evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+
+    if (difflengthEnd > 20000)
+    {
+        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+        return;
+    }
+    // int32_t difflengthPos =
+    // int32_t difflengthEnd =
+
+    int32_t merge = 0;
+    // merge = svlength + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength()*2);
+    firstPos = evidence->getLastPosDiscordantRead();
+    lastPos = evidence->getLastPosDiscordantRead();
+    firstEnd = evidence->getEndDiscordantRead();
+    lastEnd = evidence->getEndDiscordantRead();
+
+    // if (svlength < 500)
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 1) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 1) + samplestat->getSDSampleStat();
+
+    // // return
+    // }
+    // else if (svlength < 1000)
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 3) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 3) - samplestat->getSDSampleStat();
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
+    //     return;
+    // }
+    // else
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 4) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 8) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 8);
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 4);
+    //      return;
+    // }
+
+    // if (lastPos > firstEnd)
+    // {
+    //     lastPos = firstEndDis;
+    // }
+
+    // if (firstEnd < lastPos)
+    // {
+    //     firstEnd = evidence->getLastPosDiscordantRead();
+    // }
+
+    // avgPos = (firstPos + lastPos) / 2;
+    // avgEnd = (firstEnd + lastEnd) / 2;
+    // evidence->setPos(avgPos);
+    // evidence->setCiPosLeft(firstPos - avgPos);
+    // evidence->setCiPosRight(lastPos - avgPos);
+    // evidence->setEnd(avgEnd);
+    // evidence->setCiEndLeft(firstEnd - avgEnd);
+    // evidence->setCiEndRight(lastEnd - avgEnd);
+
+    // avgPos = (firstPos + lastPos) / 2;
+    // avgEnd = (firstEnd + lastEnd) / 2;
+    evidence->setPos(lastPos);
+    evidence->setCiPosLeft(-difflengthPos);
+    evidence->setCiPosRight(difflengthPos);
+    evidence->setEnd(firstEnd);
+    evidence->setCiEndLeft(-difflengthEnd);
+    evidence->setCiEndRight(difflengthEnd);
+}
+
+bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
+{
+    int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
+
+    if (svLength < 500)
+    {
+        if (evidence->getMaxMapQ() == 0)
+        {
+            return false;
+        }
+
+        if (evidence->getFrequency() <= 2)
+        {
+            return false;
+        }
+
+        // return false;
+    }
+
+    // int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead();
+    // if (svLength < 0)
+    // {
+    //     return false;
+    // }
+
+    // if (svLength <= 500)
+    // {
+    //     if (evidence->getAvgMapQ() < 10)
+    //     {
+    //         return false;
+    //     }
+
+    //     if (evidence->getFrequency() <= 5)
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    // if (svLength <= 1000)
+    // {
+    //     if (evidence->getFrequency() <= 5)
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    // if (svLength > 1000)
+    // {
+    //     if (evidence->getFrequency() <= 4)
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    // if (evidence->getMaxMapQ() == 0)
+    //     {
+    //         return false;
+    //     }
+
+    //     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead();
+    //     if (svLength < 0)
+    //     {
+    //         return false;
+    //     }
+
+    //     if (svLength <= 500)
+    //     {
+    //         if (evidence->getAvgMapQ() < 10)
+    //         {
+    //             return false;
+    //         }
+
+    //         if (evidence->getFrequency() <= 5)
+    //         {
+    //             return false;
+    //         }
+    //     }
+
+    //     if (svLength <= 1000)
+    //     {
+    //         if (evidence->getFrequency() <= 5)
+    //         {
+    //             return false;
+    //         }
+    //     }
+
+    //     if (svLength > 1000)
+    //     {
+    //         if (evidence->getFrequency() <= 4)
+    //         {
+    //             return false;
+    //         }
+    //     }
+
+    return true;
+}
+
+void SpecifyingEvidenceDeletion::checkProveEvidence()
+{
+    for (int i = 0; i < preCollectSV.size(); i++)
+    {
+        proveEvidence(i);
+    }
+}
+
+void SpecifyingEvidenceDeletion::done()
+{
+    checkProveEvidence();
+    writeFinalEvidenceAndClear();
+}

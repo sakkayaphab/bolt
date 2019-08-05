@@ -1,0 +1,14 @@
+.DS_Store
+external
+bolt
+build
+CmakeFiles
+cmake_install.cmake
+CMakeCache.txt
+*.dylib
+Makefile
+# for VS cCode
+.vscode
+
+# execute
+run.sh

@@ -1,0 +1,439 @@
+#include "refiningdeletion.h"
+#include <fasta/fastareader.h>
+#include <string.h>
+#include "smithwaterman.h"
+#include "alignment.h"
+#include "readdepthanalysis.h"
+RefiningDeletion::RefiningDeletion()
+{
+    variantresult.setVariantType("DEL");
+}
+
+RefiningDeletion::~RefiningDeletion()
+{
+}
+
+void RefiningDeletion::execute()
+{
+    ReadDepthAnalysis rda(filepath);
+
+    variantresult.setChr(evidence.getChr());
+    variantresult.setEndChr(evidence.getEndChr());
+
+    prepareBamReader();
+    first();
+    resultFromStart = true;
+    if (variantresult.isQuailtyPass())
+    {
+        return;
+    }
+    resultFromStart = false;
+    second();
+    if (variantresult.isQuailtyPass())
+    {
+        return;
+    }
+
+    // if (!variantresult.isQuailtyPass()) {
+    //     approximate();
+    // }
+}
+
+void RefiningDeletion::approximate()
+{
+    variantresult.setPos(evidence.getLastPosDiscordantRead());
+    variantresult.setEnd(evidence.getEndDiscordantRead());
+    variantresult.setFrequency(evidence.getMapQVector()->size());
+    variantresult.setChr(evidence.getChr());
+    variantresult.setEndChr(evidence.getEndChr());
+    if (variantresult.getEnd() - variantresult.getPos() > 10000)
+    {
+        variantresult.setQuailtyPass(true);
+    }
+}
+
+void RefiningDeletion::first()
+{
+    std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(), evidence.getPos() + evidence.getCiPosRight());
+
+    const char *range = findRange.c_str();
+    // const char *mChr = evidence.getChr().c_str();
+    //         std::cout << range  << std::endl;
+    refineStartToEnd(range);
+}
+
+void RefiningDeletion::second()
+{
+    std::string findRange = convertRangeToString(evidence.getEndChr(), evidence.getEnd() + evidence.getCiEndLeft(),
+                                                 evidence.getEnd() + evidence.getCiEndRight());
+    const char *range = findRange.c_str();
+
+    // std::cout << range << "/" << samplestat->getReadLength() << std::endl;
+    refineEndToStart(range);
+}
+
+void RefiningDeletion::refineStartToEnd(const char *range)
+{
+    hts_itr_t *iter = NULL;
+
+    iter = sam_itr_querys(bam_index, bam_header, range);
+    if (iter == NULL)
+        return;
+    read = bam_init1();
+    readparser.setBamHeader(bam_header);
+    readparser.setBamRead(read);
+
+    int32_t positionStartReference = evidence.getEnd() + evidence.getCiEndLeft();
+    std::string seqrefString = fastareader.getSeqbyPosition(std::string(evidence.getEndChr()),
+                                                            positionStartReference,
+                                                            evidence.getEnd() + evidence.getCiEndRight());
+    replaceSeqToUppercase(&seqrefString);
+    // const char *seqC = seqrefString.c_str();
+    // std::cout << "ref pos : " << positionStartReference
+    //           << " ref end : " << evidence.getEnd() + evidence.getCiEndRight() << std::endl;
+    // std::cout << seqrefString << std::endl;
+
+    std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
+    std::map<int32_t, int> SCReadLists;
+
+    // Alignment alignment(&seqrefString);
+    // alignment.genarateMatrix("DELSTART");
+
+    // alignment.setPosReference(positionStartReference);
+    if (seqrefString.size() < 50)
+    {
+        return;
+    }
+
+    StringSearchAlignment ssa;
+    ssa.setReference(seqrefString);
+    ssa.setSVType("DELSTART");
+    ssa.setPosReference(positionStartReference);
+    ssa.buildReference();
+    std::vector<ReadParser::Cigar> cigar;
+
+    // std::cout << "positionStartReference : " << positionStartReference << std::endl;
+
+    bool SCRead;
+
+    while (sam_itr_next(inFile, iter, read) >= 0)
+    {
+
+        if (readparser.isUnmapped())
+        {
+            continue;
+        }
+        // if (readparser.getMapQuality()<15) {
+        //             continue;
+        //         }
+
+        // optimize read
+        
+        cigar = readparser.getCigar();
+        if (cigar.size() <= 1)
+        {
+            // if (evidence.getSvLength()<250) {
+            //     continue;
+            // }
+
+            if (readparser.getAlignMD().size() <= 1)
+            {
+                continue;
+            }
+            // continue;
+            SCRead = false;
+        }
+        else
+        {
+            // if (!(cigar.at(0).getOperatorName() == 'S'))
+            // {
+            //     if (cigar.at(0).getLength() > 3)
+            //     {
+            //         continue;
+            //     }
+            // }
+
+            if (!(cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
+            {
+                continue;
+            }
+
+            if (cigar.at(cigar.size() - 1).getLength() < 4)
+            {
+                continue;
+            }
+
+            SCRead = true;
+        }
+
+        // if (readparser.getPos()>230471084) {
+        //     continue;
+        // }
+
+        //  std::cout << "pos : " << readparser.getPos() << std::endl;
+        //         continue;
+
+        std::string fullRead = readparser.getSequence();
+        // if (readparser.getEnd()!=56129321) {
+        //     continue;
+        // }
+        //      std::cout << "---------- New Read ----------" << std::endl;
+        //     std::cout << readparser.getPos() << " = " << readparser.getEnd() << " sc:" << cigar.at(cigar.size() - 1).getLength() << std::endl;
+        // std::cout << fullRead << std::endl;
+        std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtStart(&fullRead);
+        for (auto n : result)
+        {
+
+            // continue;
+            if (n.matchCount <= 4)
+            {
+                continue;
+            }
+
+            if (SCRead)
+            {
+                // if (n.matchCount + 1 < cigar.at(0).getLength())
+                // {
+                //     continue;
+                // }
+            }
+            else
+            {
+                // continue;
+                // if (n.missmatchCount >= 1)
+                // {
+                //     continue;
+                // }
+
+                // if (samplestat->getReadLength()-readparser.getLastMissMatchPosMD() > n.matchCount) {
+                //     continue;
+                // }
+            }
+
+            // if (n.matchCount <= 20) {
+            //     if (n.missmatchCount >= 1 ) {
+            //         continue;
+            //     }
+            // }
+
+            int32_t mPos = n.posseq + readparser.getPosOfSeq();
+            int32_t mEnd = n.pos;
+
+            if (mEnd <= mPos + 2)
+            {
+                continue;
+            }
+
+            // std::cout << "mPos : " << mPos << std::endl;
+            // std::cout << "mtEnd : " << mEnd<< std::endl;
+            //  std::cout << "pattern : " << n. << std::endl;
+            // std::cout << "mEnd : " << mEnd << std::endl;
+            // std::cout << "---------- MD TAG ----------" << std::endl;
+            auto rangeMapping = n.endseq - n.posseq;
+
+            // listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+            // listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+            // listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+            for (int i = 0; i < rangeMapping; i++)
+            {
+
+                int32_t tempPos = mPos + i;
+                int32_t tempEnd = mEnd + i;
+
+                if (i > 6)
+                {
+                    break;
+                }
+                if (SCRead) {
+                    listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
+                }
+                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping + i);
+                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+                // {
+                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+                // }
+                // break;
+            }
+        }
+    }
+
+    calculateFinalBreakpoint(&listPosition);
+
+    hts_itr_destroy(iter);
+    return;
+}
+
+void RefiningDeletion::refineEndToStart(const char *range)
+{
+    hts_itr_t *iter = NULL;
+
+    iter = sam_itr_querys(bam_index, bam_header, range);
+    if (iter == NULL)
+        return;
+    read = bam_init1();
+    readparser.setBamHeader(bam_header);
+    readparser.setBamRead(read);
+
+    int32_t positionStartReference = evidence.getPos() + evidence.getCiPosLeft();
+    std::string seqrefString = fastareader.getSeqbyPosition(std::string(evidence.getEndChr()),
+                                                            positionStartReference,
+                                                            evidence.getPos() + evidence.getCiPosRight());
+    replaceSeqToUppercase(&seqrefString);
+    // std::cout << "ref pos : " << positionStartReference
+    //           << " ref end : " << evidence.getEnd() + evidence.getCiEndRight() << std::endl;
+    // std::cout << seqrefString << std::endl;
+
+    std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
+    std::map<int32_t, int> SCReadLists;
+
+    // Alignment alignment(&seqrefString);
+    // alignment.genarateMatrix("DELEND");
+
+    // alignment.setPosReference(positionStartReference);
+    if (seqrefString.size() < 50)
+    {
+        return;
+    }
+    StringSearchAlignment ssa;
+    ssa.setReference(seqrefString);
+    ssa.setSVType("DELEND");
+    ssa.setPosReference(positionStartReference);
+    ssa.buildReference();
+    std::vector<ReadParser::Cigar> cigar;
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    bool SCRead = false;
+    while (sam_itr_next(inFile, iter, read) >= 0)
+    {
+        if (readparser.isUnmapped())
+        {
+            continue;
+        }
+        
+        // if (readparser.getMapQuality()<15) {
+        //     continue;
+        // }
+
+        cigar = readparser.getCigar();
+        if (cigar.size() <= 1)
+        {
+            //  if (evidence.getSvLength()<250) {
+            //     continue;
+            // }
+            if (readparser.getAlignMD().size() <= 1)
+            {
+                continue;
+            }
+            // continue;
+            SCRead = false;
+        }
+        else
+        {
+            if (!(cigar.at(0).getOperatorName() == 'S'))
+            {
+                continue;
+            }
+            if (cigar.at(0).getLength() < 4)
+            {
+                continue;
+            }
+            SCRead = true;
+        }
+
+        std::string fullRead = readparser.getSequence();
+
+        std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtEnd(&fullRead);
+        for (auto n : result)
+        {
+            // continue;
+            if (n.matchCount <= 4)
+            {
+                continue;
+            }
+
+            if (SCRead)
+            {
+                // if (n.matchCount + 1 < cigar.at(0).getLength())
+                // {
+                //     continue;
+                // }
+               
+                
+            }
+            else
+            {
+                // continue;
+                // if (!(readparser.getFirstMissMatchPosMD()<= n.matchCount)) {
+                //     continue;
+                // }
+
+                // if (n.missmatchCount >= 1)
+                // {
+                //     continue;
+                // }
+                // continue;
+            }
+
+            // if (n.matchCount <= 20) {
+            //     if (n.missmatchCount >= 1 ) {
+            //         continue;
+            //     }
+            // }
+
+            // if (evidence.getSvLength() < 300)
+            // {
+            //     if (n.missmatchCount >= 1)
+            //     {
+            //         continue;
+            //     }
+            // }
+
+            int32_t mPos = n.end;
+            int32_t mEnd = readparser.getPosOfSeq() + n.endseq;
+
+            if (mPos >= mEnd + 2)
+            {
+                continue;
+            }
+            //      std::cout << "> n.pos : " << n.pos << " n.end : " << n.end << std::endl;
+            //  std::cout << "mPos : " << mPos << std::endl;
+            //  std::cout << "mEnd : " << mEnd << std::endl;
+            //      std::cout << "pattern : " << n.pattern << std::endl;
+            // std::cout << "---------- MD TAG ----------" << std::endl;
+
+            for (int i = 0; i < n.endseq; i++)
+            {
+                // listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+                // listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(n.endseq);
+                // listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+
+                int32_t tempPos = mPos - i;
+                int32_t tempEnd = mEnd - i;
+
+                if (i > 6)
+                {
+                    break;
+                }
+
+                if (SCRead) {
+                    listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
+                }
+
+                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(n.endseq - i);
+                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+                // {
+                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+                // }
+                // break;
+            }
+        }
+    }
+
+    calculateFinalBreakpoint(&listPosition);
+    std::cout << variantresult.getPos() << std::endl;
+    hts_itr_destroy(iter);
+    return;
+}

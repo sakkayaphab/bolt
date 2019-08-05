@@ -1,0 +1,163 @@
+#include "samplestat.h"
+#include <iostream>
+#include <cmath>
+
+void SampleStat::setSamplePath(std::string t_sample_path)
+{
+    sample_path = t_sample_path;
+}
+
+SampleStat::SampleStat()
+{
+    countMax = 10000;
+}
+
+void SampleStat::setNumberOfRead(int number) {
+    countMax = number;
+}
+
+SampleStat::SampleStat(std::string samplepath)
+{
+    sample_path = samplepath;
+}
+
+void SampleStat::findReadLength()
+{
+    samFile *fp_in = hts_open(sample_path.c_str(), "r"); //open bam file
+    bam_hdr_t *bamHdr = sam_hdr_read(fp_in);     //read header
+    bam1_t *aln = bam_init1();                   //initialize an alignment
+
+    int count = 0;
+    int32_t lengthSeq = 0;
+    while (sam_read1(fp_in, bamHdr, aln) > 0)
+    {
+        lengthSeq = aln->core.l_qseq;
+        count++;
+        if (count > 2)
+        {
+            break;
+        }
+    }
+
+    bam_destroy1(aln);
+    bam_hdr_destroy(bamHdr);
+    sam_close(fp_in);
+
+    read_length = lengthSeq;
+
+    // std::cout << read_length << std::endl;
+}
+
+void SampleStat::findSDSampleStat()
+{
+    samFile *fp_in = hts_open(sample_path.c_str(), "r");
+    bam_hdr_t *bamHdr = sam_hdr_read(fp_in);
+    bam1_t *aln = bam_init1();
+
+    int count = 0;
+    int64_t UPPER = 0;
+
+    while (sam_read1(fp_in, bamHdr, aln) > 0)
+    {
+
+        if (count > countMax)
+        {
+            break;
+        }
+
+        int32_t pos = aln->core.pos + 1;
+        int32_t matepos = aln->core.mpos + 1;
+        if (pos > matepos)
+        {
+            continue;
+        }
+
+        if ((matepos - pos) > 0 && (matepos - pos) < 2000)
+        {
+            int diff = (matepos - pos);
+            UPPER += pow((diff - (insertsize_median)), 2);
+            count++;
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    bam_destroy1(aln);
+    bam_hdr_destroy(bamHdr);
+    sam_close(fp_in);
+
+    
+    insertsize_sd = (int)sqrt(UPPER / (countMax));
+}
+
+void SampleStat::findMedianSampleStat()
+{
+    samFile *fp_in = hts_open(sample_path.c_str(), "r");
+    bam_hdr_t *bamHdr = sam_hdr_read(fp_in);
+    bam1_t *aln = bam_init1();
+
+    int count = 0;
+    int64_t sumINS = 0;
+    std::string chr;
+    while (sam_read1(fp_in, bamHdr, aln) > 0)
+    {
+        chr = bamHdr->target_name[aln->core.tid];
+        if (!(chr=="1"||chr=="chr1")) {
+            continue;
+        }
+
+        if (count > countMax)
+        {
+            break;
+        }
+
+        int32_t pos = aln->core.pos + 1;
+        int32_t matepos = aln->core.mpos + 1;
+        if (pos > matepos)
+        {
+            continue;
+        }
+
+        if ((matepos - pos) > 0 && (matepos - pos) < 1000)
+        {
+            int diff = (matepos - pos);
+            sumINS += diff;
+            count++;
+        }
+        else
+        {
+            continue;
+        }
+    }
+
+    bam_destroy1(aln);
+    bam_hdr_destroy(bamHdr);
+    sam_close(fp_in);
+    
+
+    insertsize_median = (sumINS / count);
+}
+
+void SampleStat::execute()
+{
+    findReadLength();
+    findMedianSampleStat();
+    findSDSampleStat();
+}
+
+int32_t SampleStat::getReadLength()
+{
+    return read_length;
+}
+
+int SampleStat::getMedianSampleStat()
+{
+    return insertsize_median;
+}
+
+int SampleStat::getSDSampleStat()
+{
+    return insertsize_sd;
+}
