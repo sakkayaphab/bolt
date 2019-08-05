@@ -1,6 +1,6 @@
 file(GLOB SOURCES "*.cc")
 
-include_directories(${CMAKE_BINARY_DIR}/src/)
+
 
 
 add_library(caller
@@ -9,8 +9,10 @@ add_library(caller
     ${SOURCES}
 )
 
-add_subdirectory("../vcf" ${CMAKE_CURRENT_BINARY_DIR}/vcf)
-add_subdirectory("../fasta" ${CMAKE_CURRENT_BINARY_DIR}/fasta)
+include_directories(${PROJECT_SOURCE_DIR})
+
+add_subdirectory("../vcf" ${CMAKE_CURRENT_SOURCE_DIR}/vcf)
+add_subdirectory("../fasta" ${CMAKE_CURRENT_SOURCE_DIR}/fasta)
 
 if(APPLE)
     target_link_libraries(
