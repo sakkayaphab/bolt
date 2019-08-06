@@ -88,8 +88,8 @@ class Cigar
     }
   };
 
-  int getLastMissMatchPosMD();
-  int getFirstMissMatchPosMD();
+  int getLastToStartMissMatchPosMD();
+  int getStartToEndMissMatchPosMD();
   struct AlignMD
   {
     char operate;

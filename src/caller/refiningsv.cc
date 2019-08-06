@@ -274,17 +274,18 @@ std::string RefiningSV::getResultVCFFormat()
 }
 
 // if compare 449280 = 449281 @ NGB
-bool RefiningSV::isMatchRef(std::string chr,int32_t pos,int32_t end,std::string secondchr,int32_t secondpos,int32_t secondend) 
+bool RefiningSV::isMatchRef(std::string chr, int32_t pos, int32_t end, std::string secondchr, int32_t secondpos, int32_t secondend)
 {
-    std::string referenceSeq = fastareader.getSeqbyPosition(chr,pos,end);
+    std::string referenceSeq = fastareader.getSeqbyPosition(chr, pos, end);
     // std::cout << "referenceSeq :" << referenceSeq << std::endl;
 
-    std::string referenceSeqSecond = fastareader.getSeqbyPosition(secondchr,secondpos,secondend);
+    std::string referenceSeqSecond = fastareader.getSeqbyPosition(secondchr, secondpos, secondend);
     // std::cout << "referenceSeqSecond :" << referenceSeqSecond << std::endl;
 
     replaceSeqToUppercase(&referenceSeq);
     replaceSeqToUppercase(&referenceSeqSecond);
-    if (referenceSeq==referenceSeqSecond) {
+    if (referenceSeq == referenceSeqSecond)
+    {
         return true;
     }
 
@@ -293,14 +294,14 @@ bool RefiningSV::isMatchRef(std::string chr,int32_t pos,int32_t end,std::string 
 
 void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
-    
+
     int32_t bPos = 0;
     int32_t bEnd = 0;
     int32_t bHit = 0;
     uint8_t bMaxQuality = 0;
     int bMaxMatchSize = 0;
     std::vector<uint8_t> bMapQList;
-    // int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead();
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
     int lastscore = 0;
 
@@ -315,11 +316,43 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
             continue;
         }
 
+        // if (svlength+read>x.first.second-x.first.first)
+
+        if (evidence.getSvLength() < 500)
+        {
+            continue;
+            // if (maxQuality<30) {
+            //     continue;
+            // }
+            // if (maxMatchSize > 90)
+            // {
+            //     continue;
+            // }
+        }
+        else
+        {
+            if (maxQuality < 10)
+            {
+                continue;
+            }
+
+            // if (x.second.MatchLists.size() <= 2)
+            // {
+            //     if (!x.second.alignWithSoftClipped) {
+            //         continue;
+            //     }
+            // }
+            // else
+            // {
+            //
+            //     continue;
+            // }
+        }
+
         // if (maxQuality<15) {
         //     continue;
         // }
 
-    
         // if (svlength<400) {
         //     int32_t evidenceLength = x.first.second-x.first.first;
         //     if (evidenceLength<svlength-150) {
@@ -340,7 +373,6 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
         //     }
         // }
 
-        
         // if (isMatchRef(evidence.getChr(),x.first.first-1,x.first.first+20-1,evidence.getEndChr(),x.first.second,x.first.second+20)) {
         //     continue;
         // }
@@ -364,9 +396,8 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
 
         int number = x.second.NumberOfMatchRead;
 
-        int score = (number) * (2*maxMatchSize);
+        int score = (number) * (2 * maxMatchSize);
 
-        
         if (score > lastscore)
         {
             lastscore = score;
@@ -376,11 +407,6 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
             bMaxMatchSize = maxMatchSize;
             bMapQList = x.second.MapQLists;
         }
-    }
-
-    if (bHit <= 2)
-    {
-        return;
     }
 
     variantresult.setPos(bPos);

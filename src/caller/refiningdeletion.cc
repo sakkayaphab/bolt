@@ -205,9 +205,16 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 //     continue;
                 // }
 
-                // if (samplestat->getReadLength()-readparser.getLastMissMatchPosMD() > n.matchCount) {
-                //     continue;
-                // }
+                if (!(readparser.getLastToStartMissMatchPosMD() <= n.matchCount)) {
+                    // std::cout << readparser.getSequence() << std::endl;
+                    // for (auto n:readparser.getAlignMD()) {
+                    //     std::cout << n.operate << " = " << n.size << std::endl;
+                    // }
+                    // std::cout << readparser.getLastToStartMissMatchPosMD() << " / " <<  n.matchCount << std::endl;
+                    // std::cout << "---------------" << std::endl;
+                    // exit(0);
+                    continue;
+                }
             }
 
             // if (n.matchCount <= 20) {
@@ -256,6 +263,8 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 // }
                 // break;
             }
+
+            
         }
     }
 
@@ -364,9 +373,9 @@ void RefiningDeletion::refineEndToStart(const char *range)
             else
             {
                 // continue;
-                // if (!(readparser.getFirstMissMatchPosMD()<= n.matchCount)) {
-                //     continue;
-                // }
+                if (!(readparser.getStartToEndMissMatchPosMD()<= n.matchCount)) {
+                    continue;
+                }
 
                 // if (n.missmatchCount >= 1)
                 // {
@@ -433,7 +442,6 @@ void RefiningDeletion::refineEndToStart(const char *range)
     }
 
     calculateFinalBreakpoint(&listPosition);
-    std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }

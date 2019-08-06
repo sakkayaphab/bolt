@@ -107,7 +107,7 @@ int32_t ReadParser::getPosOfSeq()
 {
     std::vector<ReadParser::Cigar> cigars = getCigar();
 
-    int32_t shift=0;
+    int32_t shift = 0;
     if (cigars.at(0).getOperatorName() == 'S')
     {
         shift = cigars.at(0).getLength();
@@ -424,18 +424,19 @@ bool ReadParser::isSupplementaryAlignment()
     return false;
 }
 
-int ReadParser::getLastMissMatchPosMD() {
+int ReadParser::getLastToStartMissMatchPosMD()
+{
     std::vector<ReadParser::AlignMD> md = getAlignMD();
 
     int sizeAcc = 0;
-    for (int i=md.size()-1;i==0;i--) {
-        AlignMD lastmd = md.at(md.size()-i);
-        // if (lastmd.operate!='M') {
-            sizeAcc += lastmd.size;
-            // break;
-        // }
-
-        if (i-1==0) {
+    // std::cout << "#md.size() :" << md.size() << std::endl;
+    for (int i = md.size() - 1; i >= 0; i--)
+    {
+        AlignMD lastmd = md.at(i);
+        sizeAcc += lastmd.size;
+        // std::cout << "#" << lastmd.operate << " "<< lastmd.size << std::endl;
+        if (lastmd.operate != 'M')
+        {
             break;
         }
     }
@@ -443,14 +444,18 @@ int ReadParser::getLastMissMatchPosMD() {
     return sizeAcc;
 }
 
-int ReadParser::getFirstMissMatchPosMD() {
+int ReadParser::getStartToEndMissMatchPosMD()
+{
     std::vector<ReadParser::AlignMD> md = getAlignMD();
 
     int sizeAcc = 0;
-    for (int i=0;i<md.size();i--) {
-        AlignMD lastmd = md.at(md.size()-i-1);
+    for (int i = 0; i < md.size(); i++)
+    {
+        AlignMD lastmd = md.at(i);
         sizeAcc += lastmd.size;
-        if (lastmd.operate!='M') {
+        // std::cout << "#" << lastmd.operate << " = " << lastmd.size << std::endl;
+        if (lastmd.operate != 'M')
+        {
             break;
         }
     }
@@ -464,10 +469,12 @@ std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()
     const char *mdtagchar = "MD";
     auto aux = bam_aux_get(source_bamread, mdtagchar);
     auto auxChar = bam_aux2Z(aux);
-    // std::cout << auxChar <<std::endl;
+    // std::cout << auxChar << std::endl;
 
     std::string collectNumber;
     std::string operate = "M";
+    bool foundDel = false;
+    int delCount = 0;
     for (int i = 0; i < strlen(auxChar); i++)
     {
         const char symbol = toupper(auxChar[i]);
@@ -475,36 +482,79 @@ std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()
         if (isdigit(symbol))
         {
             collectNumber += symbol;
+
+            if (foundDel)
+            {
+                ReadParser::AlignMD Aalignmd;
+                Aalignmd.operate = 'D';
+                Aalignmd.size = delCount;
+                alignMDs.push_back(Aalignmd);
+                collectNumber = "";
+                delCount = 0;
+                foundDel = false;
+            }
         }
         else
         {
+            if (foundDel)
+            {
+                delCount++;
+                continue;
+            }
+
             if (collectNumber != "")
             {
                 ReadParser::AlignMD Aalignmd;
                 Aalignmd.operate = 'M';
                 Aalignmd.size = std::stoi(collectNumber);
                 alignMDs.push_back(Aalignmd);
+                collectNumber = "";
             }
-
-            collectNumber = "";
 
             if (symbol == '^')
             {
-                operate = "D";
+                foundDel = true;
+                delCount = 0;
             }
+
             else if (symbol == 'A')
             {
+                ReadParser::AlignMD Aalignmd;
+                Aalignmd.operate = 'A';
+                Aalignmd.size = 1;
+                alignMDs.push_back(Aalignmd);
             }
             else if (symbol == 'G')
             {
+                ReadParser::AlignMD Aalignmd;
+                Aalignmd.operate = 'G';
+                Aalignmd.size = 1;
+                alignMDs.push_back(Aalignmd);
             }
             else if (symbol == 'T')
             {
+                ReadParser::AlignMD Aalignmd;
+                Aalignmd.operate = 'T';
+                Aalignmd.size = 1;
+                alignMDs.push_back(Aalignmd);
             }
             else if (symbol == 'C')
             {
+                ReadParser::AlignMD Aalignmd;
+                Aalignmd.operate = 'C';
+                Aalignmd.size = 1;
+                alignMDs.push_back(Aalignmd);
             }
         }
+    }
+
+    if (collectNumber != "")
+    {
+        ReadParser::AlignMD Aalignmd;
+        Aalignmd.operate = 'M';
+        Aalignmd.size = std::stoi(collectNumber);
+        alignMDs.push_back(Aalignmd);
+        collectNumber = "";
     }
 
     // for (auto n : alignMDs)

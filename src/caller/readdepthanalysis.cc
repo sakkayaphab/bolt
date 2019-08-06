@@ -81,7 +81,7 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         sumINV += n.INV2;
         sumTRA += n.TRA2;
         sumINS += n.INS1;
-         sumINS += n.INS2;
+        sumINS += n.INS2;
     }
 
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
@@ -99,25 +99,24 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         return false;
     }
 
-    // if (getSCLFocusArea(&startFocusReadDepth) >= 2 || getSCFFocusArea(&endFocusReadDepth) >= 2)
+
+
+    // if (e.getSvLength() < 500)
     // {
-        
-    // }
-    // else
-    // {
-    //     return false;
-    // }
+    //     if (sumINV > 50)
+    //     {
+    //         return false;
+    //     }
 
-    // if (sumINV>10) {
-    //     return false;
-    // }
+    //     if (sumINS > 50)
+    //     {
+    //         return false;
+    //     }
 
-    // if (sumINS>50) {
-    //     return false;
-    // }
-
-    // if (sumTRA>20) {
-    //     return false;
+    //     if (sumTRA > 50)
+    //     {
+    //         return false;
+    //     }
     // }
 
     if (e.getSvLength() > 2000)
@@ -140,11 +139,11 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     }
     else if (e.getSvLength() > 1000 && e.getSvLength() <= 2000)
     {
-    //    if (e.getFrequency()<=1) {
-    //         if (e.getMaxMapQ()==0) {
-    //             return false;
-    //         }
-    //     }
+        //    if (e.getFrequency()<=1) {
+        //         if (e.getMaxMapQ()==0) {
+        //             return false;
+        //         }
+        //     }
         // if ( e.getMaxMapQ()<35) {
         //     return false;
         // }
@@ -207,7 +206,15 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     else
     {
 
-       
+        if (getSCLFocusArea(&startFocusReadDepth) >= 10 || getSCFFocusArea(&endFocusReadDepth) >= 10)
+        {
+            std::cout << e.getSvLength() << std::endl;
+        }
+        else
+        {
+            return false;
+        }
+
         // if (e.getSvLength())
         // if (e.getMaxMapQ() < 40)
         // {
@@ -218,8 +225,6 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         // {
         //     return false;
         // }
-
-        
 
         // if (sumINV+sumDUP+sumTRA>5) {
         //     return false;
