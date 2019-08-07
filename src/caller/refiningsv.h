@@ -13,6 +13,8 @@
 #include "readdepthhelper.h"
 #include "alignment.h"
 #include "stringsearchalignment.h"
+#include "stringsearchconfig.h"
+
 class RefiningSV
 {
 private:

@@ -32,9 +32,9 @@ void StringSearchAlignment::buildReference()
     ss.buildHashTable();
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtStart(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtStart(std::string *seq,StringSearchConfig *ssc)
 {
-    std::vector<StringSearch::Score> scoreresult = ss.searchEndToStart(seq);
+    std::vector<StringSearch::Score> scoreresult = ss.searchEndToStart(seq,ssc);
     std::vector<StringSearch::Score> result;
     for (auto m : scoreresult)
     {
@@ -59,9 +59,9 @@ std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtSta
     return result;
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtEnd(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtEnd(std::string *seq,StringSearchConfig *ssc)
 {
-    std::vector<StringSearch::Score> scoreresult = ss.searchStartToEnd(seq);
+    std::vector<StringSearch::Score> scoreresult = ss.searchStartToEnd(seq,ssc);
     std::vector<StringSearch::Score> result;
     for (auto m : scoreresult)
     {
@@ -86,41 +86,41 @@ std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtEnd
     return result;
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignDuplicationTargetAtStart(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignDuplicationTargetAtStart(std::string *seq,StringSearchConfig *ssc)
 {
 
-    return alignDeletionTargetAtEnd(seq);
+    return alignDeletionTargetAtEnd(seq,ssc);
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignDuplicationTargetAtEnd(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignDuplicationTargetAtEnd(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignDeletionTargetAtStart(seq);
+    return alignDeletionTargetAtStart(seq,ssc);
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtStartSCS(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtStartSCS(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignDeletionTargetAtEnd(seq);
+    return alignDeletionTargetAtEnd(seq,ssc);
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtStartSCE(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtStartSCE(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignDeletionTargetAtStart(seq);
+    return alignDeletionTargetAtStart(seq,ssc);
 }
-std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtEndSCS(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtEndSCS(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignDeletionTargetAtEnd(seq);
+    return alignDeletionTargetAtEnd(seq,ssc);
 }
-std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtEndSCE(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignTranslocationTargetAtEndSCE(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignDeletionTargetAtStart(seq);
+    return alignDeletionTargetAtStart(seq,ssc);
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtStartSCS(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtStartSCS(std::string *seq,StringSearchConfig *ssc)
 {
     ReadParser readparser;
     readparser.replaceToReverseComplement(seq);
     std::vector<StringSearch::Score> result;
-    std::vector<StringSearch::Score> scorelist = alignDeletionTargetAtStart(seq);
+    std::vector<StringSearch::Score> scorelist = alignDeletionTargetAtStart(seq,ssc);
     for (auto m : scorelist)
     {
         int32_t tempPos = seq->size() - m.endseq;
@@ -145,12 +145,12 @@ std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtSt
     return result;
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtStartSCE(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtStartSCE(std::string *seq,StringSearchConfig *ssc)
 {
     ReadParser readparser;
     readparser.replaceToReverseComplement(seq);
     std::vector<StringSearch::Score> result;
-    std::vector<StringSearch::Score> scorelist = alignDeletionTargetAtEnd(seq);
+    std::vector<StringSearch::Score> scorelist = alignDeletionTargetAtEnd(seq,ssc);
     for (auto m : scorelist)
     {
         int32_t tempPos = seq->size() - m.endseq;
@@ -175,12 +175,12 @@ std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtSt
     return result;
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtEndSCE(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtEndSCE(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignInversionTargetAtStartSCE(seq);
+    return alignInversionTargetAtStartSCE(seq,ssc);
 }
 
-std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtEndSCS(std::string *seq)
+std::vector<StringSearch::Score> StringSearchAlignment::alignInversionTargetAtEndSCS(std::string *seq,StringSearchConfig *ssc)
 {
-    return alignInversionTargetAtStartSCS(seq);
+    return alignInversionTargetAtStartSCS(seq,ssc);
 }

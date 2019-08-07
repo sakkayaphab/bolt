@@ -4,6 +4,7 @@
 #include "smithwaterman.h"
 #include "alignment.h"
 #include "readdepthanalysis.h"
+
 RefiningDeletion::RefiningDeletion()
 {
     variantresult.setVariantType("DEL");
@@ -126,9 +127,9 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         // if (readparser.getMapQuality()<15) {
         //             continue;
         //         }
-
+        std::string fullRead = readparser.getSequence();
         // optimize read
-        
+        std::vector<StringSearch::Score> result;
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
         {
@@ -140,6 +141,12 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             {
                 continue;
             }
+
+            StringSearchConfig ssc;
+            ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+            result = ssa.alignDeletionTargetAtStart(&fullRead, &ssc);
+
             // continue;
             SCRead = false;
         }
@@ -163,6 +170,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 continue;
             }
 
+            StringSearchConfig ssc;
+             ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+            result = ssa.alignDeletionTargetAtStart(&fullRead, &ssc);
+
             SCRead = true;
         }
 
@@ -173,14 +185,13 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         //  std::cout << "pos : " << readparser.getPos() << std::endl;
         //         continue;
 
-        std::string fullRead = readparser.getSequence();
         // if (readparser.getEnd()!=56129321) {
         //     continue;
         // }
         //      std::cout << "---------- New Read ----------" << std::endl;
         //     std::cout << readparser.getPos() << " = " << readparser.getEnd() << " sc:" << cigar.at(cigar.size() - 1).getLength() << std::endl;
         // std::cout << fullRead << std::endl;
-        std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtStart(&fullRead);
+
         for (auto n : result)
         {
 
@@ -205,7 +216,8 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 //     continue;
                 // }
 
-                if (!(readparser.getLastToStartMissMatchPosMD() <= n.matchCount)) {
+                if (!(readparser.getLastToStartMissMatchPosMD() <= n.matchCount))
+                {
                     // std::cout << readparser.getSequence() << std::endl;
                     // for (auto n:readparser.getAlignMD()) {
                     //     std::cout << n.operate << " = " << n.size << std::endl;
@@ -226,10 +238,10 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             int32_t mPos = n.posseq + readparser.getPosOfSeq();
             int32_t mEnd = n.pos;
 
-            if (mEnd <= mPos + 2)
-            {
-                continue;
-            }
+            // if (mEnd <= mPos + 2)
+            // {
+            //     continue;
+            // }
 
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd<< std::endl;
@@ -238,33 +250,31 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             // std::cout << "---------- MD TAG ----------" << std::endl;
             auto rangeMapping = n.endseq - n.posseq;
 
-            // listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
-            // listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
-            // listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
-            for (int i = 0; i < rangeMapping; i++)
-            {
+            listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+            listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+            listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+            // for (int i = 0; i < rangeMapping; i++)
+            // {
 
-                int32_t tempPos = mPos + i;
-                int32_t tempEnd = mEnd + i;
+            //     int32_t tempPos = mPos + i;
+            //     int32_t tempEnd = mEnd + i;
 
-                if (i > 6)
-                {
-                    break;
-                }
-                if (SCRead) {
-                    listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
-                }
-                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping + i);
-                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                // {
-                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                // }
-                // break;
-            }
-
-            
+            //     if (i > 6)
+            //     {
+            //         break;
+            //     }
+            //     if (SCRead) {
+            //         listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
+            //     }
+            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping + i);
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+            //     // {
+            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+            //     // }
+            //     // break;
+            // }
         }
     }
 
@@ -319,10 +329,13 @@ void RefiningDeletion::refineEndToStart(const char *range)
         {
             continue;
         }
-        
+
         // if (readparser.getMapQuality()<15) {
         //     continue;
         // }
+
+        std::string fullRead = readparser.getSequence();
+        std::vector<StringSearch::Score> result;
 
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
@@ -336,6 +349,12 @@ void RefiningDeletion::refineEndToStart(const char *range)
             }
             // continue;
             SCRead = false;
+
+            StringSearchConfig ssc;
+             ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+
+            result = ssa.alignDeletionTargetAtEnd(&fullRead, &ssc);
         }
         else
         {
@@ -348,11 +367,14 @@ void RefiningDeletion::refineEndToStart(const char *range)
                 continue;
             }
             SCRead = true;
+
+            StringSearchConfig ssc;
+             ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+
+            result = ssa.alignDeletionTargetAtEnd(&fullRead, &ssc);
         }
 
-        std::string fullRead = readparser.getSequence();
-
-        std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtEnd(&fullRead);
         for (auto n : result)
         {
             // continue;
@@ -367,13 +389,12 @@ void RefiningDeletion::refineEndToStart(const char *range)
                 // {
                 //     continue;
                 // }
-               
-                
             }
             else
             {
                 // continue;
-                if (!(readparser.getStartToEndMissMatchPosMD()<= n.matchCount)) {
+                if (!(readparser.getStartToEndMissMatchPosMD() <= n.matchCount))
+                {
                     continue;
                 }
 
@@ -410,34 +431,34 @@ void RefiningDeletion::refineEndToStart(const char *range)
             //  std::cout << "mEnd : " << mEnd << std::endl;
             //      std::cout << "pattern : " << n.pattern << std::endl;
             // std::cout << "---------- MD TAG ----------" << std::endl;
+            listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+            listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(n.endseq);
+            listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-            for (int i = 0; i < n.endseq; i++)
-            {
-                // listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
-                // listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(n.endseq);
-                // listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+            // for (int i = 0; i < n.endseq; i++)
+            // {
 
-                int32_t tempPos = mPos - i;
-                int32_t tempEnd = mEnd - i;
+            //     int32_t tempPos = mPos - i;
+            //     int32_t tempEnd = mEnd - i;
 
-                if (i > 6)
-                {
-                    break;
-                }
+            //     if (i > 6)
+            //     {
+            //         break;
+            //     }
 
-                if (SCRead) {
-                    listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
-                }
+            //     if (SCRead) {
+            //         listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
+            //     }
 
-                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(n.endseq - i);
-                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                // {
-                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                // }
-                // break;
-            }
+            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(n.endseq - i);
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+            //     // {
+            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+            //     // }
+            //     // break;
+            // }
         }
     }
 

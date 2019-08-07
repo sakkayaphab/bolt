@@ -114,18 +114,26 @@
 //     // }
 // }
 
-// TEST(Aligment, alignDeletionTargetAtStart)
-// {
-//     std::string ref = "GGGGGGGGGGGGGGGGGGGGACAAAGGAAGGGAGAGAGGG";
-//     std::string seq = "XXXXACAAAGGAAGGG";
+TEST(Aligment, alignDeletionTargetAtStart)
+{
+    std::string ref = "AGGGTGCTAGGTCCTGGGGATACAGCAGTGAGGTCCTTGGTCTCCCAGGGCTTGCTCGGGAACCAGGTGTCCCTCCCATGGGATTCTCGTGTGCTCCCTGGTTATAGCAAGTGCTGTGCTGTGTTTTCGTGATCTGGCTACATGTCTGTTCTCCCCACTAGACCAAGGAGCTTCTCAAGGAGAGAGTCTGAGTCTTCCATTTCTGTATCCCATAACACCTAGTGTTGGGTATATGGAAGGTTCTTTAGAACTGAATAAATGAACTAAAGGGGAGAACAGACCCAGGCCTGCTGATCCCAGGATCAATATGAAATGGGGCAAAGGAGTATTGAGGCAGCTTTTCAGATTCAAAAGCCAAGCTAGCAACAAGTCCCTGGTACAGGGTCTGTGGCTACTGTCAAGGACTGGGCTGTGTGGCCTGGGGACCAACTCACTCCTCTTTTCCTGCCAGTGTGTAGGAGCGGATCCAGGGGTTGGGCACAGACAGCCTGGGGGCCAGG";
+    std::string seq = "CTGGACTACACCTAAAACCAAAACCACTGAGTAAGATTTTTTCATTTTGTGAAAGTTCTGCCAATTTTGCTTAAGTAGAACTGAATAAATGAACTAAAGG";
 
-//     StringSearchAlignment ssa;
-//     ssa.setReference(ref);
-//     ssa.setSVType("DELEND");
-//     ssa.setPosReference(10);
-//     ssa.buildReference();
-//     ssa.alignDeletionTargetAtStart(&seq);
-// }
+    StringSearchAlignment ssa;
+    ssa.setReference(ref);
+    ssa.setSVType("DELEND");
+    ssa.setPosReference(66537691);
+    ssa.buildReference();
+    StringSearchConfig ssc;
+    std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtStart(&seq,&ssc);
+    for (auto n : result)
+    {
+        int32_t mPos = n.posseq + 66530331;
+        int32_t mEnd = n.pos;
+
+        std::cout << mPos << " = " << mEnd << std::endl;
+    }
+}
 
 // TEST(Aligment, alignDeletionTargetAtEnd)
 // {

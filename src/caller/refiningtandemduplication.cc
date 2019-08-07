@@ -111,7 +111,8 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         // std::cout << "---------- GGGG ----------" << cigar.at(cigar.size() - 1).getLength() <<  std::endl;
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtStart(&fullRead);
-        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead);
+        StringSearchConfig ssc;
+        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead,&ssc);
         for (auto n : result)
         {
             if (n.matchCount <= 8)
@@ -235,7 +236,8 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         std::string fullRead = readparser.getSequence();
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtEnd(&fullRead);
-        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead);
+        StringSearchConfig ssc;
+        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead,&ssc);
         for (auto n : result)
         {
             if (n.matchCount <= 8)

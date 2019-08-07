@@ -87,7 +87,8 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
             std::string fullRead = readparser.getSequence();
 
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtStart(&fullRead);
-            std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead);
+            StringSearchConfig ssc;
+            std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead,&ssc);
             for (auto n : result)
             {
                
@@ -124,7 +125,8 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
             // std::cout << "-------------" << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignTranslocationTargetAtStartSCE(&fullRead);
-             std::vector<StringSearch::Score> result = ssa.alignTranslocationTargetAtStartSCE(&fullRead);
+            StringSearchConfig ssc;
+             std::vector<StringSearch::Score> result = ssa.alignTranslocationTargetAtStartSCE(&fullRead,&ssc);
             // result = alignment.alignTranslocationTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {

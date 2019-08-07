@@ -50,7 +50,7 @@ std::string StringSearch::getStringRange(std::string *seq, int32_t pos, int32_t 
     return seq->substr(pos, range);
 }
 
-std::vector<StringSearch::Score> StringSearch::searchStartToEnd(std::string *seq)
+std::vector<StringSearch::Score> StringSearch::searchStartToEnd(std::string *seq,StringSearchConfig *ssc)
 {
     std::vector<StringSearch::Score> scoreresult;
     if (seq->length() < mapsplitsize)
@@ -65,7 +65,7 @@ std::vector<StringSearch::Score> StringSearch::searchStartToEnd(std::string *seq
 
     for (auto n : index)
     {
-        std::vector<StringSearch::Score> scorelist = runNext(seq, n, 0);
+        std::vector<StringSearch::Score> scorelist = runNext(seq, n, 0,ssc);
         for (auto m : scorelist)
         {
             scoreresult.push_back(m);
@@ -75,7 +75,7 @@ std::vector<StringSearch::Score> StringSearch::searchStartToEnd(std::string *seq
     return scoreresult;
 }
 
-std::vector<StringSearch::Score> StringSearch::searchEndToStart(std::string *seq)
+std::vector<StringSearch::Score> StringSearch::searchEndToStart(std::string *seq,StringSearchConfig *ssc)
 {
     std::vector<StringSearch::Score> scoreresult;
     if (seq->length() < mapsplitsize)
@@ -90,7 +90,7 @@ std::vector<StringSearch::Score> StringSearch::searchEndToStart(std::string *seq
 
     for (auto n : index)
     {
-        std::vector<StringSearch::Score> scorelist = runBack(seq, n + mapsplitsize - 1, seq->size() - mapsplitsize - 1);
+        std::vector<StringSearch::Score> scorelist = runBack(seq, n + mapsplitsize - 1, seq->size() - mapsplitsize - 1,ssc);
         for (auto m : scorelist)
         {
             scoreresult.push_back(m);
@@ -100,60 +100,6 @@ std::vector<StringSearch::Score> StringSearch::searchEndToStart(std::string *seq
     return scoreresult;
 }
 
-std::vector<StringSearch::Score> StringSearch::runBack(std::string *seq, int32_t pos, int32_t posseq)
-{
-    // std::cout << "-----------runBack-----------" << std::endl;
-    std::vector<StringSearch::Score> scorelist;
-    Score score;
-    score.end = pos + 1;
-    for (int j = 0; j < mapsplitsize; j++)
-    {
-        score.matchSeqPattern.push_front('M');
-    }
-
-    int32_t i = pos - mapsplitsize;
-    int32_t iseq = posseq;
-    int32_t lastContinueMissMatch = 0;
-    for (; i >= 0; i--)
-    {
-        // std::cout << reference[i] << " = " << (*seq)[iseq] << std::endl;
-        if (reference[i] == (*seq)[iseq])
-        {
-            score.matchSeqPattern.push_front('M');
-        }
-        else
-        {
-            score.matchSeqPattern.push_front('X');
-            if (lastContinueMissMatch >= 2)
-            {
-                break;
-            }
-            lastContinueMissMatch++;
-        }
-
-        // std::cout << (*seq)[iseq] << iseq << std::endl;
-        //condition loop
-        iseq--;
-        if (iseq < 0)
-        {
-            break;
-        }
-    }
-    // for (auto a : score.matchSeqPattern)
-    // {
-    //     std::cout << a;
-    // }
-    // std::cout << std::endl;
-    score.endseq = seq->size();
-    score.posseq = score.endseq;
-    calculateScoreRunBack(&score);
-
-    if (conditionSaveResult(&score)) {
-        scorelist.push_back(score);
-    }
-    
-    return scorelist;
-}
 
 bool StringSearch::conditionSaveResult(Score *score)
 {
@@ -225,7 +171,66 @@ void StringSearch::removeMissMatchStartPattern(StringSearch::Score *score)
     }
 }
 
-std::vector<StringSearch::Score> StringSearch::runNext(std::string *seq, int32_t pos, int32_t posseq)
+std::vector<StringSearch::Score> StringSearch::runBack(std::string *seq, int32_t pos, int32_t posseq,StringSearchConfig *ssc)
+{
+    // std::cout << "-----------runBack-----------" << std::endl;
+    std::vector<StringSearch::Score> scorelist;
+    Score score;
+    score.end = pos + 1;
+    for (int j = 0; j < mapsplitsize; j++)
+    {
+        score.matchSeqPattern.push_front('M');
+    }
+
+    int32_t i = pos - mapsplitsize;
+    int32_t iseq = posseq;
+    int32_t lastContinueMissMatch = 0;
+    int32_t accMissMatch = 0;
+    for (; i >= 0; i--)
+    {
+        // std::cout << reference[i] << " = " << (*seq)[iseq] << std::endl;
+        if (reference[i] == (*seq)[iseq])
+        {
+            score.matchSeqPattern.push_front('M');
+            lastContinueMissMatch = 0;
+        }
+        else
+        {
+            
+            if (lastContinueMissMatch+1 >= ssc->getAllowMissMatch()|| accMissMatch+1 >= ssc->getAllowMissMatch())
+            {
+                for (int j=0;j<lastContinueMissMatch;j++) {
+                    score.matchSeqPattern.pop_front();
+                }
+                break;
+            }
+            score.matchSeqPattern.push_front('X');
+            lastContinueMissMatch++;
+            accMissMatch++;
+        }
+
+        //condition loop
+        iseq--;
+        if (iseq < 0)
+        {
+            break;
+        }
+    }
+
+    
+
+    score.endseq = seq->size();
+    score.posseq = score.endseq;
+    calculateScoreRunBack(&score);
+
+    if (conditionSaveResult(&score)) {
+        scorelist.push_back(score);
+    }
+    
+    return scorelist;
+}
+
+std::vector<StringSearch::Score> StringSearch::runNext(std::string *seq, int32_t pos, int32_t posseq,StringSearchConfig *ssc)
 {
     // std::cout << "-----------runNext-----------" << std::endl;
 
@@ -240,20 +245,28 @@ std::vector<StringSearch::Score> StringSearch::runNext(std::string *seq, int32_t
 
     int32_t iseq = posseq + mapsplitsize;
     int32_t lastContinueMissMatch = 0;
+    int32_t accMissMatch = 0;
     for (; i < reference.length(); i++)
     {
         if (reference[i] == (*seq)[iseq])
         {
             score.matchSeqPattern.push_back('M');
+            lastContinueMissMatch = 0;
         }
         else
         {
-            score.matchSeqPattern.push_back('X');
-            if (lastContinueMissMatch >= 2)
+           
+            if (lastContinueMissMatch+1 > ssc->getAllowMissMatch()|| accMissMatch+1 > ssc->getAllowMissMatch())
             {
+                for (int j=0;j<lastContinueMissMatch;j++) {
+                    score.matchSeqPattern.pop_back();
+                }
+               
                 break;
             }
+            score.matchSeqPattern.push_back('X');
             lastContinueMissMatch++;
+            accMissMatch++;
         }
 
         // std::cout << (*seq)[iseq] << iseq << std::endl;

@@ -100,7 +100,8 @@ void RefiningInversion::refineStartToEnd(const char *range)
         {
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
-            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead);
+            StringSearchConfig ssc;
+            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead,&ssc);
             for (auto n : result)
             {
                 if (n.matchCount <= 8)
@@ -150,7 +151,8 @@ void RefiningInversion::refineStartToEnd(const char *range)
             // std::cout << "pos end : " << readparser.getEnd() << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
-            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead);
+            StringSearchConfig ssc;
+            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead,&ssc);
             for (auto n : result)
             {
                 if (n.matchCount <= 8)
@@ -259,7 +261,8 @@ void RefiningInversion::refineEndToStart(const char *range)
             // continue;
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
-            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead);
+            StringSearchConfig ssc;
+            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead,&ssc);
             for (auto n : result)
             {
                 if (n.matchCount <= 8)
@@ -311,7 +314,8 @@ void RefiningInversion::refineEndToStart(const char *range)
             // std::cout << fullRead << std::endl;
             // std::cout << "pos end : " << readparser.getEnd() << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
-            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead);
+            StringSearchConfig ssc;
+            std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead,&ssc);
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
