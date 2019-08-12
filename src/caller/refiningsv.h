@@ -33,6 +33,8 @@ protected:
     std::vector<uint8_t > MapQLists;
     std::string Sequence;
     int maxMatchSequence=0;
+    int32_t maxSC = 0;
+    int32_t maxAlterSC = 0;
     bool alignWithSoftClipped = false;
   };
 

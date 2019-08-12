@@ -59,21 +59,24 @@ void ReadDepthAnalysis::setFocusReadDepth(int32_t pos, int32_t end, std::vector<
     }
 }
 
+int ReadDepthAnalysis::getAvgReadDepth()
+{
+    return avgReadDepth;
+}
+
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
-    int sumDEL = 0;
-    for (auto n : startFocusReadDepth)
-    {
-        sumDEL += n.DEL1;
-        sumDEL += n.DEL2;
-    }
-
+    int sumDELStart = 0;
+    int sumDELEnd = 0;
     int sumDUP = 0;
     int sumINV = 0;
     int sumTRA = 0;
     int sumINS = 0;
     for (auto n : startFocusReadDepth)
     {
+        sumDELStart += n.DEL1;
+        sumDELEnd += n.DEL2;
+
         sumDUP += n.DUP1;
         sumINV += n.INV1;
         sumTRA += n.TRA1;
@@ -82,11 +85,21 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         sumTRA += n.TRA2;
         sumINS += n.INS1;
         sumINS += n.INS2;
+
+        // std::cout << " ----- " << "\n"
+        // << "p : " << n.pos << " = "
+        // << sumTRA << " // " << sumDELStart << std::endl;
     }
 
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
-    // if (sumOther>20) {
+    // if (sumTRA >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumINV >= e.getFrequency())
+    // {
     //     return false;
     // }
 
@@ -94,12 +107,30 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     // std::cout << e.getPos() << "\t" << n.DEL1 << "\t" << n.DEL2 << std::endl;
     // }
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 80)
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > getAvgReadDepth() * 1.5)
     {
         return false;
     }
 
+    // if ()
 
+    if (e.getMaxMapQ() == 0)
+    {
+        return false;
+    }
+
+    if (getAvgReadDepth() > 100)
+    {
+        if (e.getFrequency() <= 2)
+        {
+
+            return false;
+        }
+    }
+
+    // if (e.getFrequency()<=1) {
+    //     return false;
+    // }
 
     // if (e.getSvLength() < 500)
     // {
@@ -205,15 +236,19 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     }
     else
     {
-
-        if (getSCLFocusArea(&startFocusReadDepth) >= 10 || getSCFFocusArea(&endFocusReadDepth) >= 10)
-        {
-            std::cout << e.getSvLength() << std::endl;
-        }
-        else
+        if (e.getFrequency() <= 3)
         {
             return false;
         }
+
+        // if (getSCLFocusArea(&startFocusReadDepth) >= 10 || getSCFFocusArea(&endFocusReadDepth) >= 10)
+        // {
+        //     std::cout << e.getSvLength() << std::endl;
+        // }
+        // else
+        // {
+        //     return false;
+        // }
 
         // if (e.getSvLength())
         // if (e.getMaxMapQ() < 40)
@@ -300,11 +335,20 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
-    setFocusReadDepth(e.getPos() + e.getCiPosLeft() - 500, e.getPos() + e.getCiPosRight() + 500, &startFocusReadDepth);
-    setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - 500, e.getEnd() + e.getCiEndRight() + 500, &endFocusReadDepth);
+    // if (e.getPos() != 18185538)
+    // {
+    //     return false;
+    // }
+    setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+    setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
     // setFocusReadDepth(10300, 14300);
 
     // std::cout << "--------" << std::endl;
+    // std::cout << "pos : "
+    // << e.getPos() + e.getCiPosLeft() - configRound
+    // << " end :"
+    // << e.getPos() + e.getCiPosRight() + configRound
+    // << std::endl;
     // for (auto n : focusReadDepth)
     // {
     //     std::cout << n.pos << " rd:" << n.depth << std::endl;
@@ -604,11 +648,6 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
 //         std::cout << "Unable to open file";
 
 // }
-
-int ReadDepthAnalysis::getAvgReadDepth()
-{
-    return avgReadDepth;
-}
 
 void ReadDepthAnalysis::loadAvgReadDepthStat()
 {

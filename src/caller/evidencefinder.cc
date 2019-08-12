@@ -52,7 +52,7 @@ void EvidenceFinder::findEvidence()
 
     ReadDepthDetail readdepthdetail;
     uint32_t coverage = 0;
-    uint32_t configRound = 500;
+    uint32_t configRound = 250;
     uint32_t roundedPos = 0;
     uint32_t roundedCurrentPos = 0;
 
@@ -110,12 +110,14 @@ void EvidenceFinder::findEvidence()
         currentMPos = read->core.mpos + 1;
 
         cigar = readparser.getCigar();
-
-        seDeletion.updateRead();
-        seInsertion.updateRead();
-        seInversion.updateRead();
-        seTandemDuplication.updateRead();
-        seTranslocation.updateRead();
+        // if (readparser.getMapQuality() > 0)
+        // {
+            seDeletion.updateRead();
+            seInsertion.updateRead();
+            seInversion.updateRead();
+            seTandemDuplication.updateRead();
+            seTranslocation.updateRead();
+        // }
 
         // std::cout << readparser.getPosDiscordantRead() << ",preCollectDEL : " << preCollectDEL.size() << ",collectDeletionInfoLists : " << collectDeletionInfoLists.size() << std::endl;
 
@@ -188,7 +190,7 @@ void EvidenceFinder::findEvidence()
     sam_close(inT);
 
     ReadDepthHelper rdh(filepath);
-    rdh.setRange(500);
+    rdh.setRange(250);
     rdh.setReadDepthMap(ReadDepthLineSegment);
     rdh.setTargetChromosome(*target_chromosome);
     rdh.writeReadDepthLineFile(filepath->getReadDepthPath() + "/" + *target_chromosome + ".txt");

@@ -116,6 +116,8 @@ void RefiningDeletion::refineStartToEnd(const char *range)
     // std::cout << "positionStartReference : " << positionStartReference << std::endl;
 
     bool SCRead;
+    int32_t SCsize = 0;
+    int32_t AlterSCsize = 0;
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -128,11 +130,13 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         //             continue;
         //         }
         std::string fullRead = readparser.getSequence();
+        AlterSCsize = 0;
         // optimize read
         std::vector<StringSearch::Score> result;
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
         {
+            SCsize = 0;
             // if (evidence.getSvLength()<250) {
             //     continue;
             // }
@@ -165,14 +169,21 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 continue;
             }
 
-            if (cigar.at(cigar.size() - 1).getLength() < 4)
+            SCsize = cigar.at(cigar.size() - 1).getLength();
+            if (SCsize <= 2)
             {
                 continue;
             }
 
+            if (cigar.at(0).getOperatorName() == 'S')
+            {
+                AlterSCsize = cigar.at(0).getLength();
+            }
+
             StringSearchConfig ssc;
-             ssc.setAllowMissMatch(2);
+            ssc.setAllowMissMatch(2);
             ssc.setMaxContinueMissMatch(1);
+            ssc.setMaxAllowAlign(SCsize);
             result = ssa.alignDeletionTargetAtStart(&fullRead, &ssc);
 
             SCRead = true;
@@ -203,7 +214,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount + 1 < cigar.at(0).getLength())
+                // if (n.matchCount < cigar.at(0).getLength())
                 // {
                 //     continue;
                 // }
@@ -238,6 +249,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             int32_t mPos = n.posseq + readparser.getPosOfSeq();
             int32_t mEnd = n.pos;
 
+            if (mEnd - mPos <= 50)
+            {
+                continue;
+            }
+
             // if (mEnd <= mPos + 2)
             // {
             //     continue;
@@ -253,6 +269,15 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
             listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
             listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+            if (listPosition[std::make_pair(mPos, mEnd)].maxSC < SCsize)
+            {
+                listPosition[std::make_pair(mPos, mEnd)].maxSC = SCsize;
+            }
+            if (listPosition[std::make_pair(mPos, mEnd)].maxAlterSC < AlterSCsize)
+            {
+                listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
+            }
+
             // for (int i = 0; i < rangeMapping; i++)
             // {
 
@@ -323,6 +348,10 @@ void RefiningDeletion::refineEndToStart(const char *range)
     std::vector<ReadParser::Cigar> cigar;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
     bool SCRead = false;
+    int32_t SCsize = 0;
+    int32_t AlterSCsize = 0;
+    
+
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
         if (readparser.isUnmapped())
@@ -333,16 +362,19 @@ void RefiningDeletion::refineEndToStart(const char *range)
         // if (readparser.getMapQuality()<15) {
         //     continue;
         // }
-
+        AlterSCsize = 0;
         std::string fullRead = readparser.getSequence();
         std::vector<StringSearch::Score> result;
 
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
         {
+            SCsize = 0;
+
             //  if (evidence.getSvLength()<250) {
             //     continue;
             // }
+
             if (readparser.getAlignMD().size() <= 1)
             {
                 continue;
@@ -351,7 +383,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             SCRead = false;
 
             StringSearchConfig ssc;
-             ssc.setAllowMissMatch(2);
+            ssc.setAllowMissMatch(2);
             ssc.setMaxContinueMissMatch(1);
 
             result = ssa.alignDeletionTargetAtEnd(&fullRead, &ssc);
@@ -362,15 +394,24 @@ void RefiningDeletion::refineEndToStart(const char *range)
             {
                 continue;
             }
-            if (cigar.at(0).getLength() < 4)
+            SCsize = cigar.at(0).getLength();
+
+            if (SCsize <= 2)
             {
                 continue;
             }
+
+            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S')
+            {
+                AlterSCsize = cigar.at(cigar.size() - 1).getLength();
+            }
+
             SCRead = true;
 
             StringSearchConfig ssc;
-             ssc.setAllowMissMatch(2);
+            ssc.setAllowMissMatch(2);
             ssc.setMaxContinueMissMatch(1);
+            ssc.setMaxAllowAlign(SCsize);
 
             result = ssa.alignDeletionTargetAtEnd(&fullRead, &ssc);
         }
@@ -385,7 +426,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount + 1 < cigar.at(0).getLength())
+                // if (n.matchCount < cigar.at(0).getLength())
                 // {
                 //     continue;
                 // }
@@ -422,10 +463,15 @@ void RefiningDeletion::refineEndToStart(const char *range)
             int32_t mPos = n.end;
             int32_t mEnd = readparser.getPosOfSeq() + n.endseq;
 
-            if (mPos >= mEnd + 2)
+            if (mEnd - mPos <= 50)
             {
                 continue;
             }
+
+            // if (mPos >= mEnd + 2)
+            // {
+            //     continue;
+            // }
             //      std::cout << "> n.pos : " << n.pos << " n.end : " << n.end << std::endl;
             //  std::cout << "mPos : " << mPos << std::endl;
             //  std::cout << "mEnd : " << mEnd << std::endl;
@@ -434,6 +480,15 @@ void RefiningDeletion::refineEndToStart(const char *range)
             listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
             listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(n.endseq);
             listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
+            if (listPosition[std::make_pair(mPos, mEnd)].maxSC < SCsize)
+            {
+                listPosition[std::make_pair(mPos, mEnd)].maxSC = SCsize;
+            }
+
+            if (listPosition[std::make_pair(mPos, mEnd)].maxAlterSC < AlterSCsize)
+            {
+                listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
+            }
 
             // for (int i = 0; i < n.endseq; i++)
             // {

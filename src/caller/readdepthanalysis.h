@@ -15,14 +15,14 @@ private:
     FileManager *filemanager;
     std::string cachechr;
     int avgReadDepthFocus=0;
-    int avgReadDepth=0;
+    int avgReadDepth = 0;
     std::map<int32_t, ReadDepthHelper::ReadDepthVector> mapReadDepthLineSegment;
     // std::vector<ReadDepthHelper::ReadDepthVector> cacheReadDepthFile;
     std::vector<ReadDepthHelper::ReadDepthVector> startFocusReadDepth;
     std::vector<ReadDepthHelper::ReadDepthVector> endFocusReadDepth;
     std::vector<std::string> split(const std::string &s, char delimiter);
     SampleStat *samplestat;
-    uint32_t configRound = 500;
+    uint32_t configRound = 250;
 public:
     ReadDepthAnalysis(FileManager *filemanager);
     int32_t getRound(int32_t x, int32_t max);

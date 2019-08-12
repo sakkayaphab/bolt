@@ -52,7 +52,7 @@ void ReadDepthHelper::writeReadDepthLineFile(std::string path)
     {
         
 
-        if (currentPos+500 < n.pos)
+        if (currentPos+range < n.pos)
         {
             if (n.pos==0) {
                 continue;
@@ -60,7 +60,7 @@ void ReadDepthHelper::writeReadDepthLineFile(std::string path)
 
             for (; currentPos < n.pos;)
             {
-                currentPos += 500;
+                currentPos += range;
                 myfile << currentPos << "\t"
                        << 0 << "\t"
                        << 0 << "\t"

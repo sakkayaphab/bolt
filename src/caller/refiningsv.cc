@@ -312,22 +312,40 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 30)
+        if (maxMatchSize < 25)
         {
             continue;
         }
 
-        bFrequency = x.second.NumberOfMatchRead;
+        if (maxMatchSize> 80) {
+            continue;
+        }
 
+        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped) {
+            continue;
+        }
+
+        bFrequency = x.second.NumberOfMatchRead;
 
         // if (svlength+read>x.first.second-x.first.first)
 
         if (evidence.getSvLength() < 500)
         {
 
-        if (bFrequency<= 2) {
-            continue;
-        }
+            // if (x.second.maxSC < 10)
+            // {
+            //     continue;
+            // }
+
+            if (bFrequency <= 2)
+            {
+                continue;
+            }
+            if (maxQuality == 0)
+            {
+                continue;
+            }
+
             // continue;
             // if (maxQuality<30) {
             //     continue;
@@ -339,6 +357,13 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
         }
         else
         {
+
+            if (bFrequency <= 1)
+            {
+                continue;
+            }
+
+            // continue;
             // if (maxQuality < 10)
             // {
             //     continue;
@@ -356,8 +381,6 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
             //     continue;
             // }
         }
-
-
 
         // if (maxQuality<15) {
         //     continue;
@@ -383,24 +406,29 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
         //     }
         // }
 
-        if (isMatchRef(evidence.getChr(),x.first.first-1,x.first.first+20-1,evidence.getEndChr(),x.first.second,x.first.second+20)) {
+        if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
+        {
             continue;
         }
 
         // confirm
-        if (isMatchRef(evidence.getChr(),x.first.first-1,x.first.first+20-1,evidence.getEndChr(),x.first.second+1,x.first.second+20+1)) {
+        if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second + 1, x.first.second + 20 + 1))
+        {
             continue;
         }
 
-        if (isMatchRef(evidence.getChr(),x.first.first-1+2,x.first.first+20-1+2,evidence.getEndChr(),x.first.second+2,x.first.second+20+2)) {
+        if (isMatchRef(evidence.getChr(), x.first.first - 1 + 2, x.first.first + 20 - 1 + 2, evidence.getEndChr(), x.first.second + 2, x.first.second + 20 + 2))
+        {
             continue;
         }
 
-        if (isMatchRef(evidence.getChr(),x.first.first+1-20,x.first.first+1,evidence.getEndChr(),x.first.second-20,x.first.second)) {
+        if (isMatchRef(evidence.getChr(), x.first.first + 1 - 20, x.first.first + 1, evidence.getEndChr(), x.first.second - 20, x.first.second))
+        {
             continue;
         }
 
-        if (isMatchRef(evidence.getChr(),x.first.first+2-20,x.first.first+1+2,evidence.getEndChr(),x.first.second+20+2,x.first.second+2)) {
+        if (isMatchRef(evidence.getChr(), x.first.first + 2 - 20, x.first.first + 1 + 2, evidence.getEndChr(), x.first.second + 20 + 2, x.first.second + 2))
+        {
             continue;
         }
 

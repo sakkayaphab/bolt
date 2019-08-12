@@ -46,35 +46,35 @@ bool VariantResultFilter::passFilterSV(Evidence *variantresult)
 
 bool VariantResultFilter::passFilterDeletion(Evidence *variantresult)
 {
-    if (variantresult->getEnd() - variantresult->getPos() < 20)
-    {
-        return false;
-    }
+    // if (variantresult->getEnd() - variantresult->getPos() < 20)
+    // {
+    //     return false;
+    // }
 
-    if (variantresult->getEnd() - variantresult->getPos() > 50000)
-    {
-        return false;
-    }
+    // if (variantresult->getEnd() - variantresult->getPos() > 50000)
+    // {
+    //     return false;
+    // }
 
-    if (variantresult->getSvLength() < 1000)
-    {
-        // if (variantresult->getMaxMapQ() == 0)
-        // {
-        //     return false;
-        // }
+    // if (variantresult->getSvLength() < 1000)
+    // {
+    //     // if (variantresult->getMaxMapQ() == 0)
+    //     // {
+    //     //     return false;
+    //     // }
 
-        // if (variantresult->getM() < 3)
-        // {
-        //     return false;
-        // }
+    //     // if (variantresult->getM() < 3)
+    //     // {
+    //     //     return false;
+    //     // }
 
-        // if (variantresult->LNGMATCH>100) {
-        //     return false;
-        // }
-    }
-    else
-    {
-    }
+    //     // if (variantresult->LNGMATCH>100) {
+    //     //     return false;
+    //     // }
+    // }
+    // else
+    // {
+    // }
 
     // if (variantresult->getFrequency() > 40)
     // {

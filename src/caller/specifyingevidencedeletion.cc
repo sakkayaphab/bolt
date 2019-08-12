@@ -116,7 +116,7 @@ void SpecifyingEvidenceDeletion::checkRange()
     // }
     // else if (getSVLength() >= 2000)
     // {
-        added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    added = incrementSVFreq(merge, merge, currentPos, currentMPos);
     // }
 
     // int positionOverlapped = findOverlapped(2000, currentPos, currentMPos);
@@ -258,7 +258,7 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = ((evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = ((evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 20000)
+    if (difflengthEnd > 500000)
     {
         std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
         return;
@@ -335,12 +335,18 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
+    
+
+    if (svLength>20000) {
+        return false;
+    }
+
     if (svLength < 500)
     {
-        if (evidence->getMaxMapQ() == 0)
-        {
-            return false;
-        }
+        // if (evidence->getMaxMapQ() < 15)
+        // {
+        //     return false;
+        // }
 
         if (evidence->getFrequency() <= 2)
         {
@@ -348,6 +354,14 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
         }
 
         // return false;
+    } else {
+        // return false;
+        if (evidence->getFrequency() <= 1)
+        {
+            return false;
+        }
+
+    //    return false;
     }
 
     // int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead();
