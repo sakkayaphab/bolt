@@ -16,6 +16,7 @@ private:
 public:
   RefiningTranslocation();
   void execute();
+  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
 };
 
 #endif

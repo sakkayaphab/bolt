@@ -241,7 +241,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }
@@ -321,7 +321,7 @@ void Caller::mergeReadDepthFile()
 
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "INV")
+            if (svtype != "DUP")
             {
                 continue;
             }
@@ -483,7 +483,6 @@ int Caller::findBreakPoint()
         }
         else if (thisEvidence.getVariantType() == "BND")
         {
-
             RefiningTranslocation rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
@@ -492,7 +491,7 @@ int Caller::findBreakPoint()
             rfd.setFastaReader(fastaReader);
             rfd.execute();
             variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            std::cout << variantresult.getResultVcfFormatString() << std::endl;
         }
 
         VariantResultFilter vrf;

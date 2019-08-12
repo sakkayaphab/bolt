@@ -2,7 +2,7 @@
 #define CONFIGURATION_H
 
 #include "configuration.h"
-
+#include <stdint.h>
 class Configuration
 {
 private:

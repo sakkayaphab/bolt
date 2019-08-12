@@ -244,19 +244,19 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     int32_t lastEnd = 0;
     int32_t avgEnd = 0;
     // int32_t svlength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
-    if (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead() < 0)
-    {
-        std::cout << "getLastPosDiscordantRead" << std::endl;
-        std::cout << evidence->getLastPosDiscordantRead() << " == " << evidence->getPosDiscordantRead() << std::endl;
-    }
-    if (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead() < 0)
-    {
-        std::cout << "getLastEndDiscordantRead" << std::endl;
-        std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
-    }
+    // if (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead() < 0)
+    // {
+    //     std::cout << "getLastPosDiscordantRead" << std::endl;
+    //     std::cout << evidence->getLastPosDiscordantRead() << " == " << evidence->getPosDiscordantRead() << std::endl;
+    // }
+    // if (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead() < 0)
+    // {
+    //     std::cout << "getLastEndDiscordantRead" << std::endl;
+    //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
+    // }
 
-    int32_t difflengthPos = ((evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = ((evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead()) / 2) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
     if (difflengthEnd > 500000)
     {

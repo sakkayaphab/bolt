@@ -1,5 +1,5 @@
-#ifndef DEFINITIONEVIDENCEDELETION_H
-#define DEFINITIONEVIDENCEDELETION_H
+#ifndef SPECIFYINGEVIDENCEDELETION_H
+#define SPECIFYINGEVIDENCEDELETION_H
 #include "specifyingevidence.h"
 #include "evidence.h"
 

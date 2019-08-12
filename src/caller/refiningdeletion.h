@@ -24,6 +24,7 @@ public:
   ~RefiningDeletion();
   void execute();
   void approximate();
+  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
 };
 
 #endif

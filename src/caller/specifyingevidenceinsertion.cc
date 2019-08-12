@@ -37,6 +37,9 @@ void SpecifyingEvidenceInsertion::updateRead()
     }
 }
 
+
+
+
 void SpecifyingEvidenceInsertion::checkRange()
 {
     std::string chr = bam_header->target_name[read->core.tid];

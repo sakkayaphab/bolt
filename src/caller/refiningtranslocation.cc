@@ -52,16 +52,14 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
                                                             positionEndReference);
     replaceSeqToUppercase(&seqrefString);
     // const char *seqC = seqrefString.c_str();
-    std::cout << "ref pos : " << positionStartReference
-              << " ref end : " << evidence.getEnd() + evidence.getCiEndRight() << std::endl;
-    std::cout << seqrefString << std::endl;
+    // std::cout << "ref pos : " << positionStartReference
+    //           << " ref end : " << evidence.getEnd() + evidence.getCiEndRight() << std::endl;
+    // std::cout << seqrefString << std::endl;
 
     std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
     std::map<int32_t, int> SCReadLists;
 
-
-
-         StringSearchAlignment ssa;
+    StringSearchAlignment ssa;
     ssa.setReference(seqrefString);
     ssa.setSVType("TRASTART");
     ssa.setPosReference(positionStartReference);
@@ -80,18 +78,17 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
         //     // continue;
         // }
 
-        if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        // if (true)
+        // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
+        if (cigar.at(0).getOperatorName() == 'S')
         {
             // continue;
             std::string fullRead = readparser.getSequence();
 
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtStart(&fullRead);
             StringSearchConfig ssc;
-            std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead,&ssc);
+            std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
             for (auto n : result)
             {
-               
 
                 int32_t mPos = n.endseq + readparser.getPosOfSeq();
                 int32_t mEnd = n.end;
@@ -101,36 +98,39 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
                 // std::cout << "pattern : " << n.pattern << std::endl;
                 auto rangeMapping = n.endseq;
 
-                for (int i = 0; i < rangeMapping; i++)
-                {
-                    int32_t tempPos = mPos - i;
-                    int32_t tempEnd = mEnd - i;
+                listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+                    listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+                    listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-                    if (i > rangeMapping - 6)
-                    {
-                        break;
-                    }
+                // for (int i = 0; i < rangeMapping; i++)
+                // {
+                //     int32_t tempPos = mPos - i;
+                //     int32_t tempEnd = mEnd - i;
 
-                    listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                    listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                    listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                }
+                //     if (i > rangeMapping - 6)
+                //     {
+                //         break;
+                //     }
+
+                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
+                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+                // }
             }
         }
         else if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
         //  if (true)
         {
-            continue;
+            // continue;
             std::string fullRead = readparser.getSequence();
             // std::cout << "-------------" << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignTranslocationTargetAtStartSCE(&fullRead);
             StringSearchConfig ssc;
-             std::vector<StringSearch::Score> result = ssa.alignTranslocationTargetAtStartSCE(&fullRead,&ssc);
+            std::vector<StringSearch::Score> result = ssa.alignTranslocationTargetAtStartSCE(&fullRead, &ssc);
             // result = alignment.alignTranslocationTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
-
 
                 int32_t mPos = n.posseq + readparser.getPosOfSeq();
                 int32_t mEnd = n.pos;
@@ -143,30 +143,106 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
 
                 auto rangeMapping = n.endseq - n.posseq;
 
-                for (int i = 0; i < rangeMapping; i++)
-                {
-                    int32_t tempPos = mPos + i;
-                    int32_t tempEnd = mEnd + i;
+                listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+                listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+                listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-                    if (i > rangeMapping - 6)
-                    {
-                        break;
-                    }
+                // for (int i = 0; i < rangeMapping; i++)
+                // {
+                //     int32_t tempPos = mPos + i;
+                //     int32_t tempEnd = mEnd + i;
 
-                    listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                    listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                    listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                    // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                    // {
-                    //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                    // }
-                }
+                //     if (i > rangeMapping - 6)
+                //     {
+                //         break;
+                //     }
+
+                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
+                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+                //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+                //     // {
+                //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+                //     // }
+                // }
             }
         }
     }
 
-    calculateFinalBreakpoint(&listPosition);
+    RefiningTranslocation::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
+}
+
+
+void RefiningTranslocation::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+{
+
+    int32_t bPos = 0;
+    int32_t bEnd = 0;
+    int32_t bHit = 0;
+    uint8_t bMaxQuality = 0;
+    int bMaxMatchSize = 0;
+    int bFrequency = 0;
+    std::vector<uint8_t> bMapQList;
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    // std::cout << "svlength :" << svlength << std::endl;
+    int lastscore = 0;
+
+    for (auto const &x : *listPosition)
+    {
+        int maxMatchSize = getMaxIntFromVector(x.second.MatchLists);
+
+        uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
+
+        if (maxMatchSize < 25)
+        {
+            continue;
+        }
+        // std::cout << "maxMatchSize : " << maxMatchSize << std::endl;
+        if (maxMatchSize > 80)
+        {
+            continue;
+        }
+
+        if (maxQuality == 0)
+        {
+            continue;
+        }
+
+        int number = x.second.NumberOfMatchRead;
+
+        int score = (number) * (2 * maxMatchSize);
+
+        if (score > lastscore)
+        {
+            lastscore = score;
+            bPos = x.first.first;
+            bEnd = x.first.second;
+            bHit = number;
+            bMaxMatchSize = maxMatchSize;
+            bMapQList = x.second.MapQLists;
+        }
+    }
+
+    variantresult.setPos(bPos);
+    variantresult.setEnd(bEnd);
+    variantresult.setFrequency(bHit);
+    variantresult.setMapQList(bMapQList);
+    variantresult.setChr(evidence.getChr());
+    variantresult.setEndChr(evidence.getEndChr());
+    variantresult.LNGMATCH = bMaxMatchSize;
+
+    if (bPos == 0)
+    {
+        return;
+    }
+
+    if (bEnd == 0)
+    {
+        return;
+    }
+
+    variantresult.setQuailtyPass(true);
 }

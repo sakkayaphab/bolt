@@ -41,6 +41,11 @@ bool VariantResultFilter::passFilterSV(Evidence *variantresult)
         return passFilterTandemDuplication(variantresult);
     }
 
+    if (variantresult->getVariantType() == "BND")
+    {
+        return passFilterTranslocation(variantresult);
+    }
+
     return false;
 }
 
@@ -96,15 +101,15 @@ bool VariantResultFilter::passFilterDeletion(Evidence *variantresult)
 
 bool VariantResultFilter::passFilterTandemDuplication(Evidence *variantresult)
 {
-    if (variantresult->getFrequency() < 8)
-    {
-        return false;
-    }
+    // if (variantresult->getFrequency() < 8)
+    // {
+    //     return false;
+    // }
 
-    if (variantresult->getMaxMapQ() < 40)
-    {
-        return false;
-    }
+    // if (variantresult->getMaxMapQ() < 40)
+    // {
+    //     return false;
+    // }
 
     return true;
 }
@@ -121,15 +126,15 @@ bool VariantResultFilter::passFilterInsertion(Evidence *variantresult)
 
 bool VariantResultFilter::passFilterInversion(Evidence *variantresult)
 {
-    if (variantresult->getMaxMapQ() < 10)
-    {
-        return false;
-    }
+    // if (variantresult->getMaxMapQ() < 10)
+    // {
+    //     return false;
+    // }
 
-    if (variantresult->getFrequency() < 3)
-    {
-        return false;
-    }
+    // if (variantresult->getFrequency() < 3)
+    // {
+    //     return false;
+    // }
 
     return true;
 }

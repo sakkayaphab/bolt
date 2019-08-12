@@ -303,7 +303,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         }
     }
 
-    calculateFinalBreakpoint(&listPosition);
+    RefiningDeletion::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
@@ -517,7 +517,151 @@ void RefiningDeletion::refineEndToStart(const char *range)
         }
     }
 
-    calculateFinalBreakpoint(&listPosition);
+    RefiningDeletion::calculateFinalBreakpoint(&listPosition);
     hts_itr_destroy(iter);
     return;
+}
+
+
+
+void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+{
+
+    int32_t bPos = 0;
+    int32_t bEnd = 0;
+    int32_t bHit = 0;
+    uint8_t bMaxQuality = 0;
+    int bMaxMatchSize = 0;
+    int bFrequency = 0;
+    std::vector<uint8_t> bMapQList;
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    // std::cout << "svlength :" << svlength << std::endl;
+    int lastscore = 0;
+
+    for (auto const &x : *listPosition)
+    {
+        int maxMatchSize = getMaxIntFromVector(x.second.MatchLists);
+
+        uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
+
+        if (maxMatchSize < 25)
+        {
+            continue;
+        }
+
+        if (maxMatchSize> 80) {
+            continue;
+        }
+
+        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped) {
+            continue;
+        }
+
+        bFrequency = x.second.NumberOfMatchRead;
+
+        if (evidence.getSvLength() < 500)
+        {
+            if (bFrequency <= 2)
+            {
+                continue;
+            }
+            if (maxQuality == 0)
+            {
+                continue;
+            }
+        }
+        else
+        {
+
+            if (bFrequency <= 1)
+            {
+                continue;
+            }
+        }
+
+
+        if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
+        {
+            continue;
+        }
+
+        // confirm
+        if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second + 1, x.first.second + 20 + 1))
+        {
+            continue;
+        }
+
+        if (isMatchRef(evidence.getChr(), x.first.first - 1 + 2, x.first.first + 20 - 1 + 2, evidence.getEndChr(), x.first.second + 2, x.first.second + 20 + 2))
+        {
+            continue;
+        }
+
+        if (isMatchRef(evidence.getChr(), x.first.first + 1 - 20, x.first.first + 1, evidence.getEndChr(), x.first.second - 20, x.first.second))
+        {
+            continue;
+        }
+
+        if (isMatchRef(evidence.getChr(), x.first.first + 2 - 20, x.first.first + 1 + 2, evidence.getEndChr(), x.first.second + 20 + 2, x.first.second + 2))
+        {
+            continue;
+        }
+
+        int number = x.second.NumberOfMatchRead;
+
+        int score = (number) * (2 * maxMatchSize);
+
+        if (score > lastscore)
+        {
+            lastscore = score;
+            bPos = x.first.first;
+            bEnd = x.first.second;
+            bHit = number;
+            bMaxMatchSize = maxMatchSize;
+            bMapQList = x.second.MapQLists;
+        }
+    }
+
+    variantresult.setPos(bPos);
+    variantresult.setEnd(bEnd);
+    variantresult.setFrequency(bHit);
+    variantresult.setMapQList(bMapQList);
+    variantresult.setChr(evidence.getChr());
+    variantresult.setEndChr(evidence.getEndChr());
+    variantresult.LNGMATCH = bMaxMatchSize;
+
+    if (bPos == 0)
+    {
+        return;
+    }
+    if (bEnd == 0)
+    {
+        return;
+    }
+
+    if (variantresult.getVariantType() == "DEL")
+    {
+        if (bPos == 0)
+        {
+            return;
+        }
+        if (bEnd == 0)
+        {
+            return;
+        }
+
+        if (bEnd - bPos > 50000)
+        {
+            return;
+        }
+
+        if (bEnd - bPos < 0)
+        {
+            return;
+        }
+
+        variantresult.setQuailtyPass(true);
+        return;
+    }
+
+    variantresult.setQuailtyPass(false);
 }

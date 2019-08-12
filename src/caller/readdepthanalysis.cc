@@ -112,8 +112,6 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         return false;
     }
 
-    // if ()
-
     if (e.getMaxMapQ() == 0)
     {
         return false;
@@ -372,6 +370,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INS")
     {
+        // return filterIns
 
         if (e.getComment() == "MATEUNMAPPED")
         {
@@ -450,20 +449,20 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     if (e.getVariantType() == "DUP")
     {
 
-        if (e.getSvLength() < 1500)
-        {
-            if (e.getMaxMapQ() < 30)
-            {
-                return false;
-            }
+        // if (e.getSvLength() < 1500)
+        // {
+        //     if (e.getMaxMapQ() < 30)
+        //     {
+        //         return false;
+        //     }
 
-            if (e.getFrequency() < 2)
-            {
-                return false;
-            }
+        //     if (e.getFrequency() < 2)
+        //     {
+        //         return false;
+        //     }
 
-            return true;
-        }
+        //     return true;
+        // }
 
         //    if (focusReadDepth.size() > 3)
         //     {
@@ -503,10 +502,10 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         //     return false;
         // }
 
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500)
-        {
-            return false;
-        }
+        // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500)
+        // {
+        //     return false;
+        // }
 
         return true;
     }

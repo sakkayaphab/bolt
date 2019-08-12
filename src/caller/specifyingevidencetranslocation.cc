@@ -29,14 +29,17 @@ void SpecifyingEvidenceTranslocation::updateRead()
     checkRange();
 }
 
-void SpecifyingEvidenceTranslocation::checkRange()
+bool SpecifyingEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added;
-
-    int positionOverlapped = findOverlapped(2000, currentPos, currentMPos);
-    if (positionOverlapped >= 0)
+    for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
-        preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
+        if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos) && checkBetween(mpos,
+                                                                                                                         preCollectSV.at(positionOverlapped).getEndDiscordantRead(),
+                                                                                                                         overlappedsvlength))
+        {
+
+            preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
 
         if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
         {
@@ -56,7 +59,42 @@ void SpecifyingEvidenceTranslocation::checkRange()
         preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
         added = true;
         preCollectSV.at(positionOverlapped).incrementFrequency();
+        }
     }
+
+    return added;
+}
+
+void SpecifyingEvidenceTranslocation::checkRange()
+{
+    bool added;
+     int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+
+    // int positionOverlapped = findOverlapped(2000, currentPos, currentMPos);
+    // if (positionOverlapped >= 0)
+    // {
+    //     preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
+
+    //     if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
+    //     }
+
+    //     if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
+    //     }
+
+    //     if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
+    //     {
+    //         preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
+    //     }
+
+    //     preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+    //     added = true;
+    //     preCollectSV.at(positionOverlapped).incrementFrequency();
+    // }
 
     checkProveEvidence();
 
@@ -88,7 +126,8 @@ void SpecifyingEvidenceTranslocation::checkRange()
 
 void SpecifyingEvidenceTranslocation::proveEvidence(int index)
 {
-    if (currentPos - 1000 > preCollectSV.at(index).getPosDiscordantRead())
+     int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
         {
@@ -108,22 +147,99 @@ void SpecifyingEvidenceTranslocation::proveEvidence(int index)
 
 void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
 {
-    int32_t lastPosDis = evidence->getLastPosDiscordantRead();
-    int32_t posDis = evidence->getPosDiscordantRead();
-    int32_t firstPos = lastPosDis - (samplestat->getReadLength() * 4) - ((lastPosDis - posDis) / 2);
-    int32_t lastPos = lastPosDis + (samplestat->getReadLength() * 4) + samplestat->getSDSampleStat();
-    int32_t avgPos = (firstPos + lastPos) / 2;
-    evidence->setPos(avgPos);
-    evidence->setCiPosLeft(firstPos - avgPos);
-    evidence->setCiPosRight(lastPos - avgPos);
+     int32_t firstPos = 0;
+    int32_t lastPos = 0;
+    int32_t avgPos = 0;
+    int32_t firstEndDis = 0;
+    int32_t firstEnd = 0;
+    int32_t lastEnd = 0;
+    int32_t avgEnd = 0;
+    // int32_t svlength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    // if (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead() < 0)
+    // {
+    //     std::cout << "getLastPosDiscordantRead" << std::endl;
+    //     std::cout << evidence->getLastPosDiscordantRead() << " == " << evidence->getPosDiscordantRead() << std::endl;
+    // }
+    // if (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead() < 0)
+    // {
+    //     std::cout << "getLastEndDiscordantRead" << std::endl;
+    //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
+    // }
 
-    int32_t firstEndDis = evidence->getEndDiscordantRead();
-    int32_t firstEnd = firstEndDis - (samplestat->getReadLength() * 4) - 300;
-    int32_t lastEnd = firstEndDis + (samplestat->getReadLength() * 4);
-    int32_t avgEnd = (firstEnd + lastEnd) / 2;
-    evidence->setEnd(avgEnd);
-    evidence->setCiEndLeft(firstEnd - avgEnd);
-    evidence->setCiEndRight(lastEnd - avgEnd);
+    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+
+    if (difflengthEnd > 500000)
+    {
+        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+        return;
+    }
+    // int32_t difflengthPos =
+    // int32_t difflengthEnd =
+
+    int32_t merge = 0;
+    // merge = svlength + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength()*2);
+    firstPos = evidence->getLastPosDiscordantRead();
+    lastPos = evidence->getLastPosDiscordantRead();
+    firstEnd = evidence->getEndDiscordantRead();
+    lastEnd = evidence->getEndDiscordantRead();
+
+    // if (svlength < 500)
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 1) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 1) + samplestat->getSDSampleStat();
+
+    // // return
+    // }
+    // else if (svlength < 1000)
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 3) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 3) - samplestat->getSDSampleStat();
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
+    //     return;
+    // }
+    // else
+    // {
+    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 4) - samplestat->getSDSampleStat();
+    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 8) + samplestat->getSDSampleStat();
+    //     firstEndDis = evidence->getEndDiscordantRead();
+    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 8);
+    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 4);
+    //      return;
+    // }
+
+    // if (lastPos > firstEnd)
+    // {
+    //     lastPos = firstEndDis;
+    // }
+
+    // if (firstEnd < lastPos)
+    // {
+    //     firstEnd = evidence->getLastPosDiscordantRead();
+    // }
+
+    // avgPos = (firstPos + lastPos) / 2;
+    // avgEnd = (firstEnd + lastEnd) / 2;
+    // evidence->setPos(avgPos);
+    // evidence->setCiPosLeft(firstPos - avgPos);
+    // evidence->setCiPosRight(lastPos - avgPos);
+    // evidence->setEnd(avgEnd);
+    // evidence->setCiEndLeft(firstEnd - avgEnd);
+    // evidence->setCiEndRight(lastEnd - avgEnd);
+
+    // avgPos = (firstPos + lastPos) / 2;
+    // avgEnd = (firstEnd + lastEnd) / 2;
+    evidence->setPos(lastPos);
+    evidence->setCiPosLeft(-difflengthPos);
+    evidence->setCiPosRight(difflengthPos);
+    evidence->setEnd(firstEnd);
+    evidence->setCiEndLeft(-difflengthEnd);
+    evidence->setCiEndRight(difflengthEnd);
 }
 
 bool SpecifyingEvidenceTranslocation::filterEvidence(Evidence *evidence)

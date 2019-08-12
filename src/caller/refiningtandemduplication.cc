@@ -63,10 +63,11 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
     // Alignment alignment(&seqrefString);
     // alignment.genarateMatrix("DUPSTART");
     // alignment.setPosReference(positionStartReference);
-    if (seqrefString.size()<50) {
+    if (seqrefString.size() < 50)
+    {
         return;
     }
-    
+
     StringSearchAlignment ssa;
     ssa.setReference(seqrefString);
     ssa.setSVType("DUPSTART");
@@ -82,12 +83,15 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             continue;
         }
 
-
         auto cigar = readparser.getCigar();
         // if (!cigar.size() == 2)
         // {
         //     continue;
         // }
+        if (!(cigar.at(0).getOperatorName() == 'S'))
+        {
+            continue;
+        }
 
         // if (!(cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
         // {
@@ -112,7 +116,7 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtStart(&fullRead);
         StringSearchConfig ssc;
-        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead,&ssc);
+        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
         for (auto n : result)
         {
             if (n.matchCount <= 8)
@@ -123,12 +127,11 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             int32_t mPos = n.endseq + readparser.getPosOfSeq();
             int32_t mEnd = n.end;
 
-            if (mEnd <= mPos+2)
+            if (mEnd <= mPos + 2)
             {
                 continue;
             }
 
-        
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd << std::endl;
             // std::cout << "pattern : " << n.pattern << std::endl;
@@ -136,29 +139,32 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             // std::cout << "---------- MD TAG ----------" << std::endl;
 
             auto rangeMapping = n.endseq;
+            listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+            listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+            listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-            for (int i = 0; i < rangeMapping; i++)
-            {
-                int32_t tempPos = mPos - i;
-                int32_t tempEnd = mEnd - i;
+            // for (int i = 0; i < rangeMapping; i++)
+            // {
+            //     int32_t tempPos = mPos - i;
+            //     int32_t tempEnd = mEnd - i;
 
-                if (i > 4)
-                {
-                    break;
-                }
+            //     if (i > 4)
+            //     {
+            //         break;
+            //     }
 
-                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                // {
-                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                // }
-            }
+            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+            //     // {
+            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+            //     // }
+            // }
         }
     }
 
-    calculateFinalBreakpoint(&listPosition);
+    RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
@@ -191,9 +197,9 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
                                                             positionStartReference,
                                                             positionEndReference);
     replaceSeqToUppercase(&seqrefString);
-    std::cout << "ref pos : " << positionStartReference
-              << " ref end : " << positionEndReference << std::endl;
-    std::cout << seqrefString << std::endl;
+    // std::cout << "ref pos : " << positionStartReference
+    //           << " ref end : " << positionEndReference << std::endl;
+    // std::cout << seqrefString << std::endl;
 
     std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
     std::map<int32_t, int> SCReadLists;
@@ -201,7 +207,8 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     //  Alignment alignment(&seqrefString);
     // alignment.genarateMatrix("DUPEND");
     // alignment.setPosReference(positionStartReference);
-    if (seqrefString.size()<50) {
+    if (seqrefString.size() < 50)
+    {
         return;
     }
     StringSearchAlignment ssa;
@@ -212,7 +219,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     std::cout << positionStartReference << " / " << positionEndReference << std::endl;
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
-        
+
         if (readparser.isUnmapped())
         {
             continue;
@@ -223,7 +230,10 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         // {
         //     continue;
         // }
-
+        if (!(cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
+        {
+            continue;
+        }
         // if (!(cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
         // {
         //     continue;
@@ -237,7 +247,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtEnd(&fullRead);
         StringSearchConfig ssc;
-        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead,&ssc);
+        std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead, &ssc);
         for (auto n : result)
         {
             if (n.matchCount <= 8)
@@ -252,7 +262,6 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
             {
                 continue;
             }
-            
 
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd << std::endl;
@@ -261,30 +270,113 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
             // std::cout << "---------- MD TAG ----------" << std::endl;
 
             auto rangeMapping = n.endseq - n.posseq;
+            listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
+            listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
+            listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-            for (int i = 0; i < rangeMapping; i++)
-            {
-                int32_t tempPos = mPos + i;
-                int32_t tempEnd = mEnd + i;
+            // for (int i = 0; i < rangeMapping; i++)
+            // {
+            //     int32_t tempPos = mPos + i;
+            //     int32_t tempEnd = mEnd + i;
 
-                if (i < 10)
-                {
-                    break;
-                }
+            //     if (i < 10)
+            //     {
+            //         break;
+            //     }
 
-                listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                // {
-                //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                // }
-            }
+            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
+            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
+            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
+            //     // {
+            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
+            //     // }
+            // }
         }
     }
 
-    calculateFinalBreakpoint(&listPosition);
+    RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
     std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
+}
+
+void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+{
+
+    int32_t bPos = 0;
+    int32_t bEnd = 0;
+    int32_t bHit = 0;
+    uint8_t bMaxQuality = 0;
+    int bMaxMatchSize = 0;
+    int bFrequency = 0;
+    std::vector<uint8_t> bMapQList;
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    // std::cout << "svlength :" << svlength << std::endl;
+    int lastscore = 0;
+
+    for (auto const &x : *listPosition)
+    {
+        int maxMatchSize = getMaxIntFromVector(x.second.MatchLists);
+
+        uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
+
+        if (maxMatchSize < 25)
+        {
+            continue;
+        }
+
+        if (maxMatchSize > 80)
+        {
+            continue;
+        }
+
+        if (maxQuality == 0)
+        {
+            continue;
+        }
+
+        int number = x.second.NumberOfMatchRead;
+
+        int score = (number) * (2 * maxMatchSize);
+
+        if (score > lastscore)
+        {
+            lastscore = score;
+            bPos = x.first.first;
+            bEnd = x.first.second;
+            bHit = number;
+            bMaxMatchSize = maxMatchSize;
+            bMapQList = x.second.MapQLists;
+        }
+    }
+
+    variantresult.setPos(bPos);
+    variantresult.setEnd(bEnd);
+    variantresult.setFrequency(bHit);
+    variantresult.setMapQList(bMapQList);
+    variantresult.setChr(evidence.getChr());
+    variantresult.setEndChr(evidence.getEndChr());
+    variantresult.LNGMATCH = bMaxMatchSize;
+
+    if (bPos == 0)
+    {
+        return;
+    }
+    if (bEnd == 0)
+    {
+        return;
+    }
+
+    if (bEnd - bPos > 50000)
+    {
+        return;
+    }
+
+    if (bEnd - bPos <= 0)
+    {
+        return;
+    }
+
+    variantresult.setQuailtyPass(true);
 }
