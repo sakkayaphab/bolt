@@ -161,13 +161,13 @@ int Cli::debug()
     // std::string sample = "/home/sakkayaphab/kan/sample/G2223.remdup.uniqMap.TS.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/hx1f4s4full_3rdfixedv2.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
-    // std::string sample = "/home/sakkayaphab/kan/sample/NA12878_S1.bam";
+    std::string sample = "/home/sakkayaphab/kan/sample/NA12878_S1.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/G5091.bam";
     
     // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
     // std::string sample = "/home/sakkayaphab/kan/sra/sratoolkit.2.9.6-centos_linux64/bin/SRR390728.bam";
-    std::string sample = "/home/sakkayaphab/kan/wgsim/survi.20x.bam";
+    // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.20x.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.50x.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.100x.bam";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly19.fasta";
@@ -191,6 +191,8 @@ int Cli::debug()
     // caller.execute();
     caller.catfile();
     caller.findBreakPoint();
+    caller.refineDelpthBlock();
+    
     // caller.mergeBreakpoint();
 
     // caller.debugEvidenceProvider();

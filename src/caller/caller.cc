@@ -21,12 +21,13 @@
 #include <unistd.h>
 #include <mutex>
 #include <iostream>
-#include "evidencefilter.h"
 #include <dirent.h>
 #include "variantresultfilter.h"
 #include <tbb/tbb.h>
 #include "readdepthhelper.h"
 #include "readdepthanalysis.h"
+#include "refinedepthblock.h"
+#include "depthblockfile.h"
 
 Caller::~Caller()
 {
@@ -193,6 +194,16 @@ void Caller::execute()
     }
 }
 
+void Caller::refineDelpthBlock() {
+    RefineDepthBlock rdb;
+    rdb.setFileManager(&filepath);
+    // rdb.filemanager = filepath;
+    rdb.execute();
+
+
+    
+}
+
 void Caller::catEvidenceFile()
 {
     std::vector<std::string> evidenceFilePathLists;
@@ -241,7 +252,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DUP")
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -321,7 +332,7 @@ void Caller::mergeReadDepthFile()
 
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DUP")
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -365,15 +376,16 @@ void Caller::catfile()
 int Caller::writeFile(Evidence vr)
 {
     std::ofstream myfile;
-    myfile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
+    myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() +"."+vr.getVariantType()+".vcf", std::ios_base::app);
     // if (vr.getVariantType()=="DEL") {
     // myfile.open(filepath.getEvidencePath() + "/" + vr.getChromosome() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
-    // std::cout << filepath.getOutputPath() + "/result.vcf" << std::endl;
+    std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() +"."+vr.getVariantType()+".vcf" << std::endl;
     // }else {
     //     return 0;
     // }
     vr.setID("BOLT" + std::to_string(vcfIdNumber));
     myfile << vr.getResultVcfFormatString() << std::endl;
+    //  std::cout << "mapq : " << vr.getMapQVector()->size() << vr.convertMapQlistToCommaString() << std::endl;
     vcfIdNumber++;
     myfile.close();
     return 0;

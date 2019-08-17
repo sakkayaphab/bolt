@@ -136,6 +136,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
         {
+            continue;
             SCsize = 0;
             // if (evidence.getSvLength()<250) {
             //     continue;
@@ -249,7 +250,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             int32_t mPos = n.posseq + readparser.getPosOfSeq();
             int32_t mEnd = n.pos;
 
-            if (mEnd - mPos <= 50)
+            if (mEnd - mPos <= 10)
             {
                 continue;
             }
@@ -350,7 +351,6 @@ void RefiningDeletion::refineEndToStart(const char *range)
     bool SCRead = false;
     int32_t SCsize = 0;
     int32_t AlterSCsize = 0;
-    
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -369,6 +369,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
         cigar = readparser.getCigar();
         if (cigar.size() <= 1)
         {
+            continue;
             SCsize = 0;
 
             //  if (evidence.getSvLength()<250) {
@@ -463,7 +464,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             int32_t mPos = n.end;
             int32_t mEnd = readparser.getPosOfSeq() + n.endseq;
 
-            if (mEnd - mPos <= 50)
+            if (mEnd - mPos <= 10)
             {
                 continue;
             }
@@ -522,8 +523,6 @@ void RefiningDeletion::refineEndToStart(const char *range)
     return;
 }
 
-
-
 void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
 
@@ -536,6 +535,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     std::vector<uint8_t> bMapQList;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
+
     int lastscore = 0;
 
     for (auto const &x : *listPosition)
@@ -549,11 +549,18 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
             continue;
         }
 
-        if (maxMatchSize> 80) {
+        if (maxMatchSize > 80)
+        {
             continue;
         }
 
-        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped) {
+        if (maxQuality == 0)
+        {
+            continue;
+        }
+
+        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped)
+        {
             continue;
         }
 
@@ -562,10 +569,6 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         if (evidence.getSvLength() < 500)
         {
             if (bFrequency <= 2)
-            {
-                continue;
-            }
-            if (maxQuality == 0)
             {
                 continue;
             }
@@ -578,7 +581,6 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
                 continue;
             }
         }
-
 
         if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
         {
@@ -610,6 +612,8 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         int score = (number) * (2 * maxMatchSize);
 
+        
+
         if (score > lastscore)
         {
             lastscore = score;
@@ -621,9 +625,18 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         }
     }
 
+    int CountZeroMapQ = getNumberMapQ(bMapQList,0,0);
+    int CountNotZeroMapQ = getNumberMapQ(bMapQList,1,255);
+
+    // if (CountNotZeroMapQ>=CountZeroMapQ) {
+    //     return;
+    // }
+
+
     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
+
     variantresult.setMapQList(bMapQList);
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -638,30 +651,25 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         return;
     }
 
-    if (variantresult.getVariantType() == "DEL")
+    if (bEnd - bPos > 50000)
     {
-        if (bPos == 0)
-        {
-            return;
-        }
-        if (bEnd == 0)
-        {
-            return;
-        }
-
-        if (bEnd - bPos > 50000)
-        {
-            return;
-        }
-
-        if (bEnd - bPos < 0)
-        {
-            return;
-        }
-
-        variantresult.setQuailtyPass(true);
         return;
     }
 
-    variantresult.setQuailtyPass(false);
+    if (bEnd - bPos < 0)
+    {
+        return;
+    }
+
+    variantresult.setQuailtyPass(true);
+}
+
+int RefiningDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist,uint8_t start,uint8_t end) {
+    int count =0;
+    for (auto n:mapqlist) {
+        if (n>=start && n<= end) {
+            count++;
+        }
+    }
+    return count;
 }

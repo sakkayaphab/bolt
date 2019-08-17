@@ -54,7 +54,7 @@ public:
   //    bool isFoundEvidenceAtEnd() const;
   //
   //    void setFoundEvidenceAtEnd(bool foundEvidenceAtEnd);
-
+  std::string convertMapQlistToCommaString();
 private:
   int32_t ciEndLeft;
   int32_t ciEndRight;
@@ -71,9 +71,8 @@ private:
   };
 
   std::vector<associateRead> associateReadLists;
-  std::vector<uint8_t> mapqlist;
 
-  std::string convertMapQlistToCommaString();
+  
   //    int32_t calculateSDEndAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists);
   //    int calculateNumberOfAbnormalSDAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists,int32_t basediff);
 
@@ -87,7 +86,7 @@ private:
   std::string info;
   uint8_t qual;
   std::string filter;
-  std::vector<uint8_t> mapqList;
+  std::vector<uint8_t> mapqlist;
   std::string comment;
 
 public:

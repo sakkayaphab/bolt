@@ -136,7 +136,6 @@ void SpecifyingEvidence::setMaxRemainBufferWriteEvidenceFile(int32_t bufferWrite
     SpecifyingEvidence::maxRemainBufferWriteEvidenceFile = bufferWriteEvidenceFile;
 }
 
-
 void SpecifyingEvidence::writeBufferEvidenceFile()
 {
     if (finalEvidence.size() > getMaxRemainBufferWriteEvidenceFile())

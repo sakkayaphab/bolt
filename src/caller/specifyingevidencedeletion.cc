@@ -10,6 +10,10 @@ void SpecifyingEvidenceDeletion::updateRead()
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
 
+    // if (readparser.getMapQuality()==0) {
+    //     return;
+    // }
+
     // if (!readparser.isPairOnSameChromosome())
     // {
     //     return;
@@ -224,6 +228,7 @@ void SpecifyingEvidenceDeletion::proveEvidence(int index)
             }
 
             preCollectSV.erase(preCollectSV.begin() + index);
+            // removeDuplicateFinalEvidence();
             writeBufferEvidenceFile();
         }
         else
@@ -232,6 +237,36 @@ void SpecifyingEvidenceDeletion::proveEvidence(int index)
         }
     }
 }
+
+void SpecifyingEvidenceDeletion::removeDuplicateFinalEvidence() {
+    int number = 0;
+    std::vector<Evidence> tempEvidence;
+    for (auto n:finalEvidence) {
+        bool found;
+        for (auto m:finalEvidence) {
+            if (n.getPosDiscordantRead()==m.getPosDiscordantRead()) {
+                continue;
+            }
+
+            if (n.getPosDiscordantRead()<= m.getPosDiscordantRead() && n.getLastPosDiscordantRead()>=m.getPosDiscordantRead()) {
+                found = true;
+                break;
+            }
+
+            if (n.getPosDiscordantRead()<= m.getLastPosDiscordantRead() && n.getLastEndDiscordantRead()>=m.getLastPosDiscordantRead()) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            tempEvidence.push_back(n);
+        }
+    }
+
+    finalEvidence = tempEvidence;
+}
+
 
 void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
 {
@@ -258,9 +293,9 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 500000)
+    if (difflengthEnd > 50000)
     {
-        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+        // std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
         return;
     }
     // int32_t difflengthPos =
@@ -334,8 +369,6 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
 bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
-
-    
 
     if (svLength>20000) {
         return false;

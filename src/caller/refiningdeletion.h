@@ -25,6 +25,7 @@ public:
   void execute();
   void approximate();
   void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  int getNumberMapQ(std::vector<uint8_t> mapqlist,uint8_t start,uint8_t end);
 };
 
 #endif

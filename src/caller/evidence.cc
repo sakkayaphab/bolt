@@ -452,6 +452,7 @@ std::string Evidence::getInfoString()
         result.append("FREQ=" + std::to_string(getFrequency())+ ";");
     }
     result.append("LNGMATCH=" + std::to_string(LNGMATCH)+ ";");
+    result.append("BOLT_MQL="+convertMapQlistToCommaString()+ ";");
 
     return result;
 }
@@ -467,7 +468,7 @@ void Evidence::setComment(std::string comment)
 
 void Evidence::setMapQList(std::vector<uint8_t> mapqs)
 {
-    mapqList = mapqs;
+    mapqlist = mapqs;
 }
 
 void Evidence::setID(std::string id) {
@@ -536,6 +537,7 @@ std::string Evidence::getResultVcfFormatString()
     // 8. INFO
     result.append("\t");
     result.append(getInfoString());
+    
 
     return result;
 }

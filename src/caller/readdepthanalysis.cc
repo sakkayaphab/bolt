@@ -93,6 +93,7 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
+
     // if (sumTRA >= e.getFrequency())
     // {
     //     return false;
@@ -107,24 +108,24 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     // std::cout << e.getPos() << "\t" << n.DEL1 << "\t" << n.DEL2 << std::endl;
     // }
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > getAvgReadDepth() * 1.5)
-    {
-        return false;
-    }
+    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > getAvgReadDepth() * 1.5)
+    // {
+    //     return false;
+    // }
 
     if (e.getMaxMapQ() == 0)
     {
         return false;
     }
 
-    if (getAvgReadDepth() > 100)
-    {
-        if (e.getFrequency() <= 2)
-        {
+    // if (getAvgReadDepth() > 100)
+    // {
+    //     if (e.getFrequency() <= 2)
+    //     {
 
-            return false;
-        }
-    }
+    //         return false;
+    //     }
+    // }
 
     // if (e.getFrequency()<=1) {
     //     return false;
@@ -234,10 +235,10 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     }
     else
     {
-        if (e.getFrequency() <= 3)
-        {
-            return false;
-        }
+        // if (e.getFrequency() <= 3)
+        // {
+        //     return false;
+        // }
 
         // if (getSCLFocusArea(&startFocusReadDepth) >= 10 || getSCFFocusArea(&endFocusReadDepth) >= 10)
         // {
@@ -448,7 +449,11 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "DUP")
     {
-
+        if (e.getMaxMapQ() == 0)
+        {
+            return false;
+        }
+        
         // if (e.getSvLength() < 1500)
         // {
         //     if (e.getMaxMapQ() < 30)
@@ -512,10 +517,10 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INV")
     {
-        // if (e.getMaxMapQ() < 10)
-        // {
-        //     return false;
-        // }
+        if (e.getMaxMapQ() == 0)
+        {
+            return false;
+        }
 
         // if (e.getSvLength() > 20000)
         // {

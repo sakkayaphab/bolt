@@ -7,7 +7,7 @@
 class SpecifyingEvidence
 {
 protected:
-    int maxRemainBufferWriteEvidenceFile = 0;
+    int maxRemainBufferWriteEvidenceFile = 10;
     void writeBufferEvidenceFile();
   bam1_t *read;
   ReadParser readparser;
@@ -39,6 +39,7 @@ public:
   virtual void updateRead() = 0;
   void setOutputPath(std::string path);
   void writeFinalEvidenceAndClear();
+  
   
 
     void setReadDepthHelper(ReadDepthHelper *readdepthHelper);

@@ -26,6 +26,7 @@ public:
     std::string getOutputPath();
 
     std::string getEvidencePath();
+    std::string getVariantPath();
 
     std::string getResultVcfPath();
 

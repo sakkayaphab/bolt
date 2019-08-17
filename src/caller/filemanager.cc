@@ -30,6 +30,12 @@ std::string FileManager::getTempEvidencePath()
     return getOutputPath()+"/analysis/" + "temp_evidence";
 }
 
+
+std::string FileManager::getVariantPath()
+{
+    return getOutputPath()+"/analysis/" + "variant/";
+}
+
 std::string FileManager::getResultVcfPath() {
     return getOutputPath()+"/result.vcf";
 }
@@ -73,6 +79,7 @@ void FileManager::initialize()
     createDirectory(output_path + "/analysis/readdepth");
     createDirectory(output_path + "/analysis/temp_evidence");
     createDirectory(output_path + "/analysis/readdepthstat");
+    createDirectory(output_path + "/analysis/variant");
 }
 
 std::string FileManager::getReadDepthStatPath()

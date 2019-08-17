@@ -59,7 +59,9 @@ void SpecifyingEvidenceInsertion::checkRange()
     }
     bool added;
 
-    int positionOverlapped = findOverlapped(2000, pos, mpos);
+    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int positionOverlapped = findOverlapped(merge, pos, mpos);
+
     if (positionOverlapped >= 0)
     {
         preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
@@ -179,7 +181,8 @@ void SpecifyingEvidenceInsertion::checkRange()
 
 void SpecifyingEvidenceInsertion::proveEvidence(int index)
 {
-    if (currentPos - 2000 > preCollectSV.at(index).getPosDiscordantRead())
+    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
         {
@@ -249,7 +252,7 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
             // }
         }
 
-        return false;
+        return true;
     }
 
 

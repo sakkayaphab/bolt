@@ -35,8 +35,8 @@ public:
   void removeResult();
   int writeFile(Evidence vr);
   void debugEvidenceProvider();
-  // void mergeBreakpoint();
   void prepareHts();
+  void refineDelpthBlock();
 
 };
 

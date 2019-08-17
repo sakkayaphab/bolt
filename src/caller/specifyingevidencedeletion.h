@@ -23,6 +23,8 @@ public:
   void done();
   void checkProveEvidence();
   int32_t getSVLength();
+  void removeDuplicateFinalEvidence();
+  
 };
 
 #endif
