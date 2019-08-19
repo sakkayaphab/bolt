@@ -453,7 +453,7 @@ int Caller::findBreakPoint()
             rfd.setFastaReader(fastaReader);
             rfd.execute();
             variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            std::cout << variantresult.getResultVcfFormatString() << std::endl;
             // }
         }
         else if (thisEvidence.getVariantType() == "DUP")

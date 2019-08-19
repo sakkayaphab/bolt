@@ -79,7 +79,7 @@ private:
   //    std::vector<associateRead> errorAssociateReadLists;
 
   //    std::string convertEndAssociateReadListsToCommaString();
-  bool QuailtyPass;
+  bool QuailtyPass = false;
   std::string ID;
   std::string ref;
   std::string alt;

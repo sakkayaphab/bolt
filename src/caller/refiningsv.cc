@@ -292,6 +292,24 @@ bool RefiningSV::isMatchRef(std::string chr, int32_t pos, int32_t end, std::stri
     return false;
 }
 
+bool RefiningSV::haveIndel(std::vector<ReadParser::Cigar> cigar)
+{
+    for (auto n : cigar)
+    {
+        if (n.getOperatorName() == 'D')
+        {
+            return true;
+        }
+
+        if (n.getOperatorName() == 'I')
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
 
@@ -317,11 +335,13 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
             continue;
         }
 
-        if (maxMatchSize> 80) {
+        if (maxMatchSize > 80)
+        {
             continue;
         }
 
-        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped) {
+        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped)
+        {
             continue;
         }
 
@@ -346,7 +366,6 @@ void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, 
                 continue;
             }
         }
-
 
         if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
         {

@@ -79,6 +79,8 @@ public:
     int getReadDepthAtPosition(const char *range, int32_t pos);
 
   void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+
+  bool haveIndel(std::vector<ReadParser::Cigar> cigar);
 };
 
 #endif
