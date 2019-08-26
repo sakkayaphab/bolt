@@ -8,7 +8,7 @@ int32_t RefineDepthBlock::roundNumber(int32_t number, int32_t round)
 {
     if (number % round == 0)
     {
-        std::cout << number % round << " is even " << std::endl;
+        // std::cout << number % round << " is even " << std::endl;
         return number;
     }
 
@@ -40,11 +40,37 @@ int32_t RefineDepthBlock::previousNumber(int32_t number, int32_t round)
 void RefineDepthBlock::execute()
 {
     std::vector<std::string> vcffilelist = getPathVCFFiles();
+
     for (auto n : vcffilelist)
     {
         auto variantlist = getEvidenceByFilepath(n);
+
+        if (variantlist.size() == 0)
+        {
+            continue;
+        }
+
+        std::vector<Evidence> result;
+        if (variantlist.at(0).getSVType() == "DEL")
+        {
+            result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultDeletion(&result);
+            // } else if (variantlist.at(0).getSVType()=="DUP") {
+            //     // result = getRefineResultDuplication(&result);
+        }
+        else if (variantlist.at(0).getSVType() == "INV")
+        {
+            result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultInversion(&result);
+        }
+        else
+        {
+            result = variantlist;
+        }
+        // if (variantlist.)
+
         // auto result = getRefineResultDeletion(&variantlist);
-        auto result = getResultWithOutOverlapped(&variantlist, &variantlist);
+        // auto result = getResultWithOutOverlapped(&variantlist, &variantlist);
 
         writeFile(&result);
     }
@@ -64,11 +90,15 @@ void RefineDepthBlock::execute()
     // std::cout << previousNumber(1124, 250) << std::endl;
 }
 
-std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evidence> *master)
+std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<Evidence> *master)
 {
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
+        // if (n.getSVType()!="DEL") {
+        //     break;
+        // }
+
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
@@ -78,28 +108,255 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-        if (n.getSvLength()>2000) {
-            if (currentRD.DEL2>=2) {
+        if (n.getSvLength() > 2000)
+        {
+            if (currentRD.INV1 >= 20)
+            {
                 continue;
             }
-            if (nextRD.DEL2>=2) {
-                continue;
-            }
-            if (previousRD.DEL2>=2) {
-                continue;
-            }
-        }
 
-        if (nextRD.depth>100) {
-            continue;
-        }
+            if (currentRD.INV2 >= 20)
+            {
+                continue;
+            }
 
-        if (nextRD.depth>previousRD.depth) {
-            continue;
+            if (previousRD.INV1 >= 20)
+            {
+                continue;
+            }
+
+            if (previousRD.INV2 >= 20)
+            {
+                continue;
+            }
+
+            if (nextRD.INV1 >= 20)
+            {
+                continue;
+            }
+
+            if (nextRD.INV2 >= 20)
+            {
+                continue;
+            }
+
+            if (previousRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (previousRD.TRA2 >= 10)
+            {
+                continue;
+            }
+
+            if (currentRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (currentRD.TRA2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.TRA2 >= 10)
+            {
+                continue;
+            }
+
+            // if (currentRD.INS1 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (currentRD.DEL1 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (previousRD.INS1+previousRD.INS2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (previousRD.INS1+previousRD.INS2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (currentRD.DEL1+currentRD.DEL2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (currentRD.INV1+currentRD.INV2 >= 4)
+            // {
+            //     continue;
+            // }
+
+            // if (previousRD.INV1+previousRD.INV2 >= 4)
+            // {
+            //     continue;
+            // }
+
+            // if (nextRD.INV1+nextRD.INV2 >= 4)
+            // {
+            //     continue;
+            // }
+
+            // if (currentRD.DEL1+currentRD.DEL2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (previousRD.DEL1+previousRD.DEL2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (nextRD.DEL1+nextRD.DEL2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (currentRD.TRA1+currentRD.TRA2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (previousRD.TRA1+previousRD.TRA2 >= 10)
+            // {
+            //     continue;
+            // }
+
+            // if (nextRD.TRA1+nextRD.TRA2 >= 10)
+            // {
+            //     continue;
+            // }
         }
 
         cache.push_back(n);
+    }
 
+    return cache;
+}
+
+std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evidence> *master)
+{
+    std::vector<Evidence> cache;
+    for (auto n : *master)
+    {
+        // if (n.getSVType()!="DEL") {
+        //     break;
+        // }
+
+        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        auto nextPos = nextNumber(n.getPos(), roundConfig);
+        auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        auto currentRD = rdf.getBlock(currentPos);
+        auto nextRD = rdf.getBlock(nextPos);
+        auto previousRD = rdf.getBlock(previousPos);
+
+        if (n.getSvLength() > 2000)
+        {
+
+            if (previousRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (previousRD.TRA2 >= 10)
+            {
+                continue;
+            }
+
+            if (currentRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (currentRD.TRA2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.TRA1 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.TRA2 >= 10)
+            {
+                continue;
+            }
+        }
+
+        cache.push_back(n);
+    }
+
+    return cache;
+}
+
+std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evidence> *master)
+{
+    std::vector<Evidence> cache;
+    for (auto n : *master)
+    {
+        // if (n.getSVType()!="DEL") {
+        //     break;
+        // }
+
+        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        auto nextPos = nextNumber(n.getPos(), roundConfig);
+        auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        auto currentRD = rdf.getBlock(currentPos);
+        auto nextRD = rdf.getBlock(nextPos);
+        auto previousRD = rdf.getBlock(previousPos);
+
+        if (n.getSvLength() > 2000)
+        {
+            if (currentRD.DUP1 + currentRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (currentRD.INV1 + currentRD.INV2 >= 10)
+            {
+                continue;
+            }
+
+            if (previousRD.DUP1 + previousRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (previousRD.INV1 + previousRD.INV2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.DUP1 + previousRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextRD.INV1 + previousRD.INV2 >= 10)
+            {
+                continue;
+            }
+        }
+
+        cache.push_back(n);
     }
 
     return cache;
@@ -132,7 +389,7 @@ std::vector<Evidence> RefineDepthBlock::getResultWithOutOverlapped(std::vector<E
                 continue;
             }
 
-            if (m.getPos() - 1000 <= n.getPos() && n.getPos() <= m.getPos() + 1000)
+            if (m.getPos() - 100 <= n.getPos() && n.getPos() <= m.getPos() + 100)
             {
                 found = true;
                 break;
@@ -161,17 +418,22 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
             e.setEvidenceByString(line);
             if (e.getPos() != 0)
             {
+                // if (e.getSvLength()<500 && e.getAvgMapQ()<6) {
+
+                // } else {
                 cache.push_back(e);
+                // }
             }
 
-            std::cout
-                << e.getChr() << "\t"
-                << e.getPos() << "\t"
-                << e.getEndChr() << "\t"
-                << e.getEnd() << "\t"
-                << e.getFrequency() << "\t"
-                << e.convertMapQlistToCommaString() << "\t"
-                << std::endl;
+            // std::cout
+            //     << e.getChr() << "\t"
+            //     << e.getPos() << "\t"
+            //     << e.getEndChr() << "\t"
+            //     << e.getEnd() << "\t"
+            //     << e.getFrequency() << "\t"
+            //     << e.LNGMATCH << "\t"
+            //     << e.convertMapQlistToCommaString() << "\t"
+            //     << std::endl;
         }
         myfile.close();
     }
@@ -190,7 +452,7 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
     DIR *d;
     struct dirent *dir;
 
-    std::cout << filemanager->getVariantPath() << std::endl;
+    // std::cout << filemanager->getVariantPath() << std::endl;
     d = opendir(filemanager->getVariantPath().c_str());
     if (d)
     {

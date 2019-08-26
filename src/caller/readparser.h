@@ -152,6 +152,9 @@ public:
   bool isNotPassingFilters();
   bool isPCR();
   bool isSupplementaryAlignment();
+
+  int getSecondLastToStartMissMatchPosMD();
+  int getSecondStartToEndMissMatchPosMD();
 };
 
 #endif

@@ -85,7 +85,7 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 50)
+    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
     {
         checkRange();
         return;
@@ -222,7 +222,7 @@ void SpecifyingEvidenceDeletion::proveEvidence(int index)
         {
             calculateVCF(&preCollectSV.at(index));
 
-            if (preCollectSV.at(index).getSvLength() > 10 && preCollectSV.at(index).getSvLength() < 100000)
+            if (preCollectSV.at(index).getSvLength() > 10 && preCollectSV.at(index).getSvLength() < 1000000)
             {
                 finalEvidence.push_back(preCollectSV.at(index));
             }
@@ -290,9 +290,9 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
     // }
 
-    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t notUsed = (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength()*2);
+    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
+    int32_t notUsed = (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
 
     // if (difflengthEnd > 100000)
     // {
@@ -371,18 +371,13 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    if (svLength>100000) {
+    if (svLength>1000000) {
         return false;
     }
 
     if (svLength < 500)
     {
-        // if (evidence->getMaxMapQ() < 15)
-        // {
-        //     return false;
-        // }
-
-        if (evidence->getFrequency() <= 2)
+        if (evidence->getFrequency() <= 1)
         {
             return false;
         }

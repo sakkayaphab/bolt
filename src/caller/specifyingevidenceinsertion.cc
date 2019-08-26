@@ -12,7 +12,7 @@ void SpecifyingEvidenceInsertion::updateRead()
 
     if (read->core.flag & BAM_FMUNMAP)
     {
-        checkRange();
+        // checkRange();
         return;
     }
 
@@ -29,16 +29,13 @@ void SpecifyingEvidenceInsertion::updateRead()
             return;
         }
 
-        if (diff < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - 80)
+        if (diff < samplestat->getMedianSampleStat() - (samplestat->getSDSampleStat() / 2))
         {
             checkRange();
             return;
         }
     }
 }
-
-
-
 
 void SpecifyingEvidenceInsertion::checkRange()
 {
@@ -213,13 +210,13 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
     int32_t avgEnd = (lastpos + end) / 2;
     int32_t diff = lastend - avgEnd;
     evidence->setEnd(lastpos);
-    evidence->setPos(lastend);
+    evidence->setPos(end);
 
-    evidence->setCiEndLeft(-diff - 300);
-    evidence->setCiEndRight(diff + 300);
+    evidence->setCiPosLeft(-samplestat->getReadLength());
+    evidence->setCiPosRight(end-lastpos+samplestat->getReadLength());
 
-    evidence->setCiPosLeft(-diff - 300);
-    evidence->setCiPosRight(diff + 300);
+    evidence->setCiEndLeft(end-lastpos-samplestat->getReadLength());
+    evidence->setCiEndRight(samplestat->getReadLength());
 }
 
 bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
@@ -232,7 +229,6 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 
     if (evidence->getComment() == "MATEUNMAPPED")
     {
-        
 
         if (evidence->getBackwardDirection() == false)
         {
@@ -254,7 +250,6 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 
         return true;
     }
-
 
     // if ((int) (evidence->getFrequency())<evidence->getNumberOfZeroMapQ()-4)
     // {

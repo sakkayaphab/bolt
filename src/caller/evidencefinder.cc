@@ -251,7 +251,7 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
             return;
         }
 
-        if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
+        if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
         {
             rdd->DEL2++;
             return;
@@ -313,7 +313,7 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
             return;
         }
 
-        if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
+        if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
         {
             rdd->DEL1++;
             return;

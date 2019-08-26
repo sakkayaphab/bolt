@@ -211,6 +211,7 @@ public:
   uint8_t getAvgMapQ();
 
   int32_t getSvLength();
+  std::string getSVType();
 
   bool haveSomeMapQMoreThan(uint8_t qual);
   bool haveSomeMapQLessThan(uint8_t qual);

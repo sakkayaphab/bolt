@@ -50,7 +50,7 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
     readparser.setBamRead(read);
 
     int32_t positionStartReference = evidence.getEnd() + evidence.getCiEndLeft();
-    int32_t positionEndReference = evidence.getEnd() + evidence.getCiEndRight() + 1000;
+    int32_t positionEndReference = evidence.getEnd() + evidence.getCiEndRight();
     std::string seqrefString = fastareader.getSeqbyPosition(std::string(evidence.getEndChr()),
                                                             positionStartReference,
                                                             positionEndReference);
@@ -119,7 +119,7 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
         for (auto n : result)
         {
-            if (n.matchCount <= 8)
+            if (n.matchCount <= 4)
             {
                 continue;
             }
@@ -191,7 +191,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     readparser.setBamHeader(bam_header);
     readparser.setBamRead(read);
 
-    int32_t positionStartReference = evidence.getPos() + evidence.getCiPosLeft() - 500;
+    int32_t positionStartReference = evidence.getPos() + evidence.getCiPosLeft();
     int32_t positionEndReference = evidence.getPos() + evidence.getCiPosRight();
     std::string seqrefString = fastareader.getSeqbyPosition(std::string(evidence.getEndChr()),
                                                             positionStartReference,
@@ -250,7 +250,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead, &ssc);
         for (auto n : result)
         {
-            if (n.matchCount <= 8)
+            if (n.matchCount <= 4)
             {
                 continue;
             }
@@ -321,15 +321,15 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 25)
+        if (maxMatchSize < 15)
         {
             continue;
         }
 
-        if (maxMatchSize > 80)
-        {
-            continue;
-        }
+        // if (maxMatchSize > 80)
+        // {
+        //     continue;
+        // }
 
         if (maxQuality == 0)
         {
@@ -368,7 +368,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         return;
     }
 
-    if (bEnd - bPos > 50000)
+    if (bEnd - bPos > 1000000)
     {
         return;
     }

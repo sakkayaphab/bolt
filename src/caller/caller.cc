@@ -199,9 +199,6 @@ void Caller::refineDelpthBlock() {
     rdb.setFileManager(&filepath);
     // rdb.filemanager = filepath;
     rdb.execute();
-
-
-    
 }
 
 void Caller::catEvidenceFile()
@@ -252,7 +249,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "INS")
             {
                 continue;
             }
@@ -332,7 +329,7 @@ void Caller::mergeReadDepthFile()
 
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }
@@ -453,7 +450,7 @@ int Caller::findBreakPoint()
             rfd.setFastaReader(fastaReader);
             rfd.execute();
             variantresult = rfd.getVariantResult();
-            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
             // }
         }
         else if (thisEvidence.getVariantType() == "DUP")
@@ -503,12 +500,13 @@ int Caller::findBreakPoint()
             rfd.setFastaReader(fastaReader);
             rfd.execute();
             variantresult = rfd.getVariantResult();
-            std::cout << variantresult.getResultVcfFormatString() << std::endl;
         }
 
         VariantResultFilter vrf;
         if (vrf.passFilterSV(&variantresult))
         {
+            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+
             mxWriteFile.lock();
             // rda.analyzeByBreakPoint(variantresult);
             // if (variantresult.isQuailtyPass()) {

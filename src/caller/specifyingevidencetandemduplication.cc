@@ -31,7 +31,7 @@ void SpecifyingEvidenceTandemDuplication::updateRead()
     }
 
     //limit SVLEN
-    if (readparser.getMatePos() - readparser.getPos() > 50000)
+    if (readparser.getMatePos() - readparser.getPos() > 1000000)
     {
         return;
     }
@@ -180,10 +180,11 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
     // }
 
-    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t notUsed = (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 500000)
+    if (difflengthEnd > 1000000)
     {
         std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
         return;
@@ -250,9 +251,9 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     // avgEnd = (firstEnd + lastEnd) / 2;
     evidence->setPos(firstPos);
     evidence->setCiPosLeft(-difflengthPos);
-    evidence->setCiPosRight(difflengthPos);
+    evidence->setCiPosRight(notUsed);
     evidence->setEnd(lastEnd);
-    evidence->setCiEndLeft(-difflengthEnd);
+    evidence->setCiEndLeft(-notUsed);
     evidence->setCiEndRight(difflengthEnd);
 }
 
@@ -262,10 +263,25 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     {
         return false;
     }
+    
+    int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    if (evidence->getFrequency() < 2)
-    {
+    if (svLength>1000000) {
         return false;
+    }
+
+    if (svLength < 500)
+    {
+        if (evidence->getFrequency() <= 2)
+        {
+            return false;
+        }
+
+    } else if (svLength < 2000) {
+        if (evidence->getFrequency() <= 1)
+        {
+            return false;
+        }
     }
 
     return true;

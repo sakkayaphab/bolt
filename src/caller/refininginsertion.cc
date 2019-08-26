@@ -60,7 +60,7 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         }
 
         auto cigar = readparser.getCigar();
-        if (cigar.size() <= 1)
+        if (cigar.size() != 2)
         {
             continue;
         }
@@ -68,8 +68,6 @@ void RefiningInsertion::refineStartToEnd(const char *range)
        
         if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 5)
         {
-            
-
             mapSCFirst[readparser.getPos()]++;
             if (mapMapQFirst[readparser.getPos()]<readparser.getMapQuality()) {
                 mapMapQFirst[readparser.getPos()] = readparser.getMapQuality();
@@ -78,7 +76,6 @@ void RefiningInsertion::refineStartToEnd(const char *range)
 
         if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(cigar.size() - 1).getLength() >= 5)
         {
-          
             mapSCLast[readparser.getEnd()]++;
             if (mapMapQLast[readparser.getEnd()]<readparser.getMapQuality()) {
                 mapMapQLast[readparser.getEnd()] = readparser.getMapQuality();

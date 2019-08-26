@@ -147,11 +147,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         {
             continue;
 
-            if (haveIndel(cigar)) {
+            // if (haveIndel(cigar)) {
                 
-            }else {
-                continue;
-            }
+            // }else {
+            //     continue;
+            // }
 
 
             SCsize = 0;
@@ -237,11 +237,25 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 // {
                 //     continue;
                 // }
+                if (readparser.getLastToStartMissMatchPosMD() == 0)
+                {
+                    continue;
+                }
 
-                // if (!(readparser.getLastToStartMissMatchPosMD() <= n.matchCount))
-                // {
-                //     continue;
-                // }
+                if (!(readparser.getLastToStartMissMatchPosMD() <= n.matchCount))
+                {
+                    continue;
+                }
+
+                if (n.matchCount<30) {
+                    continue;
+                }
+
+                if (n.missmatchCount >= 1)
+                {
+                    continue;
+                }
+
             }
 
             // if (n.matchCount <= 20) {
@@ -445,15 +459,24 @@ void RefiningDeletion::refineEndToStart(const char *range)
             else
             {
                 // continue;
+
+                if (readparser.getStartToEndMissMatchPosMD()==0) {
+                    continue;
+                }
+
                 if (!(readparser.getStartToEndMissMatchPosMD() <= n.matchCount))
                 {
                     continue;
                 }
 
-                // if (n.missmatchCount >= 1)
-                // {
-                //     continue;
-                // }
+                if (n.matchCount<30) {
+                    continue;
+                }
+
+                if (n.missmatchCount >= 1)
+                {
+                    continue;
+                }
                 // continue;
             }
 
@@ -483,7 +506,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             // {
             //     continue;
             // }
-                //  std::cout << "> n.pos : " << n.pos << " n.end : " << n.end << std::endl;
+                //  std::cout << "> n.pos : " << mPos << " n.end : " << mEnd << " n.matchCount" << n.matchCount << std::endl;
             //  std::cout << "mPos : " << mPos << std::endl;
             //  std::cout << "mEnd : " << mEnd << std::endl;
             //      std::cout << "pattern : " << n.pattern << std::endl;
@@ -571,15 +594,16 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
             continue;
         }
 
-        if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped)
-        {
-            continue;
-        }
+        // if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped)
+        // {
+        //     continue;
+        // }
 
         bFrequency = x.second.NumberOfMatchRead;
 
         if (evidence.getSvLength() < 500)
         {
+            
             if (bFrequency <= 1)
             {
                 continue;
@@ -665,12 +689,12 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         return;
     }
 
-    if (bEnd - bPos > 50000)
+    if (bEnd - bPos > 1000000)
     {
         return;
     }
 
-    if (bEnd - bPos < 0)
+    if (bEnd - bPos < 50)
     {
         return;
     }

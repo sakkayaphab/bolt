@@ -35,7 +35,7 @@ void SpecifyingEvidenceInversion::updateRead()
     }
 
     //Limit SVLEN
-    if (diff > 100000)
+    if (diff > 1000000)
     {
         return;
     }
@@ -152,7 +152,7 @@ void SpecifyingEvidenceInversion::proveEvidence(int index)
         {
             calculateVCF(&preCollectSV.at(index));
 
-            if (preCollectSV.at(index).getSvLength() > 1 && preCollectSV.at(index).getSvLength() < 50000)
+            if (preCollectSV.at(index).getSvLength() > 1 && preCollectSV.at(index).getSvLength() < 1000000)
             {
                 finalEvidence.push_back(preCollectSV.at(index));
             }
@@ -190,7 +190,7 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 500000)
+    if (difflengthEnd > 1000000)
     {
         std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
         return;
@@ -265,18 +265,27 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
 
 bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
 {
+    int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    // if (evidence->getMaxMapQ() == 0)
-    // {
-    //     return false;
-    // }
-
-    if (evidence->getFrequency() >= 3)
-    {
-        return true;
+   if (svLength>1000000) {
+        return false;
     }
 
-    return false;
+    // if (svLength < 500)
+    // {
+    //     if (evidence->getFrequency() <= 1)
+    //     {
+    //         return false;
+    //     }
+
+    // } else if (svLength < 2000) {
+    //     if (evidence->getFrequency() <= 1)
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    return true;
 }
 
 void SpecifyingEvidenceInversion::checkProveEvidence()

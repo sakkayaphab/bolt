@@ -255,6 +255,11 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         //     return false;
         // }
 
+        // if (e.getAvgMapQ() < 30)
+        // {
+        //     return false;
+        // }
+
         // if (e.getFrequency() <= 3)
         // {
         //     return false;
@@ -454,64 +459,6 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
         
-        // if (e.getSvLength() < 1500)
-        // {
-        //     if (e.getMaxMapQ() < 30)
-        //     {
-        //         return false;
-        //     }
-
-        //     if (e.getFrequency() < 2)
-        //     {
-        //         return false;
-        //     }
-
-        //     return true;
-        // }
-
-        //    if (focusReadDepth.size() > 3)
-        //     {
-        //         if ((focusReadDepth.at(0).depth) < avgReadDepth)
-        //         {
-        //             return false;
-        //         }
-
-        //         if ((focusReadDepth.at(focusReadDepth.size() - 1).depth) < avgReadDepth)
-        //         {
-        //             return false;
-        //         }
-        //     }
-
-        // if (e.getMaxMapQ() < 20)
-        // {
-        //     return false;
-        // }
-
-        // if (focusReadDepth.at(0).depth < (getAvgReadDepth() - 10))
-        // {
-        //     return false;
-        // }
-
-        // if (focusReadDepth.at(focusReadDepth.size() - 1).depth < (getAvgReadDepth() - 10))
-        // {
-        //     return false;
-        // }
-
-        // if (getReadDepthAverageFocusArea() > (getAvgReadDepth() * 3))
-        // {
-        //     returnfalse;
-        // }
-
-        // if (getReadDepthAverageFocusArea() < avgReadDepth-20)
-        // {
-        //     return false;
-        // }
-
-        // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500)
-        // {
-        //     return false;
-        // }
-
         return true;
     }
 

@@ -401,15 +401,15 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 25)
+        if (maxMatchSize < 20)
         {
             continue;
         }
         // std::cout << "maxMatchSize : " << maxMatchSize << std::endl;
-        if (maxMatchSize > 80)
-        {
-            continue;
-        }
+        // if (maxMatchSize > 80)
+        // {
+        //     continue;
+        // }
 
         if (maxQuality == 0)
         {
@@ -448,7 +448,7 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
         return;
     }
 
-    if (bEnd - bPos > 50000)
+    if (bEnd - bPos > 1000000)
     {
         return;
     }

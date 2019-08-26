@@ -444,6 +444,33 @@ int ReadParser::getLastToStartMissMatchPosMD()
     return sizeAcc;
 }
 
+int ReadParser::getSecondLastToStartMissMatchPosMD()
+{
+    std::vector<ReadParser::AlignMD> md = getAlignMD();
+
+    int sizeAcc = 0;
+    int numberFound = 0;
+    for (int i = md.size() - 1; i >= 0; i--)
+    {
+        AlignMD lastmd = md.at(i);
+        sizeAcc += lastmd.size;
+        if (lastmd.operate != 'M')
+        {
+            numberFound++;
+            if (numberFound>=2) {
+                break;
+            }
+            
+        }
+    }
+
+    if (numberFound>=2) {
+        return sizeAcc;
+    }
+
+    return 0;
+}
+
 int ReadParser::getStartToEndMissMatchPosMD()
 {
     std::vector<ReadParser::AlignMD> md = getAlignMD();
@@ -461,6 +488,32 @@ int ReadParser::getStartToEndMissMatchPosMD()
     }
 
     return sizeAcc;
+}
+
+int ReadParser::getSecondStartToEndMissMatchPosMD()
+{
+    std::vector<ReadParser::AlignMD> md = getAlignMD();
+
+    int sizeAcc = 0;
+    int numberFound = 0;
+    for (int i = 0; i < md.size(); i++)
+    {
+        AlignMD lastmd = md.at(i);
+        sizeAcc += lastmd.size;
+        if (lastmd.operate != 'M')
+        {
+            numberFound++;
+            if (numberFound>=2) {
+                break;
+            }
+        }
+    }
+
+    if (numberFound>=2) {
+        return sizeAcc;
+    }
+
+    return 0;
 }
 
 std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()

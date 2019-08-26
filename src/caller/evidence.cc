@@ -303,6 +303,7 @@ void Evidence::setEvidenceByString(std::string line)
 
             for (std::string ainfo : infolist)
             {
+                // std::cout << ainfo << "  -  " << getKeybyText(ainfo)  << std::endl;
 
                 if (getKeybyText(ainfo) == "END")
                 {
@@ -379,8 +380,35 @@ void Evidence::setEvidenceByString(std::string line)
                     setComment(getValuebyText(ainfo));
                     continue;
                 }
+
+                else if (getKeybyText(ainfo) == "LNGMATCH")
+                {
+                    LNGMATCH = atoi(getValuebyText(ainfo).c_str());
+                    // std::cout << LNGMATCH << std::endl;
+                    // (getValuebyText(ainfo));
+                    continue;
+                }
+
+                else if (getKeybyText(ainfo) == "FREQ")
+                {
+                    // FREQ = atoi(ainfo.c_str());
+                    setFrequency(atoi(getValuebyText(ainfo).c_str()));
+                    // std::cout << FREQ << std::endl;
+                    // (getValuebyText(ainfo));
+                    continue;
+                }
+
+                // else if (getKeybyText(ainfo) == "DP")
+                // {
+                //     // FREQ = atoi(ainfo.c_str());
+                //     // setRead
+                //     setDep(atoi(getValuebyText(ainfo).c_str()));
+                //     // std::cout << FREQ << std::endl;
+                //     // (getValuebyText(ainfo));
+                //     continue;
+                // }
             }
-            setFrequency(mapqlist.size());
+            // setFrequency(mapqlist.size());
         }
         i++;
     }
@@ -652,6 +680,10 @@ void Evidence::setQuailtyPass(bool QuailtyPass) {
 
 bool Evidence::isQuailtyPass() const {
     return QuailtyPass;
+}
+
+std::string Evidence::getSVType() {
+    return variantType;
 }
 
 //std::string Evidence::getIsFoundEvidenceAtStartString()
