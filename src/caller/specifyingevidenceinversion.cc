@@ -17,10 +17,10 @@ void SpecifyingEvidenceInversion::updateRead()
         return;
     }
 
-    if (read->core.flag & BAM_FREAD1)
-    {
-        return;
-    }
+    // if (read->core.flag & BAM_FREAD1)
+    // {
+    //     return;
+    // }
 
     if (readparser.getPos() > readparser.getMatePos())
     {
@@ -35,23 +35,28 @@ void SpecifyingEvidenceInversion::updateRead()
     }
 
     //Limit SVLEN
-    if (diff > 1000000)
-    {
+    // if (diff > 1000000)
+    // {
+    //     return;
+    // }
+
+    if (readparser.isReverse() && readparser.isMateReverse()) {
+        checkRange();
         return;
     }
 
-    if (!(readparser.isReverse() && readparser.isMateReverse()))
-    {
+    if (!readparser.isReverse() && !readparser.isMateReverse()) {
+        checkRange();
         return;
     }
 
-    checkRange();
+    return;
 }
 
 bool SpecifyingEvidenceInversion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added;
-    for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size();positionOverlapped++)
+    for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
         if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos) && checkBetween(mpos,
                                                                                                                          preCollectSV.at(positionOverlapped).getEndDiscordantRead(),
@@ -134,7 +139,6 @@ void SpecifyingEvidenceInversion::checkRange()
             evidence.setLastEndDiscordantRead(currentMPos);
             evidence.addMapQ(readparser.getMapQuality());
             preCollectSV.push_back(evidence);
-            // std::cout << "add new evidence" << std::endl;
         }
         else
         {
@@ -152,10 +156,10 @@ void SpecifyingEvidenceInversion::proveEvidence(int index)
         {
             calculateVCF(&preCollectSV.at(index));
 
-            if (preCollectSV.at(index).getSvLength() > 1 && preCollectSV.at(index).getSvLength() < 1000000)
-            {
+            // if (preCollectSV.at(index).getSvLength() > 1 && preCollectSV.at(index).getSvLength() < 1000000)
+            // {
                 finalEvidence.push_back(preCollectSV.at(index));
-            }
+            // }
             preCollectSV.erase(preCollectSV.begin() + index);
             writeBufferEvidenceFile();
         }
@@ -168,7 +172,7 @@ void SpecifyingEvidenceInversion::proveEvidence(int index)
 
 void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
 {
-     int32_t firstPos = 0;
+    int32_t firstPos = 0;
     int32_t lastPos = 0;
     int32_t avgPos = 0;
     int32_t firstEndDis = 0;
@@ -190,11 +194,11 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 1000000)
-    {
-        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
-        return;
-    }
+    // if (difflengthEnd > 1000000)
+    // {
+    //     std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+    //     return;
+    // }
     // int32_t difflengthPos =
     // int32_t difflengthEnd =
 
@@ -267,9 +271,10 @@ bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-   if (svLength>1000000) {
-        return false;
-    }
+    // if (svLength > 1000000)
+    // {
+    //     return false;
+    // }
 
     // if (svLength < 500)
     // {

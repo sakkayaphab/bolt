@@ -66,265 +66,67 @@ int ReadDepthAnalysis::getAvgReadDepth()
 
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
-    int sumDELStart = 0;
-    int sumDELEnd = 0;
-    int sumDUP = 0;
-    int sumINV = 0;
-    int sumTRA = 0;
-    int sumINS = 0;
+    int sumStartDELStart = 0;
+    int sumStartDELEnd = 0;
+    int sumStartDUP = 0;
+    int sumStartINV = 0;
+    int sumStartTRA = 0;
+    int sumStartINS = 0;
+    int sumStartSCF = 0;
+    int sumStartSCL = 0;
     for (auto n : startFocusReadDepth)
     {
-        sumDELStart += n.DEL1;
-        sumDELEnd += n.DEL2;
+        sumStartDELStart += n.DEL1;
+        sumStartDELEnd += n.DEL2;
 
-        sumDUP += n.DUP1;
-        sumINV += n.INV1;
-        sumTRA += n.TRA1;
-        sumDUP += n.DUP2;
-        sumINV += n.INV2;
-        sumTRA += n.TRA2;
-        sumINS += n.INS1;
-        sumINS += n.INS2;
+        sumStartDUP += n.DUP1;
+        sumStartINV += n.INV1;
+        sumStartTRA += n.TRA1;
+        sumStartDUP += n.DUP2;
+        sumStartINV += n.INV2;
+        sumStartTRA += n.TRA2;
+        sumStartINS += n.INS1;
+        sumStartINS += n.INS2;
+        sumStartSCF += n.SCF;
+        sumStartSCL += n.SCL;
+    }
 
-        // std::cout << " ----- " << "\n"
-        // << "p : " << n.pos << " = "
-        // << sumTRA << " // " << sumDELStart << std::endl;
+    int sumEndDELStart = 0;
+    int sumEndDELEnd = 0;
+    int sumEndDUP = 0;
+    int sumEndINV = 0;
+    int sumEndTRA = 0;
+    int sumEndINS = 0;
+    int sumEndSCF = 0;
+    int sumEndSCL = 0;
+    for (auto n : startFocusReadDepth)
+    {
+        sumEndDELStart += n.DEL1;
+        sumEndDELEnd += n.DEL2;
+
+        sumEndDUP += n.DUP1;
+        sumEndINV += n.INV1;
+        sumEndTRA += n.TRA1;
+        sumEndDUP += n.DUP2;
+        sumEndINV += n.INV2;
+        sumEndTRA += n.TRA2;
+        sumEndINS += n.INS1;
+        sumEndINS += n.INS2;
+        sumEndSCF += n.SCF;
+        sumEndSCL += n.SCL;
+    }
+    
+
+    if (e.getSvLength()<1000) {
+        // return false;
+        if (sumStartSCL<=1 && sumStartSCF<=1) {
+            return false;
+        }
     }
 
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
-
-    // if (sumTRA >= e.getFrequency())
-    // {
-    //     return false;
-    // }
-
-    // if (sumINV >= e.getFrequency())
-    // {
-    //     return false;
-    // }
-
-    // if (n.DEL1!=0) {
-    // std::cout << e.getPos() << "\t" << n.DEL1 << "\t" << n.DEL2 << std::endl;
-    // }
-
-    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > getAvgReadDepth() * 1.5)
-    // {
-    //     return false;
-    // }
-
-    if (e.getMaxMapQ() == 0)
-    {
-        return false;
-    }
-
-    // if (getAvgReadDepth() > 100)
-    // {
-    //     if (e.getFrequency() <= 2)
-    //     {
-
-    //         return false;
-    //     }
-    // }
-
-    // if (e.getFrequency()<=1) {
-    //     return false;
-    // }
-
-    // if (e.getSvLength() < 500)
-    // {
-    //     if (sumINV > 50)
-    //     {
-    //         return false;
-    //     }
-
-    //     if (sumINS > 50)
-    //     {
-    //         return false;
-    //     }
-
-    //     if (sumTRA > 50)
-    //     {
-    //         return false;
-    //     }
-    // }
-
-    if (e.getSvLength() > 2000)
-    {
-        // if (e.getFrequency()<=1) {
-        //     if (e.getMaxMapQ()==0) {
-        //         return false;
-        //     }
-        // }
-
-        // if ( e.getMaxMapQ()<10) {
-        //     return false;
-        // }
-
-        // if (e.getFrequency() <= 5)
-        // {
-        // return false;
-        // }
-        // return false;
-    }
-    else if (e.getSvLength() > 1000 && e.getSvLength() <= 2000)
-    {
-        //    if (e.getFrequency()<=1) {
-        //         if (e.getMaxMapQ()==0) {
-        //             return false;
-        //         }
-        //     }
-        // if ( e.getMaxMapQ()<35) {
-        //     return false;
-        // }
-
-        // if ( e.getAvgMapQ()<20) {
-        //     return false;
-        // }
-
-        // if (e.getFrequency() <= 3)
-        // {
-        //     return false;
-        // }
-
-        // if (sumDEL<5) {
-        //     return false;
-        // }
-
-        // if (getSCLFocusArea(&startFocusReadDepth) >= 2 || getSCFFocusArea(&endFocusReadDepth) >= 2)
-        // {
-        // }
-        // else
-        // {
-        //     return false;
-        // }
-
-        // if (sumINV+sumDUP+sumTRA>10) {
-        //     return false;
-        // }
-        // return false;
-        // return false;
-    }
-    else if (e.getSvLength() > 500 && e.getSvLength() <= 1000)
-    {
-        // if (e.getFrequency()<=1) {
-        //     if (e.getMaxMapQ()==0) {
-        //         return false;
-        //     }
-        // }
-
-        // if (e.getFrequency() <= 2 && e.getAvgMapQ() == 60)
-        // {
-        //     return false;
-        // }
-
-        // if (getSCLFocusArea(&startFocusReadDepth) >= 2 || getSCFFocusArea(&endFocusReadDepth) >= 2)
-        // {
-        // }
-        // else
-        // {
-        //     return false;
-        // }
-
-        // if (sumDUP>5) {
-        //     return false;
-        // }
-
-        // return false;
-        // return false;
-    }
-    else
-    {
-        // if (e.getFrequency() <= 3)
-        // {
-        //     return false;
-        // }
-
-        // if (getSCLFocusArea(&startFocusReadDepth) >= 10 || getSCFFocusArea(&endFocusReadDepth) >= 10)
-        // {
-        //     std::cout << e.getSvLength() << std::endl;
-        // }
-        // else
-        // {
-        //     return false;
-        // }
-
-        // if (e.getSvLength())
-        // if (e.getMaxMapQ() < 40)
-        // {
-        //     return false;
-        // }
-
-        // if (e.getAvgMapQ() < 30)
-        // {
-        //     return false;
-        // }
-
-        // if (e.getFrequency() <= 3)
-        // {
-        //     return false;
-        // }
-
-        // if (sumINV+sumDUP+sumTRA>5) {
-        //     return false;
-        // }
-
-        // return false;
-    }
-
-    // if (getReadDepthAverageFocusArea() > 500)
-    // {
-    //     return false;
-    // }
-
-    // if (e.getMaxMapQ() < 30)
-    // {
-    //     return false;
-    // }
-
-    // if (getReadDepthAverageFocusArea()>avgReadDepth*2) {
-    //     return false;
-    // }
-
-    // if (e.getAvgMapQ()>20) {
-    //     return false;
-    // }
-
-    // if (e.getMaxMapQ() < 40)
-    // {
-    //     return false;
-    // }
-
-    // if (getReadDepthAverageFocusArea() > (getAvgReadDepth() * 4))
-    // {
-    //     return false;
-    // }
-
-    // if (e.getEndDiscordantRead() - e.getLastPosDiscordantRead() < 10)
-    // {
-    //     return false;
-    // }
-
-    // if (focusReadDepth.size() > 3)
-    // {
-    //     if ((focusReadDepth.at(0).depth) > focusReadDepth.at(1).depth)
-    //     {
-    //         return false;
-    //     }
-
-    //     if ((focusReadDepth.at(focusReadDepth.size() - 2).depth) > focusReadDepth.at(focusReadDepth.size() - 1).depth)
-    //     {
-    //         return false;
-    //     }
-    // }
-    // else
-    // {
-    //     if (focusReadDepth.at(0).depth > getAvgReadDepth())
-    //     {
-    //         return false;
-    //     }
-    // }
-
+    
     return true;
 }
 
@@ -464,8 +266,12 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INV")
     {
-        if (e.getMaxMapQ() == 0)
-        {
+        // if (e.getMaxMapQ() == 0)
+        // {
+        //     return false;
+        // }
+
+        if (e.getFrequency()<=2) {
             return false;
         }
 

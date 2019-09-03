@@ -12,6 +12,7 @@ RefiningDeletion::RefiningDeletion()
 
 RefiningDeletion::~RefiningDeletion()
 {
+
 }
 
 void RefiningDeletion::execute()
@@ -247,7 +248,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                     continue;
                 }
 
-                if (n.matchCount<30) {
+                if (n.matchCount<20) {
                     continue;
                 }
 
@@ -469,7 +470,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
                     continue;
                 }
 
-                if (n.matchCount<30) {
+                if (n.matchCount<20) {
                     continue;
                 }
 
@@ -694,7 +695,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         return;
     }
 
-    if (bEnd - bPos < 50)
+    if (bEnd - bPos < 20)
     {
         return;
     }

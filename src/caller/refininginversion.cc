@@ -12,11 +12,11 @@ void RefiningInversion::execute()
     variantresult.setEndChr(evidence.getEndChr());
     prepareBamReader();
 
-    // first();
-    // if (variantresult.isQuailtyPass())
-    // {
-    //     return;
-    // }
+    first();
+    if (variantresult.isQuailtyPass())
+    {
+        return;
+    }
     second();
     if (variantresult.isQuailtyPass())
     {
@@ -98,13 +98,21 @@ void RefiningInversion::refineStartToEnd(const char *range)
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
         if (cigar.at(0).getOperatorName() == 'S')
         {
+            if (cigar.at(0).getLength() < 4)
+            {
+                continue;
+            }
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
             StringSearchConfig ssc;
+            ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+            ssc.setMaxAllowAlign(cigar.at(0).getLength());
+
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
-                if (n.matchCount <= 8)
+                if (n.matchCount <= 4)
                 {
                     continue;
                 }
@@ -143,7 +151,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
         // else if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
         if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
         {
-            if (cigar.at(cigar.size() - 1).getLength() < 10)
+            if (cigar.at(cigar.size() - 1).getLength() < 4)
             {
                 continue;
             }
@@ -151,14 +159,17 @@ void RefiningInversion::refineStartToEnd(const char *range)
             std::string fullRead = readparser.getSequence();
             // std::cout << "-------------" << std::endl;
             // std::cout << fullRead << std::endl;
-            // std::cout << "pos end : " << readparser.getEnd() << std::endl;
+            std::cout << "pos end : " << readparser.getEnd() << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             StringSearchConfig ssc;
+            ssc.setAllowMissMatch(2);
+            ssc.setMaxContinueMissMatch(1);
+            ssc.setMaxAllowAlign(cigar.at(cigar.size() - 1).getLength());
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead, &ssc);
             for (auto n : result)
             {
-                if (n.matchCount <= 8)
+                if (n.matchCount <= 4)
                 {
                     continue;
                 }
@@ -271,7 +282,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
-                if (n.matchCount <= 8)
+                if (n.matchCount <= 4)
                 {
                     continue;
                 }
@@ -329,7 +340,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
-                if (n.matchCount <= 8)
+                if (n.matchCount <= 4)
                 {
                     continue;
                 }
@@ -376,7 +387,7 @@ void RefiningInversion::refineEndToStart(const char *range)
     }
 
     RefiningInversion::calculateFinalBreakpoint(&listPosition);
-    std::cout << variantresult.getPos() << std::endl;
+    // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
@@ -392,11 +403,12 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
-    // std::cout << "svlength :" << svlength << std::endl;
+    std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
     int lastscore = 0;
 
     for (auto const &x : *listPosition)
     {
+
         int maxMatchSize = getMaxIntFromVector(x.second.MatchLists);
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
@@ -405,16 +417,26 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
         {
             continue;
         }
+            // std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
+
+        // if (x.first.second - x.first.first < 1000)
+        // {
+        //     if (x.second.NumberOfMatchRead <= 1)
+        //     {
+        //         continue;
+        //     }
+        // }
+
         // std::cout << "maxMatchSize : " << maxMatchSize << std::endl;
         // if (maxMatchSize > 80)
         // {
         //     continue;
         // }
 
-        if (maxQuality == 0)
-        {
-            continue;
-        }
+        // if (maxQuality == 0)
+        // {
+        //     continue;
+        // }
 
         int number = x.second.NumberOfMatchRead;
 
@@ -448,10 +470,10 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
         return;
     }
 
-    if (bEnd - bPos > 1000000)
-    {
-        return;
-    }
+    // if (bEnd - bPos > 1000000)
+    // {
+    //     return;
+    // }
 
     if (bEnd - bPos <= 0)
     {

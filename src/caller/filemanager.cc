@@ -27,7 +27,7 @@ std::string FileManager::getAllEvidencePath()
 
 std::string FileManager::getTempEvidencePath()
 {
-    return getOutputPath()+"/analysis/" + "temp_evidence";
+    return getOutputPath()+"/analysis/" + "evidence";
 }
 
 
@@ -77,7 +77,6 @@ void FileManager::initialize()
     createDirectory(output_path + "/analysis");
     createDirectory(output_path + "/analysis/evidence");
     createDirectory(output_path + "/analysis/readdepth");
-    createDirectory(output_path + "/analysis/temp_evidence");
     createDirectory(output_path + "/analysis/readdepthstat");
     createDirectory(output_path + "/analysis/variant");
 }

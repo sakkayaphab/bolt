@@ -127,12 +127,12 @@ void EvidenceFinder::findEvidence()
         {
             readdepthdetail.RD++;
 
-            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 5)
+            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
             {
                 readdepthdetail.SCF++;
             }
 
-            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 5)
+            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
             {
                 readdepthdetail.SCL++;
             }

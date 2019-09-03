@@ -60,8 +60,10 @@ void RefineDepthBlock::execute()
         }
         else if (variantlist.at(0).getSVType() == "INV")
         {
-            result = getResultWithOutOverlapped(&variantlist, &variantlist);
-            result = getRefineResultInversion(&result);
+
+            // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultInversion(&variantlist);
+            // result = variantlist;
         }
         else
         {
@@ -252,10 +254,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        // if (n.getSVType()!="DEL") {
-        //     break;
-        // }
-
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
@@ -267,37 +265,149 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
 
         if (n.getSvLength() > 2000)
         {
-
-            if (previousRD.TRA1 >= 10)
+            if (currentRD.DUP1 + currentRD.DUP2 >= 20)
             {
                 continue;
             }
 
-            if (previousRD.TRA2 >= 10)
+            if (previousRD.DUP1 + previousRD.DUP2 >= 20)
             {
                 continue;
             }
 
-            if (currentRD.TRA1 >= 10)
+            if (nextRD.DUP1 + previousRD.DUP2 >= 20)
             {
                 continue;
             }
 
-            if (currentRD.TRA2 >= 10)
+            if (currentRD.TRA1 + currentRD.TRA2 >= 20)
             {
                 continue;
             }
 
-            if (nextRD.TRA1 >= 10)
+            if (previousRD.TRA1 + previousRD.TRA2 >= 20)
             {
                 continue;
             }
 
-            if (nextRD.TRA2 >= 10)
+            if (nextRD.TRA1 + previousRD.TRA2 >= 20)
+            {
+                continue;
+            }
+
+        }
+
+        auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        auto currentEndRD = rdf.getBlock(currentEnd);
+        auto nextEndRD = rdf.getBlock(nextEnd);
+        auto previousEndRD = rdf.getBlock(previousEnd);
+
+        if (n.getSvLength() > 2000)
+        {
+            if (currentEndRD.DUP1 + currentEndRD.DUP2 >= 20)
+            {
+                continue;
+            }
+
+            if (previousEndRD.DUP1 + previousEndRD.DUP2 >= 20)
+            {
+                continue;
+            }
+
+            if (nextEndRD.DUP1 + previousEndRD.DUP2 >= 20)
+            {
+                continue;
+            }
+
+            if (currentEndRD.TRA1 + currentEndRD.TRA2 >= 20)
+            {
+                continue;
+            }
+
+            if (previousEndRD.TRA1 + previousEndRD.TRA2 >= 20)
+            {
+                continue;
+            }
+
+            if (nextEndRD.TRA1 + nextEndRD.TRA2 >= 20)
+            {
+                continue;
+            }
+
+        }
+
+        if (n.getSvLength() < 20)
+        {
+            continue;
+        }
+
+        if (n.getFrequency() <= 1)
+        {
+            continue;
+        }
+
+
+        if (n.getMaxMapQ() < 60)
+        {
+            if (n.getFrequency() <= 2)
             {
                 continue;
             }
         }
+
+        if (n.getFrequency()>=30) {
+            continue;
+        }
+
+        if (n.getMaxMapQ()==0) {
+            continue;
+        }
+
+        // if (n.getAvgMapQ()<2) {
+        //     continue;
+        // }
+
+        if (n.getSvLength()>10000000) {
+            continue;
+        }
+
+
+        // if (n.getFrequency()<=2) {
+        //         continue;
+        // }
+
+        // if (n.getFrequency()==1) {
+        //     if (n.getMaxMapQ()<25) {
+        //         continue;
+        //     }
+        // }
+
+        // if (n.getSvLength()<300) {
+        //      if (n.getMaxMapQ()<10) {
+        //         continue;
+        //     }
+        // }
+
+        // if (n.getSvLength() < 1000)
+        // {
+        //     // if (n.getFrequency()<=3) {
+        //     //     continue;
+        //     // }
+        //     // if (currentRD.depth>10 || currentEndRD.depth>10) {
+        //     //     continue;
+        //     // }
+
+        //     // if (currentEndRD.depth>100) {
+        //     //     continue;
+        //     // }
+
+        //     // if (n.getMaxMapQ()<=25) {
+        //     //     continue;
+        //     // }
+        // }
 
         cache.push_back(n);
     }
@@ -310,9 +420,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        // if (n.getSVType()!="DEL") {
-        //     break;
-        // }
 
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
@@ -354,6 +461,79 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             {
                 continue;
             }
+        }
+
+        auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        auto currentEndRD = rdf.getBlock(currentEnd);
+        auto nextEndRD = rdf.getBlock(nextEnd);
+        auto previousEndRD = rdf.getBlock(previousEnd);
+
+        if (n.getSvLength() > 2000)
+        {
+            if (currentEndRD.DUP1 + currentEndRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
+            {
+                continue;
+            }
+
+            if (previousEndRD.DUP1 + previousEndRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextEndRD.DUP1 + previousEndRD.DUP2 >= 10)
+            {
+                continue;
+            }
+
+            if (nextEndRD.INV1 + previousEndRD.INV2 >= 10)
+            {
+                continue;
+            }
+        }
+
+        if (n.getSvLength() < 50)
+        {
+            continue;
+        }
+
+        if (n.getSvLength() < 300)
+        {
+            if (n.getMaxMapQ() < 10)
+            {
+                continue;
+            }
+        }
+
+        if (n.getSvLength() < 1000)
+        {
+            // if (n.getFrequency()<=3) {
+            //     continue;
+            // }
+            if (currentRD.depth > 10 || currentEndRD.depth > 10)
+            {
+                continue;
+            }
+
+            // if (currentEndRD.depth>100) {
+            //     continue;
+            // }
+
+            // if (n.getMaxMapQ()<=25) {
+            //     continue;
+            // }
         }
 
         cache.push_back(n);

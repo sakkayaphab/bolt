@@ -12,7 +12,7 @@ void SpecifyingEvidenceInsertion::updateRead()
 
     if (read->core.flag & BAM_FMUNMAP)
     {
-        // checkRange();
+        checkRange();
         return;
     }
 
@@ -29,7 +29,7 @@ void SpecifyingEvidenceInsertion::updateRead()
             return;
         }
 
-        if (diff < samplestat->getMedianSampleStat() - (samplestat->getSDSampleStat() / 2))
+        if (diff < samplestat->getMedianSampleStat() - (samplestat->getSDSampleStat()))
         {
             checkRange();
             return;
@@ -266,7 +266,7 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
     //         return false;
     //     }
 
-    if (evidence->getFrequency() < 6)
+    if (evidence->getFrequency() < 4)
     {
         return false;
     }

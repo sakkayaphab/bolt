@@ -90,6 +90,15 @@ void SpecifyingEvidenceDeletion::updateRead()
         checkRange();
         return;
     }
+
+    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 90)
+    {
+        if (readparser.getMapQuality() >= 60)
+        {
+            checkRange();
+            return;
+        }
+    }
 }
 
 int32_t SpecifyingEvidenceDeletion::getSVLength()
@@ -215,7 +224,7 @@ bool SpecifyingEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t 
 
 void SpecifyingEvidenceDeletion::proveEvidence(int index)
 {
-    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()*2) + samplestat->getReadLength();
+    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat() * 2) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
@@ -238,35 +247,41 @@ void SpecifyingEvidenceDeletion::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceDeletion::removeDuplicateFinalEvidence() {
+void SpecifyingEvidenceDeletion::removeDuplicateFinalEvidence()
+{
     int number = 0;
     std::vector<Evidence> tempEvidence;
-    for (auto n:finalEvidence) {
+    for (auto n : finalEvidence)
+    {
         bool found;
-        for (auto m:finalEvidence) {
-            if (n.getPosDiscordantRead()==m.getPosDiscordantRead()) {
+        for (auto m : finalEvidence)
+        {
+            if (n.getPosDiscordantRead() == m.getPosDiscordantRead())
+            {
                 continue;
             }
 
-            if (n.getPosDiscordantRead()<= m.getPosDiscordantRead() && n.getLastPosDiscordantRead()>=m.getPosDiscordantRead()) {
+            if (n.getPosDiscordantRead() <= m.getPosDiscordantRead() && n.getLastPosDiscordantRead() >= m.getPosDiscordantRead())
+            {
                 found = true;
                 break;
             }
 
-            if (n.getPosDiscordantRead()<= m.getLastPosDiscordantRead() && n.getLastEndDiscordantRead()>=m.getLastPosDiscordantRead()) {
+            if (n.getPosDiscordantRead() <= m.getLastPosDiscordantRead() && n.getLastEndDiscordantRead() >= m.getLastPosDiscordantRead())
+            {
                 found = true;
                 break;
             }
         }
 
-        if (!found) {
+        if (!found)
+        {
             tempEvidence.push_back(n);
         }
     }
 
     finalEvidence = tempEvidence;
 }
-
 
 void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
 {
@@ -290,9 +305,9 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
     // }
 
-    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
-    int32_t notUsed = (samplestat->getSDSampleStat()*2) + (samplestat->getReadLength());
+    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t notUsed = (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
     // if (difflengthEnd > 100000)
     // {
@@ -371,7 +386,8 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    if (svLength>1000000) {
+    if (svLength > 1000000)
+    {
         return false;
     }
 
@@ -381,12 +397,13 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
         {
             return false;
         }
-
-    } else if (svLength < 2000) {
-        if (evidence->getFrequency() <= 1)
-        {
-            return false;
-        }
+    }
+    else if (svLength < 2000)
+    {
+        // if (evidence->getFrequency() <= 1)
+        // {
+        //     return false;
+        // }
     }
 
     return true;
