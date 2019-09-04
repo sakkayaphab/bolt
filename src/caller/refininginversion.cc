@@ -88,6 +88,20 @@ void RefiningInversion::refineStartToEnd(const char *range)
         {
             continue;
         }
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
+        {
+            continue;
+        }
 
         auto cigar = readparser.getCigar();
         // if (!cigar.size() == 2)
@@ -262,6 +276,21 @@ void RefiningInversion::refineEndToStart(const char *range)
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
         if (readparser.isUnmapped())
+        {
+            continue;
+        }
+
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
         {
             continue;
         }

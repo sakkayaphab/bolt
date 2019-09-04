@@ -83,6 +83,21 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             continue;
         }
 
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
+        {
+            continue;
+        }
+
         auto cigar = readparser.getCigar();
         // if (!cigar.size() == 2)
         // {
@@ -221,6 +236,21 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     {
 
         if (readparser.isUnmapped())
+        {
+            continue;
+        }
+
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
         {
             continue;
         }

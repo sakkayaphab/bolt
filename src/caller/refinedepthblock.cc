@@ -65,6 +65,13 @@ void RefineDepthBlock::execute()
             result = getRefineResultInversion(&variantlist);
             // result = variantlist;
         }
+        else if (variantlist.at(0).getSVType() == "DUP")
+        {
+
+            // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultDuplication(&variantlist);
+            // result = variantlist;
+        }
         else
         {
             result = variantlist;
@@ -100,148 +107,159 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
         // if (n.getSVType()!="DEL") {
         //     break;
         // }
+        
 
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
-        auto nextPos = nextNumber(n.getPos(), roundConfig);
-        auto previousPos = previousNumber(n.getPos(), roundConfig);
+        
+        // auto currentPos = roundNumber(n.getPos(), roundConfig);
+        // auto nextPos = nextNumber(n.getPos(), roundConfig);
+        // auto previousPos = previousNumber(n.getPos(), roundConfig);
 
-        auto currentRD = rdf.getBlock(currentPos);
-        auto nextRD = rdf.getBlock(nextPos);
-        auto previousRD = rdf.getBlock(previousPos);
+        // auto currentRD = rdf.getBlock(currentPos);
+        // auto nextRD = rdf.getBlock(nextPos);
+        // auto previousRD = rdf.getBlock(previousPos);
 
-        if (n.getSvLength() > 2000)
+        // if (n.getSvLength() > 2000)
+        // {
+        //     if (currentRD.DEL1 + currentRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousRD.DEL1 + previousRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextRD.DEL1 + previousRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentRD.INV1 + currentRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousRD.INV1 + previousRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextRD.INV1 + previousRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentRD.TRA1 + currentRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousRD.TRA1 + previousRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextRD.TRA1 + previousRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        // }
+
+        // auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        // auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        // auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        // auto currentEndRD = rdf.getBlock(currentEnd);
+        // auto nextEndRD = rdf.getBlock(nextEnd);
+        // auto previousEndRD = rdf.getBlock(previousEnd);
+
+        // if (n.getSvLength() > 1000)
+        // {
+        //     if (currentEndRD.DEL1 + currentEndRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousEndRD.DEL1 + previousEndRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextEndRD.DEL1 + previousEndRD.DEL2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextEndRD.INV1 + nextEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentEndRD.TRA1 + currentEndRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousEndRD.TRA1 + previousEndRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextEndRD.TRA1 + nextEndRD.TRA2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        // }
+
+        //  if (n.getSvLength() < 50)
+        // {
+        //     continue;
+        // }
+
+        if (n.getFrequency() <= 1)
         {
-            if (currentRD.INV1 >= 20)
-            {
-                continue;
-            }
-
-            if (currentRD.INV2 >= 20)
-            {
-                continue;
-            }
-
-            if (previousRD.INV1 >= 20)
-            {
-                continue;
-            }
-
-            if (previousRD.INV2 >= 20)
-            {
-                continue;
-            }
-
-            if (nextRD.INV1 >= 20)
-            {
-                continue;
-            }
-
-            if (nextRD.INV2 >= 20)
-            {
-                continue;
-            }
-
-            if (previousRD.TRA1 >= 10)
-            {
-                continue;
-            }
-
-            if (previousRD.TRA2 >= 10)
-            {
-                continue;
-            }
-
-            if (currentRD.TRA1 >= 10)
-            {
-                continue;
-            }
-
-            if (currentRD.TRA2 >= 10)
-            {
-                continue;
-            }
-
-            if (nextRD.TRA1 >= 10)
-            {
-                continue;
-            }
-
-            if (nextRD.TRA2 >= 10)
-            {
-                continue;
-            }
-
-            // if (currentRD.INS1 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.DEL1 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.INS1+previousRD.INS2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.INS1+previousRD.INS2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.DEL1+currentRD.DEL2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.INV1+currentRD.INV2 >= 4)
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.INV1+previousRD.INV2 >= 4)
-            // {
-            //     continue;
-            // }
-
-            // if (nextRD.INV1+nextRD.INV2 >= 4)
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.DEL1+currentRD.DEL2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.DEL1+previousRD.DEL2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (nextRD.DEL1+nextRD.DEL2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.TRA1+currentRD.TRA2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.TRA1+previousRD.TRA2 >= 10)
-            // {
-            //     continue;
-            // }
-
-            // if (nextRD.TRA1+nextRD.TRA2 >= 10)
-            // {
-            //     continue;
-            // }
+            continue;
         }
+
+
+        // if (n.getMaxMapQ() < 60)
+        // {
+        //     if (n.getFrequency() <= 2)
+        //     {
+        //         continue;
+        //     }
+        // }
+
+        // if (n.getFrequency()>=30) {
+        //     continue;
+        // }
+
+        // if (n.getMaxMapQ()==0) {
+        //     continue;
+        // }
+
+        // if (n.getAvgMapQ()<2) {
+        //     continue;
+        // }
+
+        // if (n.getSvLength()>10000000) {
+        //     continue;
+        // }
+
 
         cache.push_back(n);
     }

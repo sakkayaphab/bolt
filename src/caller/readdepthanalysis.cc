@@ -256,10 +256,10 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "DUP")
     {
-        if (e.getMaxMapQ() == 0)
-        {
-            return false;
-        }
+        // if (e.getMaxMapQ() < 15)
+        // {
+        //     return false;
+        // }
         
         return true;
     }

@@ -72,6 +72,21 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
             continue;
         }
 
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
+        {
+            continue;
+        }
+
         auto cigar = readparser.getCigar();
         // if (!cigar.size() == 2)
         // {

@@ -134,6 +134,21 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         {
             continue;
         }
+
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
+        {
+            continue;
+        }
         // if (readparser.getMapQuality()<15) {
         //             continue;
         //         }
@@ -373,6 +388,21 @@ void RefiningDeletion::refineEndToStart(const char *range)
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
         if (readparser.isUnmapped())
+        {
+            continue;
+        }
+
+        if (readparser.isNotPassingFilters())
+        {
+            continue;
+        }
+
+        if (readparser.isPCR())
+        {
+            continue;
+        }
+
+        if (readparser.isSupplementaryAlignment())
         {
             continue;
         }

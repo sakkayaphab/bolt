@@ -31,10 +31,10 @@ void SpecifyingEvidenceTandemDuplication::updateRead()
     }
 
     //limit SVLEN
-    if (readparser.getMatePos() - readparser.getPos() > 1000000)
-    {
-        return;
-    }
+    // if (readparser.getMatePos() - readparser.getPos() > 1000000)
+    // {
+    //     return;
+    // }
 
     if (readparser.getPos() > readparser.getMatePos())
     {
@@ -184,11 +184,11 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
     int32_t notUsed = (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 1000000)
-    {
-        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
-        return;
-    }
+    // if (difflengthEnd > 1000000)
+    // {
+    //     std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+    //     return;
+    // }
     // int32_t difflengthPos =
     // int32_t difflengthEnd =
 
@@ -266,23 +266,23 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    if (svLength>1000000) {
-        return false;
-    }
+    // if (svLength>1000000) {
+    //     return false;
+    // }
 
-    if (svLength < 500)
-    {
-        if (evidence->getFrequency() <= 2)
-        {
-            return false;
-        }
+    // if (svLength < 500)
+    // {
+    //     if (evidence->getFrequency() <= 2)
+    //     {
+    //         return false;
+    //     }
 
-    } else if (svLength < 2000) {
-        if (evidence->getFrequency() <= 1)
-        {
-            return false;
-        }
-    }
+    // } else if (svLength < 2000) {
+    //     if (evidence->getFrequency() <= 1)
+    //     {
+    //         return false;
+    //     }
+    // }
 
     return true;
 }
