@@ -105,6 +105,18 @@ void EvidenceFinder::findEvidence()
         {
             continue;
         }
+        
+        std::vector<ReadParser::SATag> satag = readparser.getSATag();
+        if (satag.size()!=0) {
+            for (auto n:satag) {
+                std::cout << 
+                n.chrname << 
+                " " <<
+                n.pos <<
+                " " <<
+                n.strand << std::endl;
+            }
+        }
 
         currentPos = read->core.pos + 1;
         currentMPos = read->core.mpos + 1;
@@ -159,6 +171,9 @@ void EvidenceFinder::findEvidence()
             ReadDepthLineSegment[roundedCurrentPos].SCF += readdepthdetail.SCF;
             ReadDepthLineSegment[roundedCurrentPos].SCL += readdepthdetail.SCL;
 
+            ReadDepthLineSegment[roundedCurrentPos].R1_MUN += readdepthdetail.R1_MUN;
+            ReadDepthLineSegment[roundedCurrentPos].R2_MUN += readdepthdetail.R2_MUN;
+
             readdepthdetail.RD = 0;
             coverage = 0;
             readdepthdetail.DEL1 = 0;
@@ -174,6 +189,9 @@ void EvidenceFinder::findEvidence()
 
             readdepthdetail.SCF = 0;
             readdepthdetail.SCL = 0;
+
+            readdepthdetail.R1_MUN = 0;
+            readdepthdetail.R2_MUN = 0;
             roundedCurrentPos = roundedPos;
         }
     }
@@ -215,8 +233,85 @@ void EvidenceFinder::findEvidence()
     seTranslocation.done();
 }
 
+void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd) {
+    if (readparser.isFirstRead()) {
+        if (readparser.isMateUnmapped()) {
+            rdd->R1_MUN++;
+            return;
+        }
+
+        // if (readparser.isReverse()) {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (!readparser.isMateReverse()) {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+        // if (insertSizeFirstRead>samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        // {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (!(readparser.getPos()<readparser.getMatePos())) {
+        //     //  rdd->ABN_READ++;
+        //     return;
+        // }
+
+
+        // rdd->N_READ++;
+        return;
+    } else {
+         if (readparser.isMateUnmapped()) {
+            rdd->R2_MUN++;
+            return;
+        }
+
+        // if (!readparser.isReverse()) {
+        //     rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (readparser.isMateReverse()) {
+        //     rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
+        // if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200) {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
+        //     // rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // if (!(readparser.getMatePos()<readparser.getPos())) {
+        //     //  rdd->ABN_READ++;
+        //     return;
+        // }
+
+        // rdd->N_READ++;
+        return;
+    }
+}
+
 void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
 {
+
+    //checkNormalRead
+    checkNormalRead(rdd);
 
     if (readparser.isSecondRead())
     {

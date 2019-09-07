@@ -88,7 +88,6 @@ std::vector<StringSearch::Score> StringSearchAlignment::alignDeletionTargetAtEnd
 
 std::vector<StringSearch::Score> StringSearchAlignment::alignDuplicationTargetAtStart(std::string *seq,StringSearchConfig *ssc)
 {
-
     return alignDeletionTargetAtEnd(seq,ssc);
 }
 

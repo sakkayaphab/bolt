@@ -20,11 +20,11 @@ void RefiningTandemDuplication::execute()
     {
         return;
     }
-    second();
-    if (variantresult.isQuailtyPass())
-    {
-        return;
-    }
+    // second();
+    // if (variantresult.isQuailtyPass())
+    // {
+    //     return;
+    // }
 }
 
 void RefiningTandemDuplication::first()
@@ -33,7 +33,7 @@ void RefiningTandemDuplication::first()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    std::cout << range << " / " << samplestat->getReadLength() << std::endl;
+    // std::cout << range << " / " << samplestat->getReadLength() << std::endl;
     refineStartToEnd(range);
 }
 
@@ -99,11 +99,13 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         }
 
         auto cigar = readparser.getCigar();
-        // if (!cigar.size() == 2)
-        // {
-        //     continue;
-        // }
-        if (!(cigar.at(0).getOperatorName() == 'S'))
+
+        if (cigar.at(0).getOperatorName() != 'S')
+        {
+            continue;
+        }
+
+        if (cigar.at(0).getLength() <= 10)
         {
             continue;
         }
@@ -131,6 +133,8 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtStart(&fullRead);
         StringSearchConfig ssc;
+        ssc.setAllowMissMatch(2);
+        ssc.setMaxContinueMissMatch(1);
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
         for (auto n : result)
         {
@@ -147,9 +151,12 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
                 continue;
             }
 
+            // std::cout << "Read Pos : " << readparser.getPos() << std::endl; 
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd << std::endl;
-            // std::cout << "pattern : " << n.pattern << std::endl;
+            // std::cout << "seq : " << readparser.getSequence().substr(0,n.endseq) << std::endl;
+            
+            // std::cout << "pattern : " << n.matchSeqPattern << std::endl;
             // std::cout << "mEnd : " << mEnd << std::endl;
             // std::cout << "---------- MD TAG ----------" << std::endl;
 
@@ -231,7 +238,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     ssa.setSVType("DUPEND");
     ssa.setPosReference(positionStartReference);
     ssa.buildReference();
-    std::cout << positionStartReference << " / " << positionEndReference << std::endl;
+    // std::cout << positionStartReference << " / " << positionEndReference << std::endl;
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
 
@@ -264,6 +271,11 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         {
             continue;
         }
+
+         if (cigar.at(cigar.size() - 1).getLength() <= 2)
+        {
+            continue;
+        }
         // if (!(cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
         // {
         //     continue;
@@ -277,6 +289,8 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
 
         // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignDuplicationTargetAtEnd(&fullRead);
         StringSearchConfig ssc;
+        ssc.setAllowMissMatch(2);
+        ssc.setMaxContinueMissMatch(1);
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtEnd(&fullRead, &ssc);
         for (auto n : result)
         {
@@ -326,7 +340,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
     }
 
     RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
-    std::cout << variantresult.getPos() << std::endl;
+    // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
@@ -361,10 +375,10 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         //     continue;
         // }
 
-        if (maxQuality == 0)
-        {
-            continue;
-        }
+        // if (maxQuality == 0)
+        // {
+        //     continue;
+        // }
 
         int number = x.second.NumberOfMatchRead;
 

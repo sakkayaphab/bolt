@@ -186,14 +186,17 @@ int Cli::debug()
     // std::string output = "/data/users/wichadak/kan/bolt/temp";
     // std::string output = "temp100";
     // std::string output = "temp50";
+    // std::string name = "hello";
+    // std::cout << name.substr(0,name.size()) << std::endl;
+    // return 0;
 
     Caller caller(sample, reference, output);
     // caller.showinfo();
     // caller.setParallel(40);
     caller.execute();
-    caller.catfile();
-    caller.findBreakPoint();
-    caller.refineDelpthBlock();
+    // caller.catfile();
+    // caller.findBreakPoint();
+    // caller.refineDelpthBlock();
 
     // caller.mergeBreakpoint();
 

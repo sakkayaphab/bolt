@@ -36,6 +36,9 @@ void ReadDepthHelper::setReadDepthMap(std::map<int32_t, EvidenceFinder::ReadDept
         rdv.SCF = it->second.SCF;
         rdv.SCL = it->second.SCL;
 
+        rdv.R1_MUN = it->second.R1_MUN;
+        rdv.R2_MUN = it->second.R2_MUN;
+
         vecRDLine.push_back(rdv);
     }
 
@@ -76,6 +79,8 @@ void ReadDepthHelper::writeReadDepthLineFile(std::string path)
                        << 0 << "\t"
                        << 0 << "\t"
                        << 0 << "\t"
+                       << 0 << "\t"
+                       << 0 << "\t"
                        << 0 << std::endl;
             }
         }
@@ -96,7 +101,9 @@ void ReadDepthHelper::writeReadDepthLineFile(std::string path)
                    << n.INV2 << "\t"
                    << n.TRA2 << "\t"
                    << n.SCF << "\t"
-                   << n.SCL << std::endl;
+                   << n.SCL << "\t"
+                   << n.R1_MUN << "\t"
+                   << n.R2_MUN << std::endl;
             currentPos = n.pos;
         }
     }

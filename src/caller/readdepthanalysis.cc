@@ -266,12 +266,12 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INV")
     {
-        // if (e.getMaxMapQ() == 0)
-        // {
-        //     return false;
-        // }
+        if (e.getMaxMapQ() == 0)
+        {
+            return false;
+        }
 
-        if (e.getFrequency()<=2) {
+        if (e.getFrequency()<=1) {
             return false;
         }
 

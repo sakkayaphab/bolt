@@ -7,7 +7,7 @@
 #include <cstring>
 #include <stdlib.h>
 #include <ctype.h>
-
+#include <bits/stdc++.h>
 void ReadParser::setBamRead(bam1_t *bam_read)
 {
     source_bamread = bam_read;
@@ -179,37 +179,6 @@ void ReadParser::printCigar()
 
         // std::cout << op << "=" << ol << " ";
     }
-
-    // std::cout << std::endl;
-
-    // uint8_t *q = bam_get_seq(source_bamread);
-
-    // int32_t lseq = source_bamread->core.l_qseq;
-
-    // for (int i = 0; i < source_bamread->core.l_qseq; ++i)
-    // {
-    //     printf("%c", seq_nt16_str[bam_seqi(bam_get_seq(source_bamread), i)]);
-    // }
-    // printf("\n");
-
-    // for (int i = 0; i < lseq; ++i)
-    // {
-    //     //   printf("%c", seq_nt16_str[bam_seqi(bam_get_seq(source_bamread), i)]);
-    //     printf("%c", seq_nt16_str[bam_seqi(q, i)]);
-    // }
-
-    // for (int i = 0; i < lseq; ++i)
-    // {
-    // printf("qual:");
-    // for (int i = 0; i < source_bamread->core.l_qseq; ++i)
-    // {
-    //     printf("%c", bam_get_qual(source_bamread)[i]);
-    // }
-    // printf("\n");
-    // }
-
-    // std::cout << std::endl
-    //           << " = " << q << " / " << source_bamread->core.l_qseq << std::endl;
 }
 
 bool ReadParser::hasLastCigarSoftclipped()
@@ -424,6 +393,38 @@ bool ReadParser::isSupplementaryAlignment()
     return false;
 }
 
+std::string ReadParser::getSoftClippedSequenceStart()
+{
+    auto cigar = getCigar();
+    if (!(cigar.at(0).getOperatorName() == 'S'))
+    {
+        return "";
+    }
+
+    if (cigar.at(0).getLength() <= 2)
+    {
+        return "";
+    }
+
+    return getSequence().substr(0, cigar.at(0).getLength());
+}
+
+std::string ReadParser::getSoftClippedSequenceEnd()
+{
+    auto cigar = getCigar();
+    if (!(cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
+    {
+        return "";
+    }
+
+    if (cigar.at(cigar.size() - 1).getLength() <= 2)
+    {
+        return "";
+    }
+
+    return getSequence().substr(getSequence().size() - cigar.at(cigar.size() - 1).getLength(), getSequence().size());
+}
+
 int ReadParser::getLastToStartMissMatchPosMD()
 {
     std::vector<ReadParser::AlignMD> md = getAlignMD();
@@ -457,14 +458,15 @@ int ReadParser::getSecondLastToStartMissMatchPosMD()
         if (lastmd.operate != 'M')
         {
             numberFound++;
-            if (numberFound>=2) {
+            if (numberFound >= 2)
+            {
                 break;
             }
-            
         }
     }
 
-    if (numberFound>=2) {
+    if (numberFound >= 2)
+    {
         return sizeAcc;
     }
 
@@ -503,13 +505,15 @@ int ReadParser::getSecondStartToEndMissMatchPosMD()
         if (lastmd.operate != 'M')
         {
             numberFound++;
-            if (numberFound>=2) {
+            if (numberFound >= 2)
+            {
                 break;
             }
         }
     }
 
-    if (numberFound>=2) {
+    if (numberFound >= 2)
+    {
         return sizeAcc;
     }
 
@@ -616,4 +620,78 @@ std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()
     // }
 
     return alignMDs;
+}
+
+std::vector<ReadParser::SATag> ReadParser::getSATag()
+{
+    // std::vector<ReadParser::AlignMD> alignMDs;
+    const char *satagchar = "SA";
+    auto aux = bam_aux_get(source_bamread, satagchar);
+    auto auxChar = bam_aux2Z(aux);
+    std::string auxString(auxChar);
+    
+    std::vector<std::string> saString = splitText(auxString, ';');
+    std::vector<std::string> subSplit;
+
+    std::vector<SATag> saTag;
+    for (auto n : saString)
+    {
+        subSplit = splitText(n, ',');
+        if (subSplit.size() != 0)
+        {
+            SATag tempSAtag;
+            tempSAtag.chrname = subSplit.at(0);
+            tempSAtag.pos = std::stol(subSplit.at(1), nullptr, 0);
+            tempSAtag.strand = subSplit.at(2);
+            tempSAtag.cigar = getCigarByString(subSplit.at(3));
+            // std::cout << "cigar" << std::endl;
+            // for (auto n:tempSAtag.cigar) {
+            //     std::cout << n.getOperatorName() << " " << n.getLength() << std::endl;
+            // }
+            
+            tempSAtag.mapQ = (uint8_t)atoi(subSplit.at(4).c_str());
+            tempSAtag.NM = atoi(subSplit.at(5).c_str());
+
+            saTag.push_back(tempSAtag);
+        }
+    }
+
+    return saTag;
+}
+
+std::vector<std::string> ReadParser::splitText(std::string s, char delimiter)
+{
+    std::vector<std::string> tokens;
+
+    std::stringstream check1(s);
+
+    std::string intermediate;
+
+    while (getline(check1, intermediate, delimiter))
+    {
+        tokens.push_back(intermediate);
+    }
+
+    return tokens;
+}
+
+std::vector<ReadParser::Cigar> ReadParser::getCigarByString(std::string cigartext) {
+    std::vector<ReadParser::Cigar> cigar;
+    std::string digitstring;
+    for (auto n:cigartext) {
+        if (isdigit(n))
+        {
+            digitstring += n;
+        }
+        else {
+            Cigar tempCigar;
+            tempCigar.setLength(atoi(digitstring.c_str()));
+            digitstring = "";
+            tempCigar.setOperatorName(n);
+            cigar.push_back(tempCigar);
+            
+        }
+    }
+
+    return cigar;
 }

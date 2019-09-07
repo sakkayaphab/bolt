@@ -43,6 +43,10 @@ class Cigar
       return operation_n;
     }
 
+    void setOperatorName(char oper) {
+      operation_n = oper;
+    }
+
     void setOperatorName(int oper)
     {
       switch (oper)
@@ -155,6 +159,24 @@ public:
 
   int getSecondLastToStartMissMatchPosMD();
   int getSecondStartToEndMissMatchPosMD();
+
+  std::string getSoftClippedSequenceStart();
+  std::string getSoftClippedSequenceEnd();
+
+  struct SATag
+  {
+    std::string chrname;
+    int32_t pos=0;
+    std::string strand;
+    std::vector<ReadParser::Cigar> cigar;
+    uint8_t mapQ=0;
+    int NM=0;
+  };
+
+  std::vector<SATag> getSATag();
+  std::vector<std::string> splitText(std::string text, char delimiter);
+   std::vector<ReadParser::Cigar> getCigarByString(std::string cigartext);
+  
 };
 
 #endif

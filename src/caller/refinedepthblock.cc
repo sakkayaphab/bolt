@@ -121,35 +121,35 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
 
         // if (n.getSvLength() > 2000)
         // {
-        //     if (currentRD.DEL1 + currentRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (currentRD.DEL1 + currentRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (previousRD.DEL1 + previousRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (previousRD.DEL1 + previousRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (nextRD.DEL1 + previousRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (nextRD.DEL1 + previousRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (currentRD.INV1 + currentRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (currentRD.INV1 + currentRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (previousRD.INV1 + previousRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (previousRD.INV1 + previousRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (nextRD.INV1 + previousRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (nextRD.INV1 + previousRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
         //     if (currentRD.TRA1 + currentRD.TRA2 >= 10)
         //     {
@@ -176,37 +176,37 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
         // auto nextEndRD = rdf.getBlock(nextEnd);
         // auto previousEndRD = rdf.getBlock(previousEnd);
 
-        // if (n.getSvLength() > 1000)
+        // if (n.getSvLength() > 2000)
         // {
-        //     if (currentEndRD.DEL1 + currentEndRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (currentEndRD.DEL1 + currentEndRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (previousEndRD.DEL1 + previousEndRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (previousEndRD.DEL1 + previousEndRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (nextEndRD.DEL1 + previousEndRD.DEL2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (nextEndRD.DEL1 + previousEndRD.DEL2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
-        //     if (nextEndRD.INV1 + nextEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
+        // //     if (nextEndRD.INV1 + nextEndRD.INV2 >= 10)
+        // //     {
+        // //         continue;
+        // //     }
 
         //     if (currentEndRD.TRA1 + currentEndRD.TRA2 >= 10)
         //     {
@@ -225,15 +225,27 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
 
         // }
 
-        //  if (n.getSvLength() < 50)
+        // if (n.getSvLength() < 50)
         // {
         //     continue;
         // }
 
-        if (n.getFrequency() <= 1)
-        {
-            continue;
-        }
+        // if (n.getFrequency() <= 1)
+        // {
+        //     continue;
+        // }
+
+        // if (n.getFrequency() > 5) {
+        //     continue;
+        // }
+
+        //  if (n.getMaxMapQ() < 15) {
+        //      continue;
+        //  }
+
+        //  if (n.getMaxMapQ() < 15) {
+        //      continue;
+        //  }
 
 
         // if (n.getMaxMapQ() < 60)

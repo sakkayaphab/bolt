@@ -259,10 +259,10 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
 
 bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
 {
-    if (evidence->getEndDiscordantRead() - evidence->getLastPosDiscordantRead() < 0)
-    {
-        return false;
-    }
+    // if (evidence->getEndDiscordantRead() - evidence->getLastPosDiscordantRead() < 0)
+    // {
+    //     return false;
+    // }
     
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 

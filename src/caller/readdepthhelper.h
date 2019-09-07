@@ -38,6 +38,9 @@ public:
         int SCF = 0;
         int SCL = 0;
 
+        int R1_MUN = 0;
+        int R2_MUN = 0;
+
         bool operator<(const ReadDepthVector &rhs) const
         {
             return (pos < rhs.pos);

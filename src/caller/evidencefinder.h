@@ -27,6 +27,8 @@ class EvidenceFinder
     int TRA2 = 0;
     int SCF = 0;
     int SCL = 0;
+    int R1_MUN = 0;
+    int R2_MUN = 0;
   };
 
 private:
@@ -39,6 +41,7 @@ private:
   bam1_t *read;
   ReadParser readparser;
   void updateReadDepthSV(ReadDepthDetail *rdd);
+  void checkNormalRead(ReadDepthDetail *rdd);
   int32_t insertSizeFirstRead=0;
   int32_t insertSizeSecondRead=0;
 
