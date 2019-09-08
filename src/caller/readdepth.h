@@ -11,9 +11,9 @@ private:
     std::map<std::string, int> rdmap;
 public:
     ReadDepth();
-    void loadFile(std::string filepath);
-    void execute();
-    int getReadDepthByChr(std::string chr);
+    // void loadFile(std::string filepath);
+    // void execute();
+    // int getReadDepthByChr(std::string chr);
 };
 
 #endif

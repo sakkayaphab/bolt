@@ -13,6 +13,7 @@
 #include "specifyingevidencetranslocation.h"
 #include <unistd.h>
 #include "readdepthhelper.h"
+#include "splitread.h"
 
 EvidenceFinder::EvidenceFinder(SampleStat *samplestat_T, FileManager *filepath_T, std::string *target_chromosome_T)
 {
@@ -84,6 +85,7 @@ void EvidenceFinder::findEvidence()
     seTranslocation.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".TRA.txt");
 
     std::vector<ReadParser::Cigar> cigar;
+    SplitRead splitread(&readparser,samplestat);
     while (sam_itr_next(inT, iterT, read) >= 0)
     {
         if ((read->core.flag & BAM_FUNMAP))
@@ -105,18 +107,10 @@ void EvidenceFinder::findEvidence()
         {
             continue;
         }
-        
-        std::vector<ReadParser::SATag> satag = readparser.getSATag();
-        if (satag.size()!=0) {
-            for (auto n:satag) {
-                std::cout << 
-                n.chrname << 
-                " " <<
-                n.pos <<
-                " " <<
-                n.strand << std::endl;
-            }
-        }
+
+
+        splitread.updateRead();
+       
 
         currentPos = read->core.pos + 1;
         currentMPos = read->core.mpos + 1;
@@ -195,6 +189,8 @@ void EvidenceFinder::findEvidence()
             roundedCurrentPos = roundedPos;
         }
     }
+
+    splitread.printResult();
 
     // std::cout << "---------------------------------------" << std::endl;
     // std::cout << "✓ " << *target_chromosome << std::endl;

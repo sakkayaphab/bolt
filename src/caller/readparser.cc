@@ -110,7 +110,7 @@ int32_t ReadParser::getPosOfSeq()
     int32_t shift = 0;
     if (cigars.at(0).getOperatorName() == 'S')
     {
-        shift = cigars.at(0).getLength();
+        shift = (int32_t) cigars.at(0).getLength();
     }
 
     return getPos() - shift;
@@ -118,7 +118,7 @@ int32_t ReadParser::getPosOfSeq()
 
 int32_t ReadParser::getEndOfSeq()
 {
-    return getPosOfSeq() + source_bamread->core.l_qseq;
+    return getPosOfSeq() + (int32_t) source_bamread->core.l_qseq;
 }
 
 bool ReadParser::isMateUnmapped()
@@ -624,16 +624,22 @@ std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()
 
 std::vector<ReadParser::SATag> ReadParser::getSATag()
 {
+    std::vector<SATag> saTag;
+    
     // std::vector<ReadParser::AlignMD> alignMDs;
     const char *satagchar = "SA";
     auto aux = bam_aux_get(source_bamread, satagchar);
+    if (aux==0) {
+        return saTag;
+    }
     auto auxChar = bam_aux2Z(aux);
     std::string auxString(auxChar);
+    
     
     std::vector<std::string> saString = splitText(auxString, ';');
     std::vector<std::string> subSplit;
 
-    std::vector<SATag> saTag;
+    
     for (auto n : saString)
     {
         subSplit = splitText(n, ',');

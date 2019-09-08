@@ -26,18 +26,6 @@ protected:
 
   bool resultFromStart = false;
 
-  struct MatchRead
-  {
-    int NumberOfMatchRead=0;
-    std::vector<int> MatchLists;
-    std::vector<uint8_t > MapQLists;
-    std::string Sequence;
-    int maxMatchSequence=0;
-    int32_t maxSC = 0;
-    int32_t maxAlterSC = 0;
-    bool alignWithSoftClipped = false;
-  };
-
   SampleStat *samplestat;
   FileManager *filepath;
   FastaReader fastareader;
@@ -45,10 +33,23 @@ protected:
   Evidence evidence;
 
 public:
+  struct MatchRead
+  {
+    int NumberOfMatchRead = 0;
+    std::vector<int> MatchLists;
+    std::vector<uint8_t> MapQLists;
+    std::string Sequence;
+    int maxMatchSequence = 0;
+    int32_t maxSC = 0;
+    int32_t maxAlterSC = 0;
+    bool alignWithSoftClipped = false;
+  };
+
+public:
   RefiningSV();
   ~RefiningSV();
   Evidence variantresult;
-  
+
   int getMaxIntFromVector(std::vector<int> value);
   uint8_t getMaxUInt8FromVector(std::vector<uint8_t> value);
 
@@ -70,13 +71,13 @@ public:
   bool confirmAreaBySCAtStart(std::string chr, uint32_t pos, uint32_t end);
   bool confirmAreaBySCAtEnd(std::string chr, uint32_t pos, uint32_t end);
 
-  bool isMatchRef(std::string chr,int32_t pos,int32_t end,std::string secondchr,int32_t secondpos,int32_t secondend);
+  bool isMatchRef(std::string chr, int32_t pos, int32_t end, std::string secondchr, int32_t secondpos, int32_t secondend);
 
   virtual void execute() = 0;
 
   std::string getResultVCFFormat();
   Evidence getVariantResult();
-    int getReadDepthAtPosition(const char *range, int32_t pos);
+  int getReadDepthAtPosition(const char *range, int32_t pos);
 
   void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
 

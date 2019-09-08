@@ -36,7 +36,7 @@ void SpecifyingEvidenceTandemDuplication::updateRead()
     //     return;
     // }
 
-    if (readparser.getPos() > readparser.getMatePos())
+    if (readparser.getPosOfSeq() > readparser.getMatePos())
     {
         return;
     }
@@ -116,7 +116,7 @@ void SpecifyingEvidenceTandemDuplication::checkRange()
 
     if (!added)
     {
-        if (currentPos < currentMPos)
+        if (readparser.getPosOfSeq()  < readparser.getMatePos())
         {
             Evidence evidence;
             evidence.setVariantType(svtype);

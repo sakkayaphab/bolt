@@ -194,9 +194,9 @@ int Cli::debug()
     // caller.showinfo();
     // caller.setParallel(40);
     caller.execute();
-    // caller.catfile();
-    // caller.findBreakPoint();
-    // caller.refineDelpthBlock();
+    caller.catfile();
+    caller.findBreakPoint();
+    caller.refineDelpthBlock();
 
     // caller.mergeBreakpoint();
 
