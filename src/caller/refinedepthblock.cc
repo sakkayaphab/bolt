@@ -500,6 +500,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto currentEndRD = rdf.getBlock(currentEnd);
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
+        
 
         if (n.getSvLength() > 2000)
         {
@@ -534,8 +535,20 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
+        if (n.getMaxMapQ()<50) {
+            continue;
+        }
+
+        if (n.getSvLength()>1000000) {
+            continue;
+        }
+
         if (n.getSvLength() < 50)
         {
+            continue;
+        }
+
+        if (n.getFrequency()>20) {
             continue;
         }
 
@@ -547,24 +560,24 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
-        if (n.getSvLength() < 1000)
-        {
-            // if (n.getFrequency()<=3) {
-            //     continue;
-            // }
-            if (currentRD.depth > 10 || currentEndRD.depth > 10)
-            {
-                continue;
-            }
+        // if (n.getSvLength() < 1000)
+        // {
+        //     // if (n.getFrequency()<=3) {
+        //     //     continue;
+        //     // }
+        //     if (currentRD.depth > 10 || currentEndRD.depth > 10)
+        //     {
+        //         continue;
+        //     }
 
-            // if (currentEndRD.depth>100) {
-            //     continue;
-            // }
+        //     // if (currentEndRD.depth>100) {
+        //     //     continue;
+        //     // }
 
-            // if (n.getMaxMapQ()<=25) {
-            //     continue;
-            // }
-        }
+        //     // if (n.getMaxMapQ()<=25) {
+        //     //     continue;
+        //     // }
+        // }
 
         cache.push_back(n);
     }
@@ -662,7 +675,6 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
     DIR *d;
     struct dirent *dir;
 
-    // std::cout << filemanager->getVariantPath() << std::endl;
     d = opendir(filemanager->getVariantPath().c_str());
     if (d)
     {
@@ -676,6 +688,25 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
             if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".vcf")
             {
                 std::string tempPath = filemanager->getVariantPath() + "/" + std::string(dir->d_name);
+                evidenceFilePathLists.push_back(tempPath);
+            }
+        }
+        closedir(d);
+    }
+ 
+    d = opendir(filemanager->getSplitReadPath().c_str());
+    if (d)
+    {
+        while (dir = readdir(d))
+        {
+            if (std::string(dir->d_name).size() < 4)
+            {
+                continue;
+            }
+
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
+            {
+                std::string tempPath = filemanager->getSplitReadPath() + "/" + std::string(dir->d_name);
                 evidenceFilePathLists.push_back(tempPath);
             }
         }

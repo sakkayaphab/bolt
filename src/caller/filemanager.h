@@ -36,6 +36,8 @@ public:
 
     std::string getTempEvidencePath();
 
+    std::string getSplitReadPath();
+
     std::string getReadDepthStatPath();
 
     void setSamplePath(std::string samplepath);

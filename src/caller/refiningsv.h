@@ -35,6 +35,8 @@ protected:
 public:
   struct MatchRead
   {
+    std::string poschr;
+    std::string endchr;
     int NumberOfMatchRead = 0;
     std::vector<int> MatchLists;
     std::vector<uint8_t> MapQLists;

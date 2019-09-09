@@ -194,7 +194,71 @@ void Caller::execute()
     }
 }
 
-void Caller::refineDelpthBlock() {
+void Caller::mergeSplitRead()
+{
+    std::vector<std::string> evidenceFilePathLists;
+
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(filepath.getSplitReadPath().c_str());
+    if (d)
+    {
+        while (dir = readdir(d))
+        {
+           
+            if (std::string(dir->d_name).size() < 4)
+            {
+                continue;
+            }
+
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
+            {
+                std::string tempPath = filepath.getSplitReadPath() + "/" + std::string(dir->d_name);
+                std::cout << tempPath << std::endl;
+                evidenceFilePathLists.push_back(tempPath);
+            }
+        }
+        closedir(d);
+    }
+
+    std::sort(evidenceFilePathLists.begin(), evidenceFilePathLists.end());
+
+    //write file
+    
+    int count = 0;
+    for (auto n : evidenceFilePathLists)
+    {
+        std::vector<std::string> cache;
+
+        std::string line;
+        std::ifstream myfile(n);
+        if (myfile.is_open())
+        {
+
+            while (getline(myfile, line))
+            {
+                    cache.push_back(line);
+                    count++;
+                
+            }
+            myfile.close();
+
+            std::ofstream writefile;
+            writefile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
+            for (auto a : cache)
+            {
+                writefile << a << std::endl;
+            }
+            writefile.close();
+
+        }
+
+        cache.clear();
+    }
+}
+
+void Caller::refineDelpthBlock()
+{
     RefineDepthBlock rdb;
     rdb.setFileManager(&filepath);
     // rdb.filemanager = filepath;
@@ -249,7 +313,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DUP")
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -373,10 +437,10 @@ void Caller::catfile()
 int Caller::writeFile(Evidence vr)
 {
     std::ofstream myfile;
-    myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() +"."+vr.getVariantType()+".vcf", std::ios_base::app);
+    myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
     // if (vr.getVariantType()=="DEL") {
     // myfile.open(filepath.getEvidencePath() + "/" + vr.getChromosome() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
-    std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() +"."+vr.getVariantType()+".vcf" << std::endl;
+    std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf" << std::endl;
     // }else {
     //     return 0;
     // }

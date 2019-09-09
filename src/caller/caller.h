@@ -37,6 +37,7 @@ public:
   void debugEvidenceProvider();
   void prepareHts();
   void refineDelpthBlock();
+  void mergeSplitRead();
 
 };
 

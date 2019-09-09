@@ -347,7 +347,6 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
 
 void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
-
     int32_t bPos = 0;
     int32_t bEnd = 0;
     int32_t bHit = 0;
@@ -365,7 +364,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 15)
+        if (maxMatchSize == 0)
         {
             continue;
         }

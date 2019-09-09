@@ -141,6 +141,8 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
+
+    return true;
     // if (e.getPos() != 18185538)
     // {
     //     return false;

@@ -85,7 +85,7 @@ void EvidenceFinder::findEvidence()
     seTranslocation.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".TRA.txt");
 
     std::vector<ReadParser::Cigar> cigar;
-    SplitRead splitread(&readparser,samplestat);
+    SplitRead splitread(*target_chromosome,&readparser,samplestat,filepath);
     while (sam_itr_next(inT, iterT, read) >= 0)
     {
         if ((read->core.flag & BAM_FUNMAP))

@@ -25,8 +25,8 @@ private:
   int32_t lastpos = 0;
   int32_t lastend = 0;
 
-  int32_t ciPosLeft;
-  int32_t ciPosRight;
+  int32_t ciPosLeft=0;
+  int32_t ciPosRight=0;
 
   bool foundEvidenceAtStart = false;
   bool foundEvidenceAtEnd = false;
@@ -56,8 +56,8 @@ public:
   //    void setFoundEvidenceAtEnd(bool foundEvidenceAtEnd);
   std::string convertMapQlistToCommaString();
 private:
-  int32_t ciEndLeft;
-  int32_t ciEndRight;
+  int32_t ciEndLeft=0;
+  int32_t ciEndRight=0;
 
   int frequency = 0;
   bool forwardDirection;
@@ -84,7 +84,7 @@ private:
   std::string ref;
   std::string alt;
   std::string info;
-  uint8_t qual;
+  uint8_t qual=0;
   std::string filter;
   std::vector<uint8_t> mapqlist;
   std::string comment;

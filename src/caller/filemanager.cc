@@ -30,6 +30,10 @@ std::string FileManager::getTempEvidencePath()
     return getOutputPath()+"/analysis/" + "evidence";
 }
 
+std::string FileManager::getSplitReadPath() {
+    return getOutputPath()+"/analysis/" + "splitread";
+}
+
 
 std::string FileManager::getVariantPath()
 {
@@ -79,6 +83,7 @@ void FileManager::initialize()
     createDirectory(output_path + "/analysis/readdepth");
     createDirectory(output_path + "/analysis/readdepthstat");
     createDirectory(output_path + "/analysis/variant");
+    createDirectory(output_path + "/analysis/splitread");
 }
 
 std::string FileManager::getReadDepthStatPath()
