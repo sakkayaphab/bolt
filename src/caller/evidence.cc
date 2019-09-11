@@ -88,7 +88,6 @@ void Evidence::setBackwardDirection(bool isbackward)
     backwardDirection = isbackward;
 }
 
-
 bool Evidence::getBackwardDirection()
 {
     return backwardDirection;
@@ -120,16 +119,6 @@ void Evidence::addAssociateRead(int32_t pos, int32_t matepos)
 void Evidence::setLastPosDiscordantRead(int32_t pos)
 {
     lastposDiscordantRead = pos;
-}
-
-void Evidence::setMark(std::string mark)
-{
-    Evidence::mark = mark;
-}
-
-std::string Evidence::getMark()
-{
-    return mark;
 }
 
 void Evidence::setLastEndDiscordantRead(int32_t end)
@@ -398,6 +387,12 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
 
+               else if (getKeybyText(ainfo) == "BOLT_MARK")
+                {
+                    setMark(getValuebyText(ainfo));
+                    continue;
+                }
+
                 // else if (getKeybyText(ainfo) == "DP")
                 // {
                 //     // FREQ = atoi(ainfo.c_str());
@@ -451,7 +446,6 @@ std::string Evidence::getFilter()
     return filter;
 }
 
-
 std::string Evidence::getInfoString()
 {
     std::string result;
@@ -462,30 +456,45 @@ std::string Evidence::getInfoString()
     {
         result.append("DP=" + std::to_string(getFrequency()) + ";");
     }
-    if (getVariantType()!="BND")
+    if (getVariantType() != "BND")
     {
-        result.append("SVLEN=" + std::to_string(getEnd()-getPos()) + ";");
+        result.append("SVLEN=" + std::to_string(getEnd() - getPos()) + ";");
     }
-    if (getVariantType()=="BND")
+    if (getVariantType() == "BND")
     {
-        result.append("CHR2=" + getEndChr()+ ";");
+        result.append("CHR2=" + getEndChr() + ";");
     }
 
-    if (getComment()!="")
+    if (getComment() != "")
     {
-        result.append("COMMENT=" + getComment()+ ";");
+        result.append("COMMENT=" + getComment() + ";");
     }
-    if (getFrequency()!=0)
+    if (getFrequency() != 0)
     {
-        result.append("FREQ=" + std::to_string(getFrequency())+ ";");
+        result.append("FREQ=" + std::to_string(getFrequency()) + ";");
     }
-    result.append("LNGMATCH=" + std::to_string(LNGMATCH)+ ";");
-    result.append("BOLT_MQL="+convertMapQlistToCommaString()+ ";");
+    result.append("LNGMATCH=" + std::to_string(LNGMATCH) + ";");
+    result.append("BOLT_MQL=" + convertMapQlistToCommaString() + ";");
+    if (getMark() != "")
+    {
+        result.append("BOLT_MARK=" + getMark() + ";");
+    }
 
     return result;
 }
 
-std::string Evidence::getComment() {
+void Evidence::setMark(std::string mark)
+{
+    Evidence::mark = mark;
+}
+
+std::string Evidence::getMark()
+{
+    return mark;
+}
+
+std::string Evidence::getComment()
+{
     return comment;
 }
 
@@ -499,7 +508,8 @@ void Evidence::setMapQList(std::vector<uint8_t> mapqs)
     mapqlist = mapqs;
 }
 
-void Evidence::setID(std::string id) {
+void Evidence::setID(std::string id)
+{
     ID = id;
 }
 
@@ -565,7 +575,6 @@ std::string Evidence::getResultVcfFormatString()
     // 8. INFO
     result.append("\t");
     result.append(getInfoString());
-    
 
     return result;
 }
@@ -652,12 +661,13 @@ std::string Evidence::convertToVcfString()
     buf.append("BOLT_MQL=" + convertMapQlistToCommaString() + ";");
     buf.append("BOLT_POS_DR=" + std::to_string(getPosDiscordantRead()) + "," + std::to_string(getLastPosDiscordantRead()) + ";");
     buf.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
-    if (getComment()!="") {
+    if (getComment() != "")
+    {
         buf.append("COMMENT=" + getComment() + ";");
     }
-    if (getFrequency()!=0)
+    if (getFrequency() != 0)
     {
-        buf.append("FREQ=" + std::to_string(getFrequency())+ ";");
+        buf.append("FREQ=" + std::to_string(getFrequency()) + ";");
     }
 
     //    buf.append("BOLT_COUNTERROR=" + std::to_string(errorAssociateReadLists.size()) + ";");
@@ -674,15 +684,18 @@ int32_t Evidence::getSvLength()
     return getEnd() - getPos();
 }
 
-void Evidence::setQuailtyPass(bool QuailtyPass) {
+void Evidence::setQuailtyPass(bool QuailtyPass)
+{
     Evidence::QuailtyPass = QuailtyPass;
 }
 
-bool Evidence::isQuailtyPass() const {
+bool Evidence::isQuailtyPass() const
+{
     return QuailtyPass;
 }
 
-std::string Evidence::getSVType() {
+std::string Evidence::getSVType()
+{
     return variantType;
 }
 
@@ -774,7 +787,7 @@ void Evidence::setLastEnd(int32_t lastend)
 
 int32_t Evidence::getCiPosLeft()
 {
-    
+
     return ciPosLeft;
 }
 

@@ -88,7 +88,7 @@ void FileManager::initialize()
 
 std::string FileManager::getReadDepthStatPath()
 {
-    return getOutputPath()+"/analysis/readdepthstat";
+    return getOutputPath()+"/analysis/readdepthstat/readdepthstat.txt";
 }
 
 std::string FileManager::getReadDepthPath()

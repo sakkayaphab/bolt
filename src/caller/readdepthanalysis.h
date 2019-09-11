@@ -9,6 +9,7 @@
 #include "evidence.h"
 #include "samplestat.h"
 #include <map>
+#include "readdepthstat.h"
 
 class ReadDepthAnalysis {
 private:
@@ -23,6 +24,8 @@ private:
     std::vector<std::string> split(const std::string &s, char delimiter);
     SampleStat *samplestat;
     uint32_t configRound = 250;
+
+    ReadDepthStat readDepthStat;
 public:
     ReadDepthAnalysis(FileManager *filemanager);
     int32_t getRound(int32_t x, int32_t max);
@@ -37,8 +40,8 @@ public:
     void setFocusReadDepth(int32_t pos, int32_t end,std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
     int getNumberReadDepthVector(std::vector<ReadDepthHelper::ReadDepthVector> focus,int blocknumber);
     bool filterDeletion(Evidence e);
-    void loadAvgReadDepthStat();
     void loadavgReadDepthFocusStat();
+    
 
     int getSCFFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
     int getSCLFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);

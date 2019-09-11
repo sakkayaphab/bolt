@@ -20,6 +20,7 @@ private:
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
 
   std::vector<Evidence> vecDEL;
+  std::vector<Evidence> vecDUP;
 
   int vcfIdNumber = 0;
 
@@ -32,6 +33,8 @@ public:
   void removeDuplicateResult(std::vector<Evidence> *vec);
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   int writeFile(Evidence vr);
+  void printDeletion();
+  void printDuplication();
 };
 
 #endif

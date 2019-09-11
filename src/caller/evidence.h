@@ -36,6 +36,9 @@ private:
   std::string mark;
 
 public:
+
+  // void setMark(std::string mark);
+  // std::string getMark();
   int LNGMATCH = 0;
 
   void setMark(std::string mark);

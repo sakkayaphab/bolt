@@ -211,7 +211,7 @@ void EvidenceFinder::findEvidence()
     rdh.findEvidence();
     rdh.calculateAvgReaddepth();
     //    rdh.writeVcf(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".RDDEL.txt");
-    rdh.writeReadDepthStat(filepath->getReadDepthStatPath() + "/" + "readdepthstat.txt");
+    rdh.writeReadDepthStat(filepath->getReadDepthStatPath());
     //    if (rdh.getAvgReadDepth()>2000)
     //    {
     //        return;

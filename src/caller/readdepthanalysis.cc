@@ -5,6 +5,9 @@
 ReadDepthAnalysis::ReadDepthAnalysis(FileManager *filemanager)
 {
     ReadDepthAnalysis::filemanager = filemanager;
+    // readDepthStat = readDepthStat();
+    readDepthStat.setFilePath(filemanager);
+    readDepthStat.execute();
 }
 
 void ReadDepthAnalysis::setSampleStat(SampleStat *samplestat)
@@ -115,18 +118,18 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         sumEndSCF += n.SCF;
         sumEndSCL += n.SCL;
     }
-    
 
-    if (e.getSvLength()<1000) {
+    if (e.getSvLength() < 1000)
+    {
         // return false;
-        if (sumStartSCL<=1 && sumStartSCF<=1) {
+        if (sumStartSCL <= 1 && sumStartSCF <= 1)
+        {
             return false;
         }
     }
 
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
-    
     return true;
 }
 
@@ -175,12 +178,20 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "DEL")
     {
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
+
         return filterDeletion(e);
     }
 
     if (e.getVariantType() == "INS")
     {
-        // return filterIns
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
 
         if (e.getComment() == "MATEUNMAPPED")
         {
@@ -258,22 +269,33 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "DUP")
     {
+
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 4))
+        {
+            return false;
+        }
         // if (e.getMaxMapQ() < 15)
         // {
         //     return false;
         // }
-        
+
         return true;
     }
 
     if (e.getVariantType() == "INV")
     {
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
+        
         if (e.getMaxMapQ() == 0)
         {
             return false;
         }
 
-        if (e.getFrequency()<=1) {
+        if (e.getFrequency() <= 1)
+        {
             return false;
         }
 
@@ -407,44 +429,6 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
 //         std::cout << "Unable to open file";
 
 // }
-
-void ReadDepthAnalysis::loadAvgReadDepthStat()
-{
-    std::string filepath = filemanager->getReadDepthStatPath() + "/readdepthstat.txt";
-    std::string line;
-    std::ifstream myfile(filepath);
-    int sum = 0;
-    int count = 0;
-    if (myfile.is_open())
-    {
-        while (getline(myfile, line))
-        {
-            ReadDepthHelper::ReadDepthVector temp;
-            std::vector<std::string> token = split(line, '=');
-
-            if (std::stoi(token.at(1)) < 10)
-            {
-                continue;
-            }
-
-            if (std::stoi(token.at(1)) > 800)
-            {
-                continue;
-            }
-
-            // std::cout <<  token.at(1) << std::endl;
-            sum += std::stoi(token.at(1));
-            count++;
-        }
-        myfile.close();
-    }
-    else
-        std::cout << "Unable to open file";
-
-    avgReadDepth = sum / count;
-    // std::cout << sum << " " << count << std::endl;
-    // std::cout << avgReadDepth << std::endl;
-}
 
 std::vector<std::string> ReadDepthAnalysis::split(const std::string &s, char delimiter)
 {

@@ -16,8 +16,9 @@ void SplitRead::updateRead()
     {
         return;
     }
+
     findDeletion();
-    // findTandemDuplication();
+    findTandemDuplication();
 
     // if (readparser->isFirstRead()) {
     //     // if (readparser->is)
@@ -116,17 +117,17 @@ void SplitRead::findDeletion()
 void SplitRead::findTandemDuplication()
 {
 
-    if (satag.size() != 1)
-    {
-        return;
-    }
+    // if (satag.size() != 1)
+    // {
+    //     return;
+    // }
 
     for (ReadParser::SATag sa : satag)
     {
-        if (sa.mapQ < 30)
-        {
-            continue;
-        }
+        // if (sa.mapQ < 30)
+        // {
+        //     continue;
+        // }
 
         if (sa.cigar.size() != 2)
         {
@@ -167,6 +168,8 @@ void SplitRead::findTandemDuplication()
             if (sa.cigar.at(0).getOperatorName() == 'M' && sa.cigar.at(1).getOperatorName() == 'S')
             {
                 mapDUP[std::make_pair(readparser->getPos(), sa.pos + sa.cigar.at(0).getLength())].NumberOfMatchRead++;
+                mapDUP[std::make_pair(readparser->getPos(), sa.pos + sa.cigar.at(0).getLength())].MatchLists.push_back(sa.cigar.at(0).getLength());
+                mapDUP[std::make_pair(readparser->getPos(), sa.pos + sa.cigar.at(0).getLength())].MapQLists.push_back(readparser->getMapQuality());
             }
         }
         else
@@ -199,6 +202,8 @@ void SplitRead::findTandemDuplication()
             if (sa.cigar.at(0).getOperatorName() == 'S' && sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'M')
             {
                 mapDUP[std::make_pair(sa.pos, readparser->getEnd())].NumberOfMatchRead++;
+                mapDUP[std::make_pair(sa.pos, readparser->getEnd())].MatchLists.push_back(sa.cigar.at(sa.cigar.size() - 1).getLength());
+                mapDUP[std::make_pair(sa.pos, readparser->getEnd())].MapQLists.push_back(readparser->getMapQuality());
             }
         }
     }
@@ -206,18 +211,11 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-    for (auto const &x : mapDUP)
-    {
-        if (x.second.NumberOfMatchRead >= 2)
-        {
-            std::cout
-                << " pos : " << x.first.first
-                << " end : " << x.first.second
-                << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-                << std::endl;
-        }
-    }
+    // printDeletion();
+    printDuplication();
+}
 
+void SplitRead::printDeletion() {
     std::cout << "Deletion" << std::endl;
     for (auto const &x : mapDEL)
     {
@@ -230,6 +228,7 @@ void SplitRead::printResult()
             evidence.setEndChr(chrname);
             evidence.setFrequency(x.second.NumberOfMatchRead);
             evidence.setVariantType("DEL");
+            evidence.setMark("SR");
             evidence.setMapQList(x.second.MapQLists);
 
             if (evidence.getEnd() - evidence.getPos() < 100)
@@ -263,6 +262,55 @@ void SplitRead::printResult()
         writeFile(x);
     }
 }
+
+  void SplitRead::printDuplication() {
+    //   std::cout << "duplication" << std::endl;
+    for (auto const &x : mapDUP)
+    {
+        if (x.second.NumberOfMatchRead >= 2)
+        {
+            Evidence evidence;
+            evidence.setPos(x.first.first);
+            evidence.setEnd(x.first.second);
+            evidence.setChr(chrname);
+            evidence.setEndChr(chrname);
+            evidence.setFrequency(x.second.NumberOfMatchRead);
+            evidence.setVariantType("DUP");
+            evidence.setMark("SR");
+            // evidence.LNGMATCH = x.second.
+            evidence.setMapQList(x.second.MapQLists);
+
+            if (evidence.getEnd() - evidence.getPos() < 100)
+            {
+                continue;
+            }
+
+            if (evidence.getMaxMapQ() < 50)
+            {
+                continue;
+            }
+
+            if (evidence.getMinMapQ() == 0)
+            {
+                continue;
+            }
+
+            vecDUP.push_back(evidence);
+
+            std::cout
+                << " pos : " << x.first.first
+                << " end : " << x.first.second
+                << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
+                << std::endl;
+        }
+    }
+
+    // removeDuplicateResult(&vecDUP);
+    for (auto x : vecDUP)
+    {
+        writeFile(x);
+    }
+  }
 
 void SplitRead::removeDuplicateResult(std::vector<Evidence> *vec)
 {
@@ -311,15 +359,9 @@ int SplitRead::writeFile(Evidence vr)
 {
     std::ofstream myfile;
     myfile.open(filepath->getOutputPath() + "/analysis/splitread/" + vr.getChr() + "." + vr.getVariantType() + ".txt", std::ios_base::app);
-    // if (vr.getVariantType()=="DEL") {
-    // myfile.open(filepath.getEvidencePath() + "/" + vr.getChromosome() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
-    // std::cout << filepath.getOutputPath() + "/analysis/splitread/" + vr.getChr() +"."+vr.getVariantType()+".vcf" << std::endl;
-    // }else {
-    //     return 0;
-    // }
+    // std::cout << filepath->getOutputPath() + "/analysis/splitread/" + vr.getChr() + "." + vr.getVariantType() + ".txt" << std::endl;
     vr.setID("BOLT" + std::to_string(vcfIdNumber));
     myfile << vr.getResultVcfFormatString() << std::endl;
-    //  std::cout << "mapq : " << vr.getMapQVector()->size() << vr.convertMapQlistToCommaString() << std::endl;
     vcfIdNumber++;
     myfile.close();
     return 0;

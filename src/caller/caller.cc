@@ -51,6 +51,12 @@ Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::strin
     prepareHts();
     execSampleStat();
     applyBamHeader();
+
+
+    // ReadDepthStat readDepthStat;
+    // readDepthStat.setFilePath(&filepath);
+    // readDepthStat.execute();
+    // std::cout << readDepthStat.getReadDepthByChr("1") << std::endl;
 }
 
 void Caller::setnumberofpair_stat(int n)
@@ -225,36 +231,36 @@ void Caller::mergeSplitRead()
 
     //write file
     
-    int count = 0;
-    for (auto n : evidenceFilePathLists)
-    {
-        std::vector<std::string> cache;
+    // int count = 0;
+    // for (auto n : evidenceFilePathLists)
+    // {
+    //     std::vector<std::string> cache;
 
-        std::string line;
-        std::ifstream myfile(n);
-        if (myfile.is_open())
-        {
+    //     std::string line;
+    //     std::ifstream myfile(n);
+    //     if (myfile.is_open())
+    //     {
 
-            while (getline(myfile, line))
-            {
-                    cache.push_back(line);
-                    count++;
+    //         while (getline(myfile, line))
+    //         {
+    //                 cache.push_back(line);
+    //                 count++;
                 
-            }
-            myfile.close();
+    //         }
+    //         myfile.close();
 
-            std::ofstream writefile;
-            writefile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
-            for (auto a : cache)
-            {
-                writefile << a << std::endl;
-            }
-            writefile.close();
+    //         std::ofstream writefile;
+    //         writefile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
+    //         for (auto a : cache)
+    //         {
+    //             writefile << a << std::endl;
+    //         }
+    //         writefile.close();
 
-        }
+    //     }
 
-        cache.clear();
-    }
+    //     cache.clear();
+    // }
 }
 
 void Caller::refineDelpthBlock()
@@ -267,6 +273,7 @@ void Caller::refineDelpthBlock()
 
 void Caller::catEvidenceFile()
 {
+    
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
@@ -301,8 +308,10 @@ void Caller::catEvidenceFile()
     //write file
     std::string writeFinal = filepath.getAllEvidencePath();
     int count = 0;
+     
     ReadDepthAnalysis rda(&filepath);
-    rda.loadAvgReadDepthStat();
+
+
     for (auto n : evidenceFilePathLists)
     {
         std::vector<std::string> cache;
@@ -313,7 +322,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }
@@ -381,7 +390,6 @@ void Caller::mergeReadDepthFile()
     std::string writeFinal = filepath.getAllEvidencePath();
     int count = 0;
     ReadDepthAnalysis rda(&filepath);
-    rda.loadAvgReadDepthStat();
     for (auto n : evidenceFilePathLists)
     {
         std::vector<std::string> cache;
@@ -486,7 +494,6 @@ int Caller::findBreakPoint()
     // tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
-    rda.loadAvgReadDepthStat();
 
     tbb::parallel_for(0, sizeLoop, [&](int i) {
         mxRead.lock();

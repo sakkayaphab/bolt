@@ -3,6 +3,7 @@
 #include "evidence.h"
 #include "filemanager.h"
 #include "depthblockfile.h"
+#include "readdepthstat.h"
 
 class RefineDepthBlock
 {
@@ -11,6 +12,7 @@ private:
   int32_t vcfIdNumber = 0;
   DepthBlockFile rdf;
   int32_t roundConfig = 250;
+  ReadDepthStat readDepthStat;
 public:
   RefineDepthBlock();
   void execute();
