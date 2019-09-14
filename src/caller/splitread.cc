@@ -343,11 +343,11 @@ void SplitRead::printDeletion()
 
             vecDEL.push_back(evidence);
 
-            std::cout
-                << " pos : " << x.first.first
-                << " end : " << x.first.second
-                << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-                << std::endl;
+            // std::cout
+            //     << " pos : " << x.first.first
+            //     << " end : " << x.first.second
+            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
+            //     << std::endl;
         }
     }
 
@@ -393,11 +393,11 @@ void SplitRead::printDuplication()
 
             vecDUP.push_back(evidence);
 
-            std::cout
-                << " pos : " << x.first.first
-                << " end : " << x.first.second
-                << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-                << std::endl;
+            // std::cout
+            //     << " pos : " << x.first.first
+            //     << " end : " << x.first.second
+            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
+            //     << std::endl;
         }
     }
 
@@ -443,11 +443,11 @@ void SplitRead::printInversion()
 
             vecINV.push_back(evidence);
 
-            std::cout
-                << " pos : " << x.first.first
-                << " end : " << x.first.second
-                << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-                << std::endl;
+            // std::cout
+            //     << " pos : " << x.first.first
+            //     << " end : " << x.first.second
+            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
+            //     << std::endl;
         }
     }
 

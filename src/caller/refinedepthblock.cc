@@ -304,6 +304,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
+      
+
         if (n.getSvLength() > 2000)
         {
             // if (currentRD.DUP1 + currentRD.DUP2 >= 20)
@@ -344,6 +346,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto currentEndRD = rdf.getBlock(currentEnd);
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
+
+        
 
         if (n.getSvLength() > 2000)
         {
@@ -467,25 +471,62 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-        if (currentRD.INV1 >= n.getFrequency())
+        // if (currentRD.depth==0) {
+        //     continue;
+        // }
+
+        
+
+        
+
+        std::cout << getDivider(10,2,10,1) << " = "<< 10*(2/10) << std::endl;
+
+        // if (previousRD.TRA1+previousRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
+
+        // if (previousRD.INV1+previousRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
+
+        if (currentRD.INS1+currentRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
         {
             continue;
         }
 
-        if (currentRD.INV2 >= n.getFrequency())
+        if (currentRD.INV1+currentRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
         {
             continue;
         }
 
-        if (currentRD.TRA1 >= n.getFrequency())
+        if (currentRD.TRA1+currentRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        {
+           continue;
+        }
+
+
+        if (currentRD.INV1+currentRD.INV2 >= n.getFrequency())
         {
             continue;
         }
 
-        if (currentRD.TRA2 >= n.getFrequency())
+        if (currentRD.TRA1+currentRD.TRA2 >= n.getFrequency())
+        {
+           continue;
+        }
+
+        if (nextRD.INV1+nextRD.INV2 >= n.getFrequency())
         {
             continue;
         }
+
+        if (nextRD.TRA1+nextRD.TRA2 >= n.getFrequency())
+        {
+           continue;
+        }
+
 
         if (n.getSvLength() > 2000)
         {
@@ -527,6 +568,45 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto currentEndRD = rdf.getBlock(currentEnd);
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
+
+        // if (currentEndRD.depth==0) {
+        //     continue;
+        // }
+
+        if (currentEndRD.INS1+currentEndRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        {
+            continue;
+        }
+
+        if (currentEndRD.INV1+currentEndRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        {
+            continue;
+        }
+
+        if (currentEndRD.TRA1+currentEndRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        {
+           continue;
+        }
+
+        if (currentEndRD.INV1+currentEndRD.INV2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentEndRD.TRA1+currentEndRD.TRA2 >= n.getFrequency())
+        {
+           continue;
+        }
+
+        if (previousEndRD.INV1+previousEndRD.INV2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (previousEndRD.TRA1+previousEndRD.TRA2 >= n.getFrequency())
+        {
+           continue;
+        }
 
         if (n.getSvLength() > 2000)
         {
@@ -588,26 +668,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
         }
-
-        // if (n.getSvLength() < 1000)
-        // {
-        //     // if (n.getFrequency()<=3) {
-        //     //     continue;
-        //     // }
-        //     if (currentRD.depth > 10 || currentEndRD.depth > 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     // if (currentEndRD.depth>100) {
-        //     //     continue;
-        //     // }
-
-        //     // if (n.getMaxMapQ()<=25) {
-        //     //     continue;
-        //     // }
-        // }
-
+ 
         cache.push_back(n);
     }
 
@@ -745,4 +806,14 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
     // }
 
     return evidenceFilePathLists;
+}
+
+int RefineDepthBlock::getDivider(int value,int top,int down,int minimum) {
+    auto returnvalue =  (int) (float(value)*(float(top)/float(down)));
+
+    if (returnvalue>minimum) {
+        return returnvalue;
+    }
+
+    return minimum;
 }

@@ -146,12 +146,12 @@ std::vector<uint8_t> *Evidence::getMapQVector()
     return &mapqlist;
 }
 
-std::string Evidence::convertMapQlistToCommaString()
+std::string Evidence::convertMapQlistToCommaString(std::vector<uint8_t> *mapqlist)
 {
     std::string mapqString;
 
     bool first = false;
-    for (auto n : *getMapQVector())
+    for (auto n : *mapqlist)
     {
         if (!first)
         {
@@ -347,6 +347,17 @@ void Evidence::setEvidenceByString(std::string line)
                     }
                     continue;
                 }
+                else if (getKeybyText(ainfo) == "BOLT_RPMQL")
+                {
+                    std::string pv_BMQL = getValuebyText(ainfo);
+                    std::vector<std::string> nineSection = split(getValuebyText(ainfo), ',');
+                    for (std::string a_mq : nineSection)
+                    {
+                        uint8_t t_mq = (uint8_t)atoi(a_mq.c_str());
+                        rpmapqlist.push_back(t_mq);
+                    }
+                    continue;
+                }
                 else if (getKeybyText(ainfo) == "BOLT_POS_DR")
                 {
                     std::string pv_BMQL = getValuebyText(ainfo);
@@ -387,7 +398,7 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
 
-               else if (getKeybyText(ainfo) == "BOLT_MARK")
+                else if (getKeybyText(ainfo) == "BOLT_MARK")
                 {
                     setMark(getValuebyText(ainfo));
                     continue;
@@ -474,7 +485,7 @@ std::string Evidence::getInfoString()
         result.append("FREQ=" + std::to_string(getFrequency()) + ";");
     }
     result.append("LNGMATCH=" + std::to_string(LNGMATCH) + ";");
-    result.append("BOLT_MQL=" + convertMapQlistToCommaString() + ";");
+    result.append("BOLT_MQL=" + convertMapQlistToCommaString(getMapQVector()) + ";");
     if (getMark() != "")
     {
         result.append("BOLT_MARK=" + getMark() + ";");
@@ -506,6 +517,11 @@ void Evidence::setComment(std::string comment)
 void Evidence::setMapQList(std::vector<uint8_t> mapqs)
 {
     mapqlist = mapqs;
+}
+
+void Evidence::setRPMapQ(std::vector<uint8_t> rpmapq)
+{
+    Evidence::rpmapqlist = rpmapq;
 }
 
 void Evidence::setID(std::string id)
@@ -658,7 +674,7 @@ std::string Evidence::convertToVcfString()
     buf.append("CIPOS=" + std::to_string(getCiPosLeft()) + "," + std::to_string(getCiPosRight()) + ";");
     buf.append("CIEND=" + std::to_string(getCiEndLeft()) + "," + std::to_string(getCiEndRight()) + ";");
     buf.append("CHR2=" + getEndChr() + ";");
-    buf.append("BOLT_MQL=" + convertMapQlistToCommaString() + ";");
+    buf.append("BOLT_MQL=" + convertMapQlistToCommaString(getMapQVector()) + ";");
     buf.append("BOLT_POS_DR=" + std::to_string(getPosDiscordantRead()) + "," + std::to_string(getLastPosDiscordantRead()) + ";");
     buf.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
     if (getComment() != "")
@@ -668,6 +684,9 @@ std::string Evidence::convertToVcfString()
     if (getFrequency() != 0)
     {
         buf.append("FREQ=" + std::to_string(getFrequency()) + ";");
+    }
+    if (rpmapqlist.size()!=0) {
+        buf.append("BOLT_RPMQL=" + convertMapQlistToCommaString(&rpmapqlist) + ";");
     }
 
     //    buf.append("BOLT_COUNTERROR=" + std::to_string(errorAssociateReadLists.size()) + ";");

@@ -14,6 +14,7 @@ private:
   int32_t roundConfig = 250;
   ReadDepthStat readDepthStat;
   SampleStat *samplestat;
+  int minimumdivide = 4;
 
 public:
   RefineDepthBlock();
@@ -30,6 +31,7 @@ public:
   int32_t roundNumber(int32_t number,int32_t round);
   int32_t nextNumber(int32_t number,int32_t round);
   int32_t previousNumber(int32_t number,int32_t round);
+  int getDivider(int value,int top,int down,int minimum);
 };
 
 #endif

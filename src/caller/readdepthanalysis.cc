@@ -119,38 +119,38 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         sumEndSCL += n.SCL;
     }
 
+    if (e.getFrequency()<=1) {
+        return false;
+    }
+
     if (e.getSvLength() < 1000)
     {
-        // return false;
         if (sumStartSCL <= 1 && sumStartSCF <= 1)
         {
             return false;
         }
     }
 
-     if (sumStartTRA >= e.getFrequency())
+    if (sumStartTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
     {
         return false;
     }
 
-    if (sumEndTRA >= e.getFrequency())
+    if (sumEndTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
     {
         return false;
     }
 
-    if (sumStartINV >= e.getFrequency())
+    if (sumStartINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
     {
         return false;
     }
 
-    if (sumEndINV >= e.getFrequency())
+    if (sumEndINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
     {
         return false;
     }
 
-
-
-    int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
     return true;
 }
@@ -160,14 +160,14 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     if (cachechr != e.getChr())
     {
         loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt");
-        std::cout << "e.getChr() : " << e.getChr() << std::endl;
+        std::cout << "✓ : " << e.getChr() << std::endl;
         cachechr = e.getChr();
     }
 
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
 
-    return true;
+    // return true;
     // if (e.getPos() != 18185538)
     // {
     //     return false;
@@ -205,12 +205,10 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
-
-        
 
         return filterDeletion(e);
     }
@@ -222,7 +220,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
@@ -309,7 +307,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
@@ -328,11 +326,11 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
-        
+
         if (e.getMaxMapQ() == 0)
         {
             return false;
@@ -451,7 +449,7 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
         std::cout << "Unable to open file";
 
     avgReadDepthFocus = int(sumRD / count);
-    std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
+    // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }
 
 // void ReadDepthAnalysis::loadReadDepthStat() {
@@ -484,4 +482,16 @@ std::vector<std::string> ReadDepthAnalysis::split(const std::string &s, char del
         tokens.push_back(token);
     }
     return tokens;
+}
+
+int ReadDepthAnalysis::getDivider(int value, int top, int down, int minimum)
+{
+    auto returnvalue = (int)(float(value) * (float(top) / float(down)));
+
+    if (returnvalue > minimum)
+    {
+        return returnvalue;
+    }
+
+    return minimum;
 }

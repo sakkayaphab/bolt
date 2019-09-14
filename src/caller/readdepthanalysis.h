@@ -26,6 +26,8 @@ private:
     uint32_t configRound = 250;
 
     ReadDepthStat readDepthStat;
+    int minimumdivide = 2;
+    int getDivider(int value,int top,int down,int minimum);
 public:
     ReadDepthAnalysis(FileManager *filemanager);
     int32_t getRound(int32_t x, int32_t max);

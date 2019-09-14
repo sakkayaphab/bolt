@@ -34,8 +34,9 @@ private:
   std::vector<std::string> multipleEndChromosome;
 
   std::string mark;
-
+  std::vector<uint8_t> rpmapqlist;
 public:
+void setRPMapQ(std::vector<uint8_t> rpmapq);
 
   // void setMark(std::string mark);
   // std::string getMark();
@@ -57,7 +58,7 @@ public:
   //    bool isFoundEvidenceAtEnd() const;
   //
   //    void setFoundEvidenceAtEnd(bool foundEvidenceAtEnd);
-  std::string convertMapQlistToCommaString();
+  std::string convertMapQlistToCommaString(std::vector<uint8_t> *mapqs);
 private:
   int32_t ciEndLeft=0;
   int32_t ciEndRight=0;
