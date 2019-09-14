@@ -198,34 +198,28 @@ void SpecifyingEvidenceInsertion::proveEvidence(int index)
 
 void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
 {
-    // int32_t firstPos = evidence->getLastPosDiscordantRead()-50;
-
     int32_t pos = evidence->getPosDiscordantRead();
 
     int32_t lastpos = evidence->getLastPosDiscordantRead();
     int32_t end = evidence->getEndDiscordantRead();
     int32_t lastend = evidence->getLastEndDiscordantRead();
 
-    // int32_t lastEnd = evidence->getLastPosDiscordantRead()+200;
     int32_t avgEnd = (lastpos + end) / 2;
     int32_t diff = lastend - avgEnd;
-    evidence->setEnd(lastpos);
-    evidence->setPos(end);
 
-    evidence->setCiPosLeft(-samplestat->getReadLength());
+    
+    evidence->setPos(lastpos);
+    evidence->setEnd(end);
+
+    evidence->setCiPosLeft(-(lastpos-pos)-samplestat->getReadLength());
     evidence->setCiPosRight(end-lastpos+samplestat->getReadLength());
 
-    evidence->setCiEndLeft(end-lastpos-samplestat->getReadLength());
-    evidence->setCiEndRight(samplestat->getReadLength());
+    evidence->setCiEndLeft(lastpos-end);
+    evidence->setCiEndRight(lastend-end-samplestat->getReadLength());
 }
 
 bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 {
-    //    readdepthHelper->getVariantVcfFormat();
-    //    if (readdepthHelper->isRangeDisorderByMorethanRD(evidence->getPosDiscordantRead(),evidence->getEndDiscordantRead(),samplestat->getMedianSampleStat()+10))
-    //    {
-    //        return false;
-    //    }
 
     if (evidence->getComment() == "MATEUNMAPPED")
     {
@@ -266,7 +260,7 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
     //         return false;
     //     }
 
-    if (evidence->getFrequency() < 4)
+    if (evidence->getFrequency() < 3)
     {
         return false;
     }

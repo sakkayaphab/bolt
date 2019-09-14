@@ -128,6 +128,28 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         }
     }
 
+     if (sumStartTRA >= e.getFrequency())
+    {
+        return false;
+    }
+
+    if (sumEndTRA >= e.getFrequency())
+    {
+        return false;
+    }
+
+    if (sumStartINV >= e.getFrequency())
+    {
+        return false;
+    }
+
+    if (sumEndINV >= e.getFrequency())
+    {
+        return false;
+    }
+
+
+
     int32_t svlength = e.getEndDiscordantRead() - e.getPosDiscordantRead();
 
     return true;
@@ -183,12 +205,24 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
+         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
+
+        
+
         return filterDeletion(e);
     }
 
     if (e.getVariantType() == "INS")
     {
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
+
+         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
@@ -270,7 +304,12 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     if (e.getVariantType() == "DUP")
     {
 
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 4))
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 8))
+        {
+            return false;
+        }
+
+         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }
@@ -285,6 +324,11 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     if (e.getVariantType() == "INV")
     {
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+        {
+            return false;
+        }
+
+         if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
         {
             return false;
         }

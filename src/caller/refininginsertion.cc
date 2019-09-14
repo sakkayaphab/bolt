@@ -81,7 +81,7 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         }
 
        
-        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 5)
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
         {
             mapSCFirst[readparser.getPos()]++;
             if (mapMapQFirst[readparser.getPos()]<readparser.getMapQuality()) {
@@ -89,7 +89,7 @@ void RefiningInsertion::refineStartToEnd(const char *range)
             }
         }
 
-        if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(cigar.size() - 1).getLength() >= 5)
+        if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(cigar.size() - 1).getLength() >= 2)
         {
             mapSCLast[readparser.getEnd()]++;
             if (mapMapQLast[readparser.getEnd()]<readparser.getMapQuality()) {

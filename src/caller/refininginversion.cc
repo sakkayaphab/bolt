@@ -30,7 +30,7 @@ void RefiningInversion::first()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    std::cout << range << "/" << samplestat->getReadLength() << std::endl;
+    // std::cout << range << "/" << samplestat->getReadLength() << std::endl;
     refineStartToEnd(range);
 }
 
@@ -40,7 +40,7 @@ void RefiningInversion::second()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    std::cout << range << "/" << samplestat->getReadLength() << std::endl;
+    // std::cout << range << "/" << samplestat->getReadLength() << std::endl;
     refineEndToStart(range);
 }
 
@@ -173,7 +173,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
             std::string fullRead = readparser.getSequence();
             // std::cout << "-------------" << std::endl;
             // std::cout << fullRead << std::endl;
-            std::cout << "pos end : " << readparser.getEnd() << std::endl;
+            // std::cout << "pos end : " << readparser.getEnd() << std::endl;
             // std::cout << " sc : " << cigar.at(cigar.size() - 1).getLength() << std::endl;
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             StringSearchConfig ssc;
@@ -432,7 +432,7 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
-    std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
+    // std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
     int lastscore = 0;
 
     for (auto const &x : *listPosition)

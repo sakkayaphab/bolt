@@ -13,11 +13,14 @@ private:
   DepthBlockFile rdf;
   int32_t roundConfig = 250;
   ReadDepthStat readDepthStat;
+  SampleStat *samplestat;
+
 public:
   RefineDepthBlock();
   void execute();
   std::vector<std::string> getPathVCFFiles();
   void setFileManager(FileManager *filemanager);
+  void setSampleStat(SampleStat *samplestat);
   std::vector<Evidence> getEvidenceByFilepath(std::string filepaht);
   std::vector<Evidence> getResultWithOutOverlapped(std::vector<Evidence> *master, std::vector<Evidence> *slave);
   std::vector<Evidence> getRefineResultDeletion(std::vector<Evidence> *master);

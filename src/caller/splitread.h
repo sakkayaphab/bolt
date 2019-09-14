@@ -18,9 +18,11 @@ private:
 
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDUP;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
+  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
 
   std::vector<Evidence> vecDEL;
   std::vector<Evidence> vecDUP;
+  std::vector<Evidence> vecINV;
 
   int vcfIdNumber = 0;
 
@@ -29,12 +31,16 @@ public:
   void updateRead();
   void findTandemDuplication();
   void findDeletion();
+  void findInversion();
   void printResult();
   void removeDuplicateResult(std::vector<Evidence> *vec);
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   int writeFile(Evidence vr);
   void printDeletion();
   void printDuplication();
+  void printInversion();
+  
+  
 };
 
 #endif

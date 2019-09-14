@@ -271,10 +271,10 @@ bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
 
-    // if (svLength > 1000000)
-    // {
-    //     return false;
-    // }
+    if (svLength > 1000000)
+    {
+        return false;
+    }
 
     // if (svLength < 500)
     // {
@@ -284,10 +284,10 @@ bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
     //     }
 
     // } else if (svLength < 2000) {
-    //     if (evidence->getFrequency() <= 1)
-    //     {
-    //         return false;
-    //     }
+        if (evidence->getFrequency() <= 1)
+        {
+            return false;
+        }
     // }
 
     return true;
