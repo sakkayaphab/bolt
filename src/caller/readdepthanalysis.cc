@@ -317,10 +317,12 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         {
             return false;
         }
-        // if (e.getMaxMapQ() < 15)
-        // {
-        //     return false;
-        // }
+
+
+        if (e.getMaxMapQ() < 15)
+        {
+            return false;
+        }
 
         return true;
     }
@@ -337,7 +339,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-        if (e.getMaxMapQ() == 0)
+        if (e.getMaxMapQ() < 15)
         {
             return false;
         }
