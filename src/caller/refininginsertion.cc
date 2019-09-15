@@ -195,6 +195,7 @@ void RefiningInsertion::refineVariant(const char *range) {
 
     variantresult.setPos(averagePos);
     variantresult.setEnd(averagePos);
+    variantresult.setRPMapQ(*evidence.getMapQVector());
     variantresult.setFrequency(hit_position_second + hit_position_first);
     variantresult.setQuailtyPass(true);
 }

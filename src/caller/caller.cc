@@ -322,13 +322,13 @@ void Caller::catEvidenceFile()
         if (myfile.is_open())
         {
             std::string svtype = n.substr(n.size() - 7, 3);
-            std::cout << svtype << std::endl;
+            // std::cout << svtype << std::endl;
             if (svtype != "DEL")
             {
                 continue;
             }
             std::string chr = n.substr(filepath.getTempEvidencePath().size() + 1, n.size() - filepath.getTempEvidencePath().size() - 9);
-            std::cout << chr << std::endl;
+            // std::cout << chr << std::endl;
 
             while (getline(myfile, line))
             {
@@ -356,7 +356,7 @@ void Caller::catEvidenceFile()
         cache.clear();
     }
 
-    std::cout << count << std::endl;
+    // std::cout << count << std::endl;
 }
 
 void Caller::mergeReadDepthFile()

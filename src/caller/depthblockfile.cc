@@ -118,5 +118,5 @@ void DepthBlockFile::loadDataToCache(std::string filepath)
         std::cout << "Unable to open file";
 
     avgReadDepthFocus = int(sumRD / count);
-    std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
+    // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }

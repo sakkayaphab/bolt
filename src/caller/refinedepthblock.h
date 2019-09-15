@@ -18,6 +18,7 @@ private:
 
 public:
   RefineDepthBlock();
+  
   void execute();
   std::vector<std::string> getPathVCFFiles();
   void setFileManager(FileManager *filemanager);

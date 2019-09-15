@@ -17,8 +17,8 @@ void SplitRead::updateRead()
         return;
     }
 
-    findInversion();
-    // findDeletion();
+    // findInversion();
+    findDeletion();
     // findTandemDuplication();
 
     // if (readparser->isFirstRead()) {

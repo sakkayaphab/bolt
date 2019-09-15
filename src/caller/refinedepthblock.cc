@@ -304,8 +304,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-      
-
         if (n.getSvLength() > 2000)
         {
             // if (currentRD.DUP1 + currentRD.DUP2 >= 20)
@@ -346,8 +344,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto currentEndRD = rdf.getBlock(currentEnd);
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
-
-        
 
         if (n.getSvLength() > 2000)
         {
@@ -475,12 +471,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         //     continue;
         // }
 
-        
-
-        
-
-        std::cout << getDivider(10,2,10,1) << " = "<< 10*(2/10) << std::endl;
-
         // if (previousRD.TRA1+previousRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
         // {
         //     continue;
@@ -491,75 +481,76 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         //     continue;
         // }
 
-        if (currentRD.INS1+currentRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-            continue;
-        }
+        // if (currentRD.INS1+currentRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.INV1+currentRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-            continue;
-        }
+        // if (currentRD.INV1+currentRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.TRA1+currentRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-           continue;
-        }
-
-
-        if (currentRD.INV1+currentRD.INV2 >= n.getFrequency())
-        {
-            continue;
-        }
-
-        if (currentRD.TRA1+currentRD.TRA2 >= n.getFrequency())
-        {
-           continue;
-        }
-
-        if (nextRD.INV1+nextRD.INV2 >= n.getFrequency())
-        {
-            continue;
-        }
-
-        if (nextRD.TRA1+nextRD.TRA2 >= n.getFrequency())
-        {
-           continue;
-        }
-
+        // if (currentRD.TRA1+currentRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //    continue;
+        // }
 
         if (n.getSvLength() > 2000)
         {
-            if (currentRD.DUP1 + currentRD.DUP2 >= 10)
+            if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
             {
                 continue;
             }
 
-            if (currentRD.INV1 + currentRD.INV2 >= 10)
-            {
-                continue;
-            }
-
-            if (previousRD.DUP1 + previousRD.DUP2 >= 10)
-            {
-                continue;
-            }
-
-            if (previousRD.INV1 + previousRD.INV2 >= 10)
-            {
-                continue;
-            }
-
-            if (nextRD.DUP1 + previousRD.DUP2 >= 10)
-            {
-                continue;
-            }
-
-            if (nextRD.INV1 + previousRD.INV2 >= 10)
+            if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
             {
                 continue;
             }
         }
+
+        // if (nextRD.INV1+nextRD.INV2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (nextRD.TRA1+nextRD.TRA2 >= n.getFrequency())
+        // {
+        //    continue;
+        // }
+
+        // if (n.getSvLength() > 2000)
+        // {
+        //     if (currentRD.DUP1 + currentRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentRD.INV1 + currentRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousRD.DUP1 + previousRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousRD.INV1 + previousRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextRD.DUP1 + previousRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextRD.INV1 + previousRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+        // }
 
         auto currentEnd = roundNumber(n.getEnd(), roundConfig);
         auto nextEnd = nextNumber(n.getEnd(), roundConfig);
@@ -573,73 +564,75 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         //     continue;
         // }
 
-        if (currentEndRD.INS1+currentEndRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-            continue;
-        }
+        // if (currentEndRD.INS1+currentEndRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
 
-        if (currentEndRD.INV1+currentEndRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-            continue;
-        }
+        // if (currentEndRD.INV1+currentEndRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //     continue;
+        // }
 
-        if (currentEndRD.TRA1+currentEndRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        {
-           continue;
-        }
-
-        if (currentEndRD.INV1+currentEndRD.INV2 >= n.getFrequency())
-        {
-            continue;
-        }
-
-        if (currentEndRD.TRA1+currentEndRD.TRA2 >= n.getFrequency())
-        {
-           continue;
-        }
-
-        if (previousEndRD.INV1+previousEndRD.INV2 >= n.getFrequency())
-        {
-            continue;
-        }
-
-        if (previousEndRD.TRA1+previousEndRD.TRA2 >= n.getFrequency())
-        {
-           continue;
-        }
+        // if (currentEndRD.TRA1+currentEndRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
+        // {
+        //    continue;
+        // }
 
         if (n.getSvLength() > 2000)
         {
-            if (currentEndRD.DUP1 + currentEndRD.DUP2 >= 10)
+            if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
             {
                 continue;
             }
 
-            if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
-            {
-                continue;
-            }
-
-            if (previousEndRD.DUP1 + previousEndRD.DUP2 >= 10)
-            {
-                continue;
-            }
-
-            if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
-            {
-                continue;
-            }
-
-            if (nextEndRD.DUP1 + previousEndRD.DUP2 >= 10)
-            {
-                continue;
-            }
-
-            if (nextEndRD.INV1 + previousEndRD.INV2 >= 10)
+            if (currentEndRD.TRA1 + currentEndRD.TRA2 >= n.getFrequency())
             {
                 continue;
             }
         }
+        // if (previousEndRD.INV1+previousEndRD.INV2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (previousEndRD.TRA1+previousEndRD.TRA2 >= n.getFrequency())
+        // {
+        //    continue;
+        // }
+
+        // if (n.getSvLength() > 2000)
+        // {
+        //     if (currentEndRD.DUP1 + currentEndRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousEndRD.DUP1 + previousEndRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextEndRD.DUP1 + previousEndRD.DUP2 >= 10)
+        //     {
+        //         continue;
+        //     }
+
+        //     if (nextEndRD.INV1 + previousEndRD.INV2 >= 10)
+        //     {
+        //         continue;
+        //     }
+        // }
 
         if (n.getMaxMapQ() < 40)
         {
@@ -656,7 +649,9 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-        if (n.getFrequency() > 20)
+        // std::cout << n.getFrequency() << " = " << readDepthStat.getReadDepthByChr(n.getChr()) << " - " << n.getChr() << std::endl;
+
+        if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
         {
             continue;
         }
@@ -668,7 +663,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
         }
- 
+
         cache.push_back(n);
     }
 
@@ -758,6 +753,7 @@ void RefineDepthBlock::setFileManager(FileManager *filemanager)
 {
     RefineDepthBlock::filemanager = filemanager;
     readDepthStat.setFilePath(filemanager);
+    // std::cout << "std::stoi(token.at(1))" << std::endl;
     readDepthStat.execute();
 }
 
@@ -786,32 +782,34 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
         closedir(d);
     }
 
-    // d = opendir(filemanager->getSplitReadPath().c_str());
-    // if (d)
-    // {
-    //     while (dir = readdir(d))
-    //     {
-    //         if (std::string(dir->d_name).size() < 4)
-    //         {
-    //             continue;
-    //         }
+    d = opendir(filemanager->getSplitReadPath().c_str());
+    if (d)
+    {
+        while (dir = readdir(d))
+        {
+            if (std::string(dir->d_name).size() < 4)
+            {
+                continue;
+            }
 
-    //         if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-    //         {
-    //             std::string tempPath = filemanager->getSplitReadPath() + "/" + std::string(dir->d_name);
-    //             evidenceFilePathLists.push_back(tempPath);
-    //         }
-    //     }
-    //     closedir(d);
-    // }
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
+            {
+                std::string tempPath = filemanager->getSplitReadPath() + "/" + std::string(dir->d_name);
+                evidenceFilePathLists.push_back(tempPath);
+            }
+        }
+        closedir(d);
+    }
 
     return evidenceFilePathLists;
 }
 
-int RefineDepthBlock::getDivider(int value,int top,int down,int minimum) {
-    auto returnvalue =  (int) (float(value)*(float(top)/float(down)));
+int RefineDepthBlock::getDivider(int value, int top, int down, int minimum)
+{
+    auto returnvalue = (int)(float(value) * (float(top) / float(down)));
 
-    if (returnvalue>minimum) {
+    if (returnvalue > minimum)
+    {
         return returnvalue;
     }
 

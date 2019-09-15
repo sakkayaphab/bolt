@@ -399,6 +399,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
     variantresult.setFrequency(bHit);
     variantresult.setMapQList(bMapQList);
     variantresult.setChr(evidence.getChr());
+    variantresult.setRPMapQ(*evidence.getMapQVector());
     variantresult.setEndChr(evidence.getEndChr());
     variantresult.LNGMATCH = bMaxMatchSize;
 

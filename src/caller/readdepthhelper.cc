@@ -164,7 +164,7 @@ void ReadDepthHelper::calculateAvgReaddepth()
         int avg = int(sumRD / size);
 
         setAvgReadDepth(avg);
-        std::cout << "size : " << size << " rd : " << sumRD << " AVG : " << avg << std::endl;
+        // std::cout << "size : " << size << " rd : " << sumRD << " AVG : " << avg << std::endl;
     }
     else
     {

@@ -490,6 +490,10 @@ std::string Evidence::getInfoString()
     {
         result.append("BOLT_MARK=" + getMark() + ";");
     }
+    if (getRPMapQ()->size() != 0)
+    {
+        result.append("BOLT_RPMQL=" +convertMapQlistToCommaString(getRPMapQ()) + ";");
+    }
 
     return result;
 }
@@ -522,6 +526,10 @@ void Evidence::setMapQList(std::vector<uint8_t> mapqs)
 void Evidence::setRPMapQ(std::vector<uint8_t> rpmapq)
 {
     Evidence::rpmapqlist = rpmapq;
+}
+
+std::vector<uint8_t> *Evidence::getRPMapQ() {
+    return &rpmapqlist;
 }
 
 void Evidence::setID(std::string id)

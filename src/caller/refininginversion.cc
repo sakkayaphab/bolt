@@ -488,6 +488,7 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
     variantresult.setMapQList(bMapQList);
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
+    variantresult.setRPMapQ(*evidence.getMapQVector());
     variantresult.LNGMATCH = bMaxMatchSize;
 
     if (bPos == 0)

@@ -705,6 +705,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
+    variantresult.setRPMapQ(*evidence.getMapQVector());
 
     variantresult.setMapQList(bMapQList);
     variantresult.setChr(evidence.getChr());

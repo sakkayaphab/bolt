@@ -17,6 +17,7 @@ void ReadDepthStat::setFilePath(FileManager *filepath)
 
 void ReadDepthStat::execute()
 {
+
     std::string line;
     std::ifstream myfile(filepath->getReadDepthStatPath());
     if (myfile.is_open())

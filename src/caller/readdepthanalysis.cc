@@ -119,38 +119,44 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
         sumEndSCL += n.SCL;
     }
 
-    if (e.getFrequency()<=1) {
-        return false;
-    }
-
-    if (e.getSvLength() < 1000)
-    {
-        if (sumStartSCL <= 1 && sumStartSCF <= 1)
-        {
-            return false;
-        }
-    }
-
-    if (sumStartTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    if (e.getMaxMapQ() < 10)
     {
         return false;
     }
 
-    if (sumEndTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
+    {
+
+    }
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()),1,10,1))
     {
         return false;
     }
 
-    if (sumStartINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    if (sumStartSCL <= 1 && sumStartSCF <= 1)
     {
         return false;
     }
 
-    if (sumEndINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
-    {
-        return false;
-    }
+    // if (sumStartTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    // {
+    //     return false;
+    // }
 
+    // if (sumEndTRA >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndINV >= getDivider(e.getFrequency(), 1, minimumdivide, 1))
+    // {
+    //     return false;
+    // }
 
     return true;
 }
@@ -188,7 +194,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     // }
 
     // return false;
-
+    //  return true;
     if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800)
     {
         return false;
@@ -209,7 +215,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         {
             return false;
         }
-
+       
         return filterDeletion(e);
     }
 

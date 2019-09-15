@@ -37,6 +37,7 @@ private:
   std::vector<uint8_t> rpmapqlist;
 public:
 void setRPMapQ(std::vector<uint8_t> rpmapq);
+std::vector<uint8_t> *getRPMapQ();
 
   // void setMark(std::string mark);
   // std::string getMark();
