@@ -11,7 +11,7 @@ void SampleStat::setSamplePath(std::string t_sample_path)
 
 SampleStat::SampleStat()
 {
-    countMax = 10000;
+    countMax = 50000;
 }
 
 void SampleStat::setNumberOfRead(int number)
@@ -127,14 +127,15 @@ void SampleStat::findMedianSampleStat()
 
         int32_t pos = aln->core.pos + 1;
         int32_t matepos = aln->core.mpos + 1;
+
         if (pos > matepos)
         {
             continue;
         }
 
-        if ((matepos - pos) > 0 && (matepos - pos) < 1000)
+        if ((matepos - pos) > 0 && (matepos - pos) < 2000)
         {
-            int diff = (matepos - pos);
+            int diff = (matepos+getReadLength())- pos;
             sumINS += diff;
             count++;
         }
@@ -153,6 +154,7 @@ void SampleStat::findMedianSampleStat()
 
 void SampleStat::execute()
 {
+    SampleStat();
     findReadLength();
     findMedianSampleStat();
     findSDSampleStat();

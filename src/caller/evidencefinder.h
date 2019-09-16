@@ -67,6 +67,14 @@ public:
   bool isINS();
   bool isTRA();
 
+
+  bool isDeletion();
+  bool isTandemDuplication();
+  bool isInversion();
+  bool isInsertion();
+  bool isTranslocation();
+  bool isDefaultOrientation();
+
 };
 
 #endif

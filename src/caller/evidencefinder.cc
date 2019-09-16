@@ -85,10 +85,11 @@ void EvidenceFinder::findEvidence()
     seTranslocation.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".TRA.txt");
 
     std::vector<ReadParser::Cigar> cigar;
-    SplitRead splitread(*target_chromosome,&readparser,samplestat,filepath);
+    SplitRead splitread(*target_chromosome, &readparser, samplestat, filepath);
     while (sam_itr_next(inT, iterT, read) >= 0)
     {
-        if ((read->core.flag & BAM_FUNMAP))
+
+        if (readparser.isUnmapped())
         {
             continue;
         }
@@ -108,21 +109,21 @@ void EvidenceFinder::findEvidence()
             continue;
         }
 
-
         splitread.updateRead();
-       
 
         currentPos = read->core.pos + 1;
         currentMPos = read->core.mpos + 1;
 
         cigar = readparser.getCigar();
+
+
         // if (readparser.getMapQuality() > 0)
         // {
-            seDeletion.updateRead();
-            seInsertion.updateRead();
-            seInversion.updateRead();
-            seTandemDuplication.updateRead();
-            seTranslocation.updateRead();
+        seDeletion.updateRead();
+        seInsertion.updateRead();
+        seInversion.updateRead();
+        seTandemDuplication.updateRead();
+        seTranslocation.updateRead();
         // }
 
         // std::cout << readparser.getPosDiscordantRead() << ",preCollectDEL : " << preCollectDEL.size() << ",collectDeletionInfoLists : " << collectDeletionInfoLists.size() << std::endl;
@@ -229,9 +230,12 @@ void EvidenceFinder::findEvidence()
     seTranslocation.done();
 }
 
-void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd) {
-    if (readparser.isFirstRead()) {
-        if (readparser.isMateUnmapped()) {
+void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
+{
+    if (readparser.isFirstRead())
+    {
+        if (readparser.isMateUnmapped())
+        {
             rdd->R1_MUN++;
             return;
         }
@@ -263,11 +267,13 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd) {
         //     return;
         // }
 
-
         // rdd->N_READ++;
         return;
-    } else {
-         if (readparser.isMateUnmapped()) {
+    }
+    else
+    {
+        if (readparser.isMateUnmapped())
+        {
             rdd->R2_MUN++;
             return;
         }
@@ -309,130 +315,172 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
     //checkNormalRead
     checkNormalRead(rdd);
 
-    if (readparser.isSecondRead())
-    {
-        insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
-
-        if (readparser.isMateUnmapped())
-        {
-            rdd->INS2++;
-            return;
-        }
-
-        if (!readparser.isPairOnSameChromosome())
-        {
-            rdd->TRA2++;
-            return;
-        }
-
-        if (insertSizeSecondRead < 0)
-        {
-            return;
-        }
-
-        if (readparser.isReverse() && readparser.isMateReverse())
-        {
-            rdd->INV2++;
-            return;
-        }
-
-        if (!readparser.isReverse() && !readparser.isMateReverse())
-        {
-            rdd->INV2++;
-            return;
-        }
-
-        if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
-        {
-            rdd->DEL2++;
-            return;
-        }
-
-        if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
-        {
-            rdd->INS2++;
-            return;
-        }
-
-        if (!readparser.isReverse())
-        {
-            return;
-        }
-
-        if (readparser.isMateReverse())
-        {
-            return;
-        }
-
-        if (readparser.getPos() < readparser.getMatePos())
-        {
-            rdd->DUP2++;
-            return;
-        }
-        return;
-    }
-
     if (readparser.isFirstRead())
     {
-        insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
-        if (readparser.isMateUnmapped())
-        {
-            rdd->INS1++;
-            return;
-        }
-
-        if (!readparser.isPairOnSameChromosome())
-        {
-            rdd->TRA1++;
-            return;
-        }
-
-        if (insertSizeFirstRead < 0)
-        {
-            return;
-        }
-
-        if (readparser.isReverse() && readparser.isMateReverse())
-        {
-            rdd->INV1++;
-            return;
-        }
-
-        if (!readparser.isReverse() && !readparser.isMateReverse())
-        {
-            rdd->INV1++;
-            return;
-        }
-
-        if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        if (isDeletion())
         {
             rdd->DEL1++;
-            return;
         }
 
-        if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
-        {
-            rdd->INS1++;
-            return;
-        }
-
-        if (readparser.isReverse())
-        {
-            return;
-        }
-
-        if (!readparser.isMateReverse())
-        {
-            return;
-        }
-
-        if (readparser.getPos() > readparser.getMatePos())
+        if (isTandemDuplication())
         {
             rdd->DUP1++;
-            return;
         }
-        return;
+
+        if (isInsertion())
+        {
+            rdd->INS1++;
+        }
+
+        if (isInversion())
+        {
+            rdd->INV1++;
+        }
+
+        if (isTranslocation())
+        {
+            rdd->TRA1++;
+        }
     }
+
+    if (readparser.isSecondRead())
+    {
+        if (isDeletion())
+        {
+            rdd->DEL2++;
+        }
+
+        if (isTandemDuplication())
+        {
+            rdd->DUP2++;
+        }
+
+        if (isInsertion())
+        {
+            rdd->INS2++;
+        }
+
+        if (isInversion())
+        {
+            rdd->INV2++;
+        }
+
+        if (isTranslocation())
+        {
+            rdd->TRA2++;
+        }
+    }
+
+    // if (readparser.isSecondRead())
+    // {
+    //     insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
+
+    //     if (readparser.isMateUnmapped() && readparser.isReverse())
+    //     {
+    //         rdd->INS2++;
+    //         return;
+    //     }
+
+    //     if (!readparser.isPairOnSameChromosome())
+    //     {
+    //         rdd->TRA2++;
+    //         return;
+    //     }
+
+    //     if (readparser.isReverse() && readparser.isMateReverse())
+    //     {
+    //         rdd->INV2++;
+    //         return;
+    //     }
+
+    //     if (!readparser.isReverse() && !readparser.isMateReverse())
+    //     {
+    //         rdd->INV2++;
+    //         return;
+    //     }
+
+    //     if (readparser.isReverse() && !readparser.isMateReverse())
+    //     {
+    //         if (readparser.getPos() < readparser.getMatePos())
+    //         {
+    //             rdd->DUP2++;
+    //             return;
+    //         }
+
+    //         if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+    //         {
+    //             rdd->DEL2++;
+    //             return;
+    //         }
+
+    //         if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+    //         {
+    //             rdd->INS2++;
+    //             return;
+    //         }
+    //         return;
+    //     }
+
+    //     return;
+    // }
+
+    // if (readparser.isFirstRead())
+    // {
+    //     insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+    //     if (readparser.isMateUnmapped() && !readparser.isReverse())
+    //     {
+    //         rdd->INS1++;
+    //         return;
+    //     }
+
+    //     if (!readparser.isPairOnSameChromosome())
+    //     {
+    //         rdd->TRA1++;
+    //         return;
+    //     }
+
+    //     if (!readparser.isReverse() && readparser.isMateReverse())
+    //     {
+    //         if (readparser.getPos() > readparser.getMatePos())
+    //         {
+    //             rdd->DUP1++;
+    //             return;
+    //         }
+
+    //         if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+    //         {
+    //             rdd->DEL1++;
+    //             return;
+    //         }
+
+    //         if (insertSizeFirstRead < 0)
+    //         {
+    //             return;
+    //         }
+
+    //         if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+    //         {
+    //             rdd->INS1++;
+    //             return;
+    //         }
+
+    //         return;
+    //     }
+
+    //     if (readparser.isReverse() && readparser.isMateReverse())
+    //     {
+    //         rdd->INV1++;
+    //         return;
+    //     }
+
+    //     if (!readparser.isReverse() && !readparser.isMateReverse())
+    //     {
+    //         rdd->INV1++;
+    //         return;
+    //     }
+
+    //     return;
+    // }
 }
 
 void EvidenceFinder::execute()
@@ -465,4 +513,264 @@ void EvidenceFinder::setupReadParser(bam1_t *alnT)
     read = alnT;
     readparser.setBamRead(alnT);
     readparser.setBamHeader(bam_header);
+}
+
+bool EvidenceFinder::isDefaultOrientation()
+{
+    if (readparser.isFirstRead())
+    {
+        if (readparser.isReverse())
+        {
+            return false;
+        }
+
+        if (!readparser.isMateReverse())
+        {
+            return false;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        if (!readparser.isReverse())
+        {
+            return false;
+        }
+
+        if (readparser.isMateReverse())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool EvidenceFinder::isDeletion()
+{
+    if (!readparser.isPairOnSameChromosome())
+    {
+        return false;
+    }
+
+    if (readparser.isUnmapped()) {
+        return false;
+    }
+
+    if (readparser.isMateUnmapped()) {
+        return false;
+    }
+
+    if (isTranslocation())
+    {
+        return false;
+    }
+
+    if (!isDefaultOrientation())
+    {
+        return false;
+    }
+
+    if (readparser.isFirstRead())
+    {
+        insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+
+        if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        {
+            return true;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
+
+        if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool EvidenceFinder::isTandemDuplication()
+{
+    if (readparser.isUnmapped()) {
+        return false;
+    }
+
+    if (readparser.isMateUnmapped()) {
+        return false;
+    }
+
+    if (!readparser.isPairOnSameChromosome())
+    {
+        return false;
+    }
+
+    if (isTranslocation())
+    {
+        return false;
+    }
+
+    if (!isDefaultOrientation())
+    {
+        return false;
+    }
+
+    if (readparser.isFirstRead())
+    {
+        if (readparser.getPos() > readparser.getMatePos())
+        {
+            return true;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        if (readparser.getPos() < readparser.getMatePos())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool EvidenceFinder::isInversion()
+{
+    if (!readparser.isPairOnSameChromosome())
+    {
+        return false;
+    }
+
+    if (readparser.isUnmapped()) {
+        return false;
+    }
+
+    if (readparser.isMateUnmapped()) {
+        return false;
+    }
+
+    if (isTranslocation())
+    {
+        return false;
+    }
+
+    if (readparser.isReverse() && readparser.isMateReverse())
+    {
+        return true;
+    }
+
+    if (!readparser.isReverse() && !readparser.isMateReverse())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool EvidenceFinder::isInsertion()
+{
+    
+    if (readparser.isUnmapped()) {
+        return false;
+    }
+
+    if (isTranslocation())
+    {
+        return false;
+    }
+
+    if (readparser.isFirstRead())
+    {
+        if (readparser.isReverse())
+        {
+            return false;
+        }
+
+        if (readparser.isMateUnmapped())
+        {
+            return true;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        if (!readparser.isReverse())
+        {
+            return false;
+        }
+
+        if (readparser.isMateUnmapped())
+        {
+            return true;
+        }
+    }
+
+    if (!readparser.isPairOnSameChromosome())
+    {
+        return false;
+    }
+
+    if (!isDefaultOrientation())
+    {
+        return false;
+    }
+
+    if (readparser.isFirstRead())
+    {
+        insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+
+        if (insertSizeFirstRead<0) {
+            return false;
+        }
+
+        if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        {
+            return true;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
+
+        if (insertSizeSecondRead<0) {
+            return false;
+        }
+
+        if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        {
+            return true;
+        }
+        
+    }
+
+    
+    return false;
+}
+
+bool EvidenceFinder::isTranslocation()
+{
+    if (readparser.isUnmapped()) {
+        return false;
+    }
+
+    if (readparser.isMateUnmapped()) {
+        return false;
+    }
+
+    if (!isDefaultOrientation())
+    {
+        return false;
+    }
+
+    if (readparser.isPairOnSameChromosome())
+    {
+        return false;
+    }
+
+    return true;
 }

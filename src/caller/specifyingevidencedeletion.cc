@@ -10,53 +10,34 @@ void SpecifyingEvidenceDeletion::updateRead()
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
 
-    // if (readparser.getMapQuality()==0) {
-    //     return;
-    // }
-
-    // if (!readparser.isPairOnSameChromosome())
-    // {
-    //     return;
-    // }
-
-    // if (readparser.getPos() > readparser.getMatePos())
-    // {
-    //     return;
-    // }
-
-    if (read->core.flag & BAM_FREAD2)
+    if (!readparser.isPairOnSameChromosome())
     {
         return;
     }
 
-    // if (!(read->core.flag & BAM_FMREVERSE))
-    // {
-    //     return;
-    // }
+    if (readparser.getPos() > readparser.getMatePos())
+    {
+        return;
+    }
 
-    // if (read->core.flag & BAM_FREVERSE)
-    // {
-    //     return;
-    // }
+    if (readparser.isMateUnmapped())
+    {
+        return;
+    }
 
-    // int32_t diff = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+    if (readparser.isSecondRead())
+    {
+        return;
+    }
 
-    // if (diff < 0)
-    // {
-    //     return;
-    // }
+    if (readparser.isReverse()) {
+        return;
+    }
 
-    // //Limit SVLEN
-    // if (diff > 50000)
-    // {
-    //     return;
-    // }
-
-    // if (diff > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
-    // {
-    //     //Pass filter
-    //     checkRange();
-    // }
+    if (!readparser.isMateReverse())
+    {
+        return;
+    }
 
     int32_t insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
 

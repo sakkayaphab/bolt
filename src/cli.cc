@@ -166,15 +166,15 @@ int Cli::debug()
 
     // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
 
-    std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
+    // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
     // std::string sample = "/home/sakkayaphab/kan/sra/sratoolkit.2.9.6-centos_linux64/bin/SRR390728.bam";
-    // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.20x.bam";
+    std::string sample = "/home/sakkayaphab/kan/wgsim/survi.20x.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.50x.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.100x.bam";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly19.fasta";
-    //  std::string reference = "/home/sakkayaphab/kan/reference/ucsc_hg19.fa";
-    std::string reference = "/home/sakkayaphab/kan/reference/hs37d5.fa";
+     std::string reference = "/home/sakkayaphab/kan/reference/ucsc_hg19.fa";
+    // std::string reference = "/home/sakkayaphab/kan/reference/hs37d5.fa";
 
     //   std::string reference = "/home/sakkayaphab/kan/reference/GRCh38_full_plus_hs38d1_analysis_set_minus_alts/GRCh38_full_plus_hs38d1_analysis_set_minus_alts.fa";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens/NCBI/GRCh38Decoy/Sequence/WholeGenomeFasta/genome.fa";
@@ -193,9 +193,9 @@ int Cli::debug()
     Caller caller(sample, reference, output);
     // caller.showinfo();
     // caller.setParallel(40);
-    // caller.execute();
-    // caller.catfile();
-    // caller.findBreakPoint();
+    caller.execute();
+    caller.catfile();
+    caller.findBreakPoint();
     caller.refineDelpthBlock();
     // caller.mergeSplitRead();
    

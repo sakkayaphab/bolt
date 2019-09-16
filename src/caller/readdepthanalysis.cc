@@ -38,7 +38,6 @@ void ReadDepthAnalysis::setFocusReadDepth(int32_t pos, int32_t end, std::vector<
     // std::vector<ReadDepthHelper::ReadDepthVector> vFocus;
     for (auto n : listrange)
     {
-        // std::cout << n << std::endl;
         ReadDepthHelper::ReadDepthVector datamodel;
         auto data = mapReadDepthLineSegment[n];
         datamodel.pos = data.pos;
@@ -67,57 +66,85 @@ int ReadDepthAnalysis::getAvgReadDepth()
     return avgReadDepth;
 }
 
+bool ReadDepthAnalysis::filterInversion(Evidence e)
+{
+
+    if (sumStartDEL>=getDivider(readDepthStat.getReadDepthByChr(e.getChr()),3,10,1)) {
+        return false;
+    }
+
+    if (sumEndDEL>=getDivider(readDepthStat.getReadDepthByChr(e.getChr()),3,10,1)) {
+        return false;
+    }
+
+    // if (sumStartINV - e.getFrequency()>=getDivider(readDepthStat.getReadDepthByChr(e.getChr()),3,10,1)) {
+    //     return false;
+    // }
+
+    // if (sumEndINV - e.getFrequency()>=getDivider(readDepthStat.getReadDepthByChr(e.getChr()),3,10,1)) {
+    //     return false;
+    // }
+
+    if (e.getFrequency() <= sumStartINV - e.getFrequency())
+    {
+        return false;
+    }
+
+    if (e.getFrequency() <= sumEndINV - e.getFrequency())
+    {
+        return false;
+    }
+
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    {
+        return false;
+    }
+
+    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    {
+        return false;
+    }
+
+    if (e.getMaxMapQ() < 15)
+    {
+        return false;
+    }
+
+    if (e.getFrequency() <= 1)
+    {
+        return false;
+    }
+
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 1000)
+    {
+        return false;
+    }
+
+     if (sumStartTRA >= e.getFrequency())
+    {
+        return false;
+    }
+
+    if (sumEndTRA >= e.getFrequency())
+    {
+        return false;
+    }
+
+     if (sumStartDEL >= e.getFrequency())
+    {
+        return false;
+    }
+
+    if (sumEndDEL >= e.getFrequency())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
-    int sumStartDELStart = 0;
-    int sumStartDELEnd = 0;
-    int sumStartDUP = 0;
-    int sumStartINV = 0;
-    int sumStartTRA = 0;
-    int sumStartINS = 0;
-    int sumStartSCF = 0;
-    int sumStartSCL = 0;
-    for (auto n : startFocusReadDepth)
-    {
-        sumStartDELStart += n.DEL1;
-        sumStartDELEnd += n.DEL2;
-
-        sumStartDUP += n.DUP1;
-        sumStartINV += n.INV1;
-        sumStartTRA += n.TRA1;
-        sumStartDUP += n.DUP2;
-        sumStartINV += n.INV2;
-        sumStartTRA += n.TRA2;
-        sumStartINS += n.INS1;
-        sumStartINS += n.INS2;
-        sumStartSCF += n.SCF;
-        sumStartSCL += n.SCL;
-    }
-
-    int sumEndDELStart = 0;
-    int sumEndDELEnd = 0;
-    int sumEndDUP = 0;
-    int sumEndINV = 0;
-    int sumEndTRA = 0;
-    int sumEndINS = 0;
-    int sumEndSCF = 0;
-    int sumEndSCL = 0;
-    for (auto n : startFocusReadDepth)
-    {
-        sumEndDELStart += n.DEL1;
-        sumEndDELEnd += n.DEL2;
-
-        sumEndDUP += n.DUP1;
-        sumEndINV += n.INV1;
-        sumEndTRA += n.TRA1;
-        sumEndDUP += n.DUP2;
-        sumEndINV += n.INV2;
-        sumEndTRA += n.TRA2;
-        sumEndINS += n.INS1;
-        sumEndINS += n.INS2;
-        sumEndSCF += n.SCF;
-        sumEndSCL += n.SCL;
-    }
 
     if (e.getMaxMapQ() < 10)
     {
@@ -126,9 +153,8 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
-
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()),1,10,1))
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 10, 1))
     {
         return false;
     }
@@ -178,10 +204,9 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     // {
     //     return false;
     // }
-    setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
-    setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
-    // setFocusReadDepth(10300, 14300);
-
+    setFocusReadDepth(e.getPosDiscordantRead()-configRound, e.getLastPosDiscordantRead() + configRound, &startFocusReadDepth);
+    setFocusReadDepth(e.getEndDiscordantRead() - configRound, e.getLastEndDiscordantRead() + configRound, &endFocusReadDepth);
+    collectNewData();
     // std::cout << "--------" << std::endl;
     // std::cout << "pos : "
     // << e.getPos() + e.getCiPosLeft() - configRound
@@ -215,7 +240,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         {
             return false;
         }
-       
+
         return filterDeletion(e);
     }
 
@@ -318,7 +343,6 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
-
         if (e.getMaxMapQ() < 15)
         {
             return false;
@@ -329,45 +353,64 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INV")
     {
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-        {
-            return false;
-        }
 
-        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-        {
-            return false;
-        }
-
-        if (e.getMaxMapQ() < 15)
-        {
-            return false;
-        }
-
-        if (e.getFrequency() <= 1)
-        {
-            return false;
-        }
-
-        // if (e.getSvLength() > 20000)
-        // {
-        //     return false;
-        // }
-
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 1000)
-        {
-            return false;
-        }
-
-        // if (focusReadDepth.at(0).depth < (getAvgReadDepth() - 15))
-        // {
-        //     return false;
-        // }
-
-        return true;
+        return filterInversion(e);
     }
 
     return true;
+}
+
+void ReadDepthAnalysis::collectNewData()
+{
+    sumStartDEL = 0;
+    sumStartDUP = 0;
+    sumStartINV = 0;
+    sumStartTRA = 0;
+    sumStartINS = 0;
+    sumStartSCF = 0;
+    sumStartSCL = 0;
+
+    sumEndDEL = 0;
+    sumEndDUP = 0;
+    sumEndINV = 0;
+    sumEndTRA = 0;
+    sumEndINS = 0;
+    sumEndSCF = 0;
+    sumEndSCL = 0;
+
+    for (auto n : startFocusReadDepth)
+    {
+        sumStartDEL += n.DEL1;
+        sumStartDEL += n.DEL2;
+
+        sumStartDUP += n.DUP1;
+        sumStartINV += n.INV1;
+        sumStartTRA += n.TRA1;
+        sumStartDUP += n.DUP2;
+        sumStartINV += n.INV2;
+        sumStartTRA += n.TRA2;
+        sumStartINS += n.INS1;
+        sumStartINS += n.INS2;
+        sumStartSCF += n.SCF;
+        sumStartSCL += n.SCL;
+    }
+
+    for (auto n : startFocusReadDepth)
+    {
+        sumEndDEL += n.DEL1;
+        sumEndDEL += n.DEL2;
+
+        sumEndDUP += n.DUP1;
+        sumEndINV += n.INV1;
+        sumEndTRA += n.TRA1;
+        sumEndDUP += n.DUP2;
+        sumEndINV += n.INV2;
+        sumEndTRA += n.TRA2;
+        sumEndINS += n.INS1;
+        sumEndINS += n.INS2;
+        sumEndSCF += n.SCF;
+        sumEndSCL += n.SCL;
+    }
 }
 
 int ReadDepthAnalysis::getSCFFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth)

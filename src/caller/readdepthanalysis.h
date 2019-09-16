@@ -28,7 +28,28 @@ private:
     ReadDepthStat readDepthStat;
     int minimumdivide = 2;
     int getDivider(int value,int top,int down,int minimum);
+
+private:
+    int sumStartDEL = 0;
+    int sumStartDUP = 0;
+    int sumStartINV = 0;
+    int sumStartTRA = 0;
+    int sumStartINS = 0;
+    int sumStartSCF = 0;
+    int sumStartSCL = 0;
+
+
+     int sumEndDEL = 0;
+    int sumEndDUP = 0;
+    int sumEndINV = 0;
+    int sumEndTRA = 0;
+    int sumEndINS = 0;
+    int sumEndSCF = 0;
+    int sumEndSCL = 0;
+
+
 public:
+    void collectNewData();
     ReadDepthAnalysis(FileManager *filemanager);
     int32_t getRound(int32_t x, int32_t max);
     std::vector<std::int32_t> getVectorRange(int32_t pos, int32_t end);
@@ -42,6 +63,7 @@ public:
     void setFocusReadDepth(int32_t pos, int32_t end,std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
     int getNumberReadDepthVector(std::vector<ReadDepthHelper::ReadDepthVector> focus,int blocknumber);
     bool filterDeletion(Evidence e);
+    bool filterInversion(Evidence e);
     void loadavgReadDepthFocusStat();
     
 
