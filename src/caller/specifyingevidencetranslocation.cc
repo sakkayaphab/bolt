@@ -10,17 +10,45 @@ void SpecifyingEvidenceTranslocation::updateRead()
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
 
+    if (readparser.isUnmapped())
+    {
+        return;
+    }
+
+    if (readparser.isMateUnmapped())
+    {
+        return;
+    }
+
+    if (readparser.isFirstRead())
+    {
+        if (readparser.isReverse())
+        {
+            return;
+        }
+
+        if (!readparser.isMateReverse())
+        {
+            return;
+        }
+    }
+
+    if (readparser.isSecondRead())
+    {
+        if (!readparser.isReverse())
+        {
+            return;
+        }
+
+        if (readparser.isMateReverse())
+        {
+            return;
+        }
+
+        return ;
+    }
+
     if (readparser.isPairOnSameChromosome())
-    {
-        return;
-    }
-
-    if (read->core.flag & BAM_FREAD2)
-    {
-        return;
-    }
-
-    if (!(!(read->core.flag & BAM_FREVERSE) && (read->core.flag & BAM_FMREVERSE)))
     {
         return;
     }
@@ -38,27 +66,26 @@ bool SpecifyingEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int
                                                                                                                          preCollectSV.at(positionOverlapped).getEndDiscordantRead(),
                                                                                                                          overlappedsvlength))
         {
-
             preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
 
-        if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
-        {
-            preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
-        }
+            if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+            {
+                preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
+            }
 
-        if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
-        {
-            preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
-        }
+            if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
+            {
+                preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
+            }
 
-        if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
-        {
-            preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
-        }
+            if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
+            {
+                preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
+            }
 
-        preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
-        added = true;
-        preCollectSV.at(positionOverlapped).incrementFrequency();
+            preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+            added = true;
+            preCollectSV.at(positionOverlapped).incrementFrequency();
         }
     }
 
@@ -68,7 +95,7 @@ bool SpecifyingEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int
 void SpecifyingEvidenceTranslocation::checkRange()
 {
     bool added;
-     int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     // int positionOverlapped = findOverlapped(2000, currentPos, currentMPos);
@@ -100,33 +127,25 @@ void SpecifyingEvidenceTranslocation::checkRange()
 
     if (!added)
     {
-        if (currentPos < currentMPos)
-        {
-            Evidence evidence;
-            evidence.setVariantType(svtype);
-            evidence.setChr(readparser.getChromosomeNameString());
-            evidence.setEndChr(readparser.getMateChromosomeNameString());
-            evidence.setPosDiscordantRead(currentPos);
-            evidence.setEndDiscordantRead(currentMPos);
-            evidence.incrementFrequency();
-            evidence.setForwardDirection(true);
-            evidence.addAssociateRead(currentPos, currentMPos);
-            evidence.setLastPosDiscordantRead(currentPos);
-            evidence.setLastEndDiscordantRead(currentMPos);
-            evidence.addMapQ(readparser.getMapQuality());
-            preCollectSV.push_back(evidence);
-
-        }
-        else
-        {
-            return;
-        }
+        Evidence evidence;
+        evidence.setVariantType(svtype);
+        evidence.setChr(readparser.getChromosomeNameString());
+        evidence.setEndChr(readparser.getMateChromosomeNameString());
+        evidence.setPosDiscordantRead(currentPos);
+        evidence.setEndDiscordantRead(currentMPos);
+        evidence.incrementFrequency();
+        evidence.setForwardDirection(true);
+        evidence.addAssociateRead(currentPos, currentMPos);
+        evidence.setLastPosDiscordantRead(currentPos);
+        evidence.setLastEndDiscordantRead(currentMPos);
+        evidence.addMapQ(readparser.getMapQuality());
+        preCollectSV.push_back(evidence);
     }
 }
 
 void SpecifyingEvidenceTranslocation::proveEvidence(int index)
 {
-     int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
@@ -147,7 +166,7 @@ void SpecifyingEvidenceTranslocation::proveEvidence(int index)
 
 void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
 {
-     int32_t firstPos = 0;
+    int32_t firstPos = 0;
     int32_t lastPos = 0;
     int32_t avgPos = 0;
     int32_t firstEndDis = 0;
@@ -169,11 +188,11 @@ void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
 
-    if (difflengthEnd > 500000)
-    {
-        std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
-        return;
-    }
+    // if (difflengthEnd > 500000)
+    // {
+    //     std::cout << evidence->getLastEndDiscordantRead() << " = " << evidence->getEndDiscordantRead() << std::endl;
+    //     return;
+    // }
     // int32_t difflengthPos =
     // int32_t difflengthEnd =
 
@@ -238,18 +257,24 @@ void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
     evidence->setCiPosLeft(-difflengthPos);
     evidence->setCiPosRight(difflengthPos);
     evidence->setEnd(firstEnd);
-    evidence->setCiEndLeft(-difflengthEnd);
+
+    if (firstEnd-difflengthEnd<0) {
+        evidence->setCiEndLeft(1);
+    }else {
+        evidence->setCiEndLeft(-difflengthEnd);
+    }
+    
     evidence->setCiEndRight(difflengthEnd);
 }
 
 bool SpecifyingEvidenceTranslocation::filterEvidence(Evidence *evidence)
 {
 
-    if (evidence->getMaxMapQ() == 0)
-    {
+    // if (evidence->getMaxMapQ() == 0)
+    // {
 
-        return false;
-    }
+    //     return false;
+    // }
 
     if (evidence->getFrequency() >= 3)
     {

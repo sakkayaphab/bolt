@@ -72,6 +72,13 @@ void RefineDepthBlock::execute()
             result = getRefineResultDuplication(&variantlist);
             // result = variantlist;
         }
+        else if (variantlist.at(0).getSVType() == "BND")
+        {
+
+            // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultTranslocation(&variantlist);
+            // result = variantlist;
+        }
         else
         {
             result = variantlist;
@@ -104,6 +111,98 @@ void RefineDepthBlock::setSampleStat(SampleStat *samplestat)
     RefineDepthBlock::samplestat = samplestat;
 }
 
+std::vector<Evidence> RefineDepthBlock::getRefineResultTranslocation(std::vector<Evidence> *master)
+{
+    std::vector<Evidence> cache;
+    for (auto n : *master)
+    {
+        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+
+        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        auto nextPos = nextNumber(n.getPos(), roundConfig);
+        auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        auto currentRD = rdf.getBlock(currentPos);
+        auto nextRD = rdf.getBlock(nextPos);
+        auto previousRD = rdf.getBlock(previousPos);
+
+        if (n.getMark() == "")
+        {
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+            {
+                continue;
+            }
+        }
+
+        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+        {
+            continue;
+        }
+
+        if (currentRD.INS1 + currentRD.INS2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        auto currentEndRD = rdf.getBlock(currentEnd);
+        auto nextEndRD = rdf.getBlock(nextEnd);
+        auto previousEndRD = rdf.getBlock(previousEnd);
+
+        if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentEndRD.INS1 + currentEndRD.INS2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (n.getFrequency() <= 2)
+        {
+            continue;
+        }
+
+        if (n.getMaxMapQ() < 40)
+        {
+            continue;
+        }
+
+        cache.push_back(n);
+    }
+
+    return cache;
+}
+
 std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<Evidence> *master)
 {
     std::vector<Evidence> cache;
@@ -134,51 +233,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
 
         if (n.getSvLength() > 500)
         {
-
-            //     if (currentRD.DEL1 + currentRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            //     if (previousRD.DEL1 + previousRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            //     if (nextRD.DEL1 + previousRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            // if (currentRD.INV1 + currentRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.INV1 + previousRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (nextRD.INV1 + previousRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (currentRD.TRA1 + currentRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (previousRD.TRA1 + previousRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (nextRD.TRA1 + previousRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
 
             if (currentRD.INS1 + currentRD.INS2 >= n.getFrequency())
             {
@@ -231,51 +285,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
             {
                 continue;
             }
-
-            //     if (currentEndRD.DEL1 + currentEndRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            //     if (previousEndRD.DEL1 + previousEndRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            //     if (nextEndRD.DEL1 + previousEndRD.DEL2 >= 10)
-            //     {
-            //         continue;
-            //     }
-
-            // if (currentEndRD.INV1 + currentEndRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (previousEndRD.INV1 + previousEndRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (nextEndRD.INV1 + nextEndRD.INV2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (currentEndRD.TRA1 + currentEndRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (previousEndRD.TRA1 + previousEndRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
-
-            // if (nextEndRD.TRA1 + nextEndRD.TRA2 >= readDepthStat.getReadDepthByChr(n.getChr()))
-            // {
-            //     continue;
-            // }
         }
 
         if (n.getSvLength() < 100)
@@ -326,7 +335,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             continue;
         }
 
-        if (currentRD.depth==0) {
+        if (currentRD.depth == 0)
+        {
             continue;
         }
 

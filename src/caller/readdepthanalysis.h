@@ -65,6 +65,7 @@ public:
     bool filterDeletion(Evidence e);
     bool filterInversion(Evidence e);
     void loadavgReadDepthFocusStat();
+    bool filterTranslocation(Evidence e);
     
 
     int getSCFFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);

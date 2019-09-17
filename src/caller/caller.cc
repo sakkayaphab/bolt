@@ -274,7 +274,6 @@ void Caller::refineDelpthBlock()
 
 void Caller::catEvidenceFile()
 {
-    
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
@@ -323,7 +322,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "BND")
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -499,14 +498,16 @@ int Caller::findBreakPoint()
     tbb::parallel_for(0, sizeLoop, [&](int i) {
         mxRead.lock();
 
-        std::cout << "# " << countRunEvidence + 1 << "/" << sizeLoop << std::endl;
-
         if (ep.isEmpty())
         {
             std::cout << "end" << std::endl;
         }
         Evidence thisEvidence = ep.getEvidence();
         Evidence variantresult;
+                    std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr() 
+                    << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
+                    << std::endl;
+
         mxRead.unlock();
         //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
         if (thisEvidence.getVariantType() == "DEL")
