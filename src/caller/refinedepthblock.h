@@ -29,6 +29,7 @@ public:
   std::vector<Evidence> getRefineResultDuplication(std::vector<Evidence> *master);
   std::vector<Evidence> getRefineResultInversion(std::vector<Evidence> *master);
   std::vector<Evidence> getRefineResultTranslocation(std::vector<Evidence> *master);
+  std::vector<Evidence> getRefineResultInsertion(std::vector<Evidence> *master);
 
   void writeFile(std::vector<Evidence> *master);
   int32_t roundNumber(int32_t number,int32_t round);

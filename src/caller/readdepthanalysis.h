@@ -64,6 +64,7 @@ public:
     int getNumberReadDepthVector(std::vector<ReadDepthHelper::ReadDepthVector> focus,int blocknumber);
     bool filterDeletion(Evidence e);
     bool filterInversion(Evidence e);
+    bool filterInsertion(Evidence e);
     void loadavgReadDepthFocusStat();
     bool filterTranslocation(Evidence e);
     

@@ -52,7 +52,6 @@ Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::strin
     execSampleStat();
     applyBamHeader();
 
-
     // ReadDepthStat readDepthStat;
     // readDepthStat.setFilePath(&filepath);
     // readDepthStat.execute();
@@ -211,7 +210,7 @@ void Caller::mergeSplitRead()
     {
         while (dir = readdir(d))
         {
-           
+
             if (std::string(dir->d_name).size() < 4)
             {
                 continue;
@@ -230,7 +229,7 @@ void Caller::mergeSplitRead()
     std::sort(evidenceFilePathLists.begin(), evidenceFilePathLists.end());
 
     //write file
-    
+
     // int count = 0;
     // for (auto n : evidenceFilePathLists)
     // {
@@ -245,7 +244,7 @@ void Caller::mergeSplitRead()
     //         {
     //                 cache.push_back(line);
     //                 count++;
-                
+
     //         }
     //         myfile.close();
 
@@ -308,9 +307,8 @@ void Caller::catEvidenceFile()
     //write file
     std::string writeFinal = filepath.getAllEvidencePath();
     int count = 0;
-     
-    ReadDepthAnalysis rda(&filepath);
 
+    ReadDepthAnalysis rda(&filepath);
 
     for (auto n : evidenceFilePathLists)
     {
@@ -448,7 +446,7 @@ int Caller::writeFile(Evidence vr)
     myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
     // if (vr.getVariantType()=="DEL") {
     // myfile.open(filepath.getEvidencePath() + "/" + vr.getChromosome() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
-    std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf" << std::endl;
+    // std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf" << std::endl;
     // }else {
     //     return 0;
     // }
@@ -504,9 +502,9 @@ int Caller::findBreakPoint()
         }
         Evidence thisEvidence = ep.getEvidence();
         Evidence variantresult;
-                    std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr() 
-                    << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
-                    << std::endl;
+        // std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr()
+        // << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
+        // << std::endl;
 
         mxRead.unlock();
         //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;

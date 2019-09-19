@@ -6,21 +6,46 @@
 #include <map>
 #include <vector>
 #include "refiningsv.h"
+#include "insertionpositiondetail.h"
 
 class RefiningInsertion : public RefiningSV
 {
 private:
   void first();
   void refineStartToEnd(const char *range);
-  int32_t getPosMaxHitValue(std::map<int32_t, int> *map,std::map<int32_t, uint8_t> *mapMapQ);
-  int getHitByPos(std::map<int32_t, int> *map, int32_t pos);
-  bool isBetWeen(int32_t primary, int32_t secondary, int32_t range);
-  void refineVariant(const char *range);
 
-  std::map<int32_t, int> mapSCFirst;
-  std::map<int32_t, uint8_t> mapMapQFirst;
-  std::map<int32_t, int> mapSCLast;
-  std::map<int32_t, uint8_t> mapMapQLast;
+  std::map<int32_t, InsertionPositionDetail> mapSCStart;
+  std::map<int32_t, InsertionPositionDetail> mapSCEnd;
+
+
+  std::vector<InsertionPositionDetail> vectorSCStart;
+  std::vector<InsertionPositionDetail> vectorSCEnd;
+
+  struct BreakpointPosition
+  {
+    int32_t pos;
+    int32_t end;
+    int frequency = 0;
+    int longmapstart =0;
+    int longmapend = 0;
+    int score = 0;
+    std::vector<uint8_t> mappingqualitylist;
+
+    bool operator<(const BreakpointPosition &rhs) const
+    {
+        return (frequency < rhs.frequency);
+    }
+  };
+
+  std::vector<BreakpointPosition> vectorBP;
+  
+  
+  void convertMapSC();
+  void clearMapSC();
+  void convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> *mapSC,std::vector<InsertionPositionDetail> *vectorSC);
+  void findBreakpoint();
+  bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
+  void filterBreakpoint();
 
 public:
   RefiningInsertion();

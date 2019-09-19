@@ -15,10 +15,12 @@ private:
   bool filterEvidence(Evidence *evidence);
   void calculateVCF(Evidence *evidence);
 protected:
+
 public:
   SpecifyingEvidenceInsertion();
   void updateRead();
   void done();
+  bool incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos);
 };
 
 #endif

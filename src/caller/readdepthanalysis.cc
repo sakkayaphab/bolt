@@ -169,6 +169,115 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     return true;
 }
 
+bool ReadDepthAnalysis::filterInsertion(Evidence e)
+{
+
+    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 3))
+    // {
+    //     return false;
+    // }
+
+    // if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 3))
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartSCL<getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 10, 1))
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndSCF<getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 10, 1))
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartDEL >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndDEL >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartDUP >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndDUP >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartINV >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndINV >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumStartTRA >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    // if (sumEndTRA >= e.getFrequency())
+    // {
+    //     return false;
+    // }
+
+    if (e.getMaxMapQ() < 20)
+    {
+        return false;
+    }
+
+    if (e.getFrequency() <= 2)
+    {
+        return false;
+    }
+
+    // return true;
+
+    // if (e.getComment() == "MATEUNMAPPED")
+    // {
+
+    //     if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800)
+    //     {
+    //         return false;
+    //     }
+
+    //     if (getReadDepthAverageFocusArea(&startFocusReadDepth) < 10)
+    //     {
+    //         return false;
+    //     }
+
+    //     if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 10, 1))
+    //     {
+    //         return false;
+    //     }
+
+    //     return true;
+    // }
+
+    // if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 10, 1))
+    // {
+    //     return false;
+    // }
+
+    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) < 10)
+    // {
+    //     return false;
+    // }
+
+    return true;
+}
+
 bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 {
     if (cachechr != e.getChr())
@@ -228,56 +337,15 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "INS")
     {
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-        {
-            return false;
-        }
-
-        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-        {
-            return false;
-        }
-
-        if (e.getComment() == "MATEUNMAPPED")
-        {
-            if (e.getMaxMapQ() == 0)
-            {
-                return false;
-            }
-
-            if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800)
-            {
-                return false;
-            }
-
-            if (getReadDepthAverageFocusArea(&startFocusReadDepth) < 10)
-            {
-                return false;
-            }
-
-            if (e.getFrequency() < 4)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500)
-        {
-            return false;
-        }
-
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) < 10)
-        {
-            return false;
-        }
-
-        return true;
+        return filterInsertion(e);
     }
 
     if (e.getVariantType() == "DUP")
     {
+        if (sumStartSCL <= 1 && sumStartSCF <= 1)
+    {
+        return false;
+    }
 
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 8))
         {

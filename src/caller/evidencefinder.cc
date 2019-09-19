@@ -116,17 +116,11 @@ void EvidenceFinder::findEvidence()
 
         cigar = readparser.getCigar();
 
-
-        // if (readparser.getMapQuality() > 0)
-        // {
         seDeletion.updateRead();
         seInsertion.updateRead();
         seInversion.updateRead();
         seTandemDuplication.updateRead();
         seTranslocation.updateRead();
-        // }
-
-        // std::cout << readparser.getPosDiscordantRead() << ",preCollectDEL : " << preCollectDEL.size() << ",collectDeletionInfoLists : " << collectDeletionInfoLists.size() << std::endl;
 
         //Read depth
         getRound(&currentPos, &configRound, &roundedPos);
@@ -134,12 +128,12 @@ void EvidenceFinder::findEvidence()
         {
             readdepthdetail.RD++;
 
-            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
+            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
             {
                 readdepthdetail.SCF++;
             }
 
-            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
+            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
             {
                 readdepthdetail.SCL++;
             }

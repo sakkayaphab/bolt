@@ -10,20 +10,7 @@ void RefiningInsertion::execute()
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     prepareBamReader();
-
-    //large insertion by unmapped read
-    //    std::cout << evidence.getPosDiscordantRead() << " // " << evidence.getEndDiscordantRead() << std::endl;
-    // if (evidence.getPosDiscordantRead() == evidence.getEndDiscordantRead())
-    // {
-        first();
-    // }
-    // small - medium insertion
-    // else
-    // {
-    //     /* code */
-    // }
-
-    //    std::cout << "---+ run complete +---" << std::endl;
+    first();
 }
 
 void RefiningInsertion::first()
@@ -31,10 +18,9 @@ void RefiningInsertion::first()
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(),
                                                  evidence.getPos() + evidence.getCiPosRight());
 
-    const char *range = findRange.c_str();
-    // const char *mChr = evidence.getChr().c_str();
+    std::cout << findRange << std::endl;
 
-    // std::cout << range << "/" << samplestat->getReadLength() << std::endl;
+    const char *range = findRange.c_str();
     refineStartToEnd(range);
 }
 
@@ -48,8 +34,6 @@ void RefiningInsertion::refineStartToEnd(const char *range)
     read = bam_init1();
     readparser.setBamHeader(bam_header);
     readparser.setBamRead(read);
-
-    
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -75,169 +59,177 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         }
 
         auto cigar = readparser.getCigar();
-        if (cigar.size() != 2)
+        if (cigar.size() <= 1)
         {
             continue;
         }
 
-       
-        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 2)
+        if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(cigar.size() - 1).getLength() >= 4)
         {
-            mapSCFirst[readparser.getPos()]++;
-            if (mapMapQFirst[readparser.getPos()]<readparser.getMapQuality()) {
-                mapMapQFirst[readparser.getPos()] = readparser.getMapQuality();
-            }
+            mapSCEnd[readparser.getEnd()].addMapQ(readparser.getMapQuality());
+            mapSCEnd[readparser.getEnd()].addLongMapping(cigar.at(cigar.size() - 1).getLength());
+            mapSCEnd[readparser.getEnd()].setPosition(readparser.getEnd());
         }
 
-        if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(cigar.size() - 1).getLength() >= 2)
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
         {
-            mapSCLast[readparser.getEnd()]++;
-            if (mapMapQLast[readparser.getEnd()]<readparser.getMapQuality()) {
-                mapMapQLast[readparser.getEnd()] = readparser.getMapQuality();
-            }
+            // std::cout << readparser.getPos() << std::endl;
+            mapSCStart[readparser.getPos()].addMapQ(readparser.getMapQuality());
+            mapSCStart[readparser.getPos()].addLongMapping(cigar.at(0).getLength());
+            mapSCStart[readparser.getPos()].setPosition(readparser.getPos());
         }
     }
 
-    refineVariant(range);
+    RefiningInsertion::convertMapSC();
+    RefiningInsertion::clearMapSC();
+    RefiningInsertion::findBreakpoint();
+    RefiningInsertion::filterBreakpoint();
 
     hts_itr_destroy(iter);
 
     return;
 }
 
-void RefiningInsertion::refineVariant(const char *range) {
-    //find max
-    
-    int32_t position_first_hit = 0;
-    int32_t position_second_hit = 0;
-    int hit_position_second = 0;
-    int hit_position_first = 0;
-    if (getPosMaxHitValue(&mapSCLast,&mapMapQLast) < getPosMaxHitValue(&mapSCFirst,&mapMapQFirst))
-    {
-        position_first_hit = getPosMaxHitValue(&mapSCFirst,&mapMapQFirst);
-     
+void RefiningInsertion::filterBreakpoint()
+{
+    std::sort(vectorBP.begin(), vectorBP.end());
 
-        for (auto const &x : mapSCLast)
+    for (BreakpointPosition n : vectorBP)
+    {
+        int32_t averagePos = 0;
+        if (n.pos > n.end)
         {
-
-            if (!isBetWeen(position_first_hit,x.first,100)) {
-                continue;
-            }
-
-            if (x.second <= 3)
-            {
-                continue;
-            }
-
-            if (hit_position_second < x.second)
-            {
-                position_second_hit = x.first;
-                hit_position_second = x.second;
-            }
+            averagePos = n.pos;
         }
-    }
-    else
-    {
-        position_second_hit = getPosMaxHitValue(&mapSCLast,&mapMapQLast);
-
-        for (auto const &x : mapSCFirst)
+        else
         {
-
-            if (!isBetWeen(position_second_hit,x.first,100)) {
-                continue;
-            }
-
-            if (x.second <= 3)
-            {
-                continue;
-            }
-
-            if (hit_position_first < x.second)
-            {
-                position_first_hit = x.first;
-                hit_position_first = x.second;
-            }
+            averagePos = (n.end + n.pos) / 2;
         }
-    }
 
-    if (position_second_hit == 0 && position_first_hit == 0)
-    {
-        return;
-    }
-    
-    if (position_second_hit == 0 )
-    {
-        position_second_hit = position_first_hit;
-    }
-    if (position_first_hit == 0)
-    {
-        position_second_hit = position_first_hit;
-    }
+        // std::cout << n.pos << " = " << n.end << std::endl;
 
-    int32_t averagePos = (position_first_hit + position_second_hit) / 2;
-    int readdepthAtPos = getReadDepthAtPosition(range, averagePos);
+        variantresult.setPos(averagePos);
+        variantresult.setEnd(averagePos);
+        variantresult.setFrequency(n.mappingqualitylist.size());
+        variantresult.setRPMapQ(*evidence.getMapQVector());
 
-    if (readdepthAtPos < 5)
-    {
-        return;
+        variantresult.setMapQList(n.mappingqualitylist);
+        variantresult.setChr(evidence.getChr());
+        variantresult.setEndChr(evidence.getEndChr());
+        variantresult.setQuailtyPass(true);
+        break;
     }
-
-    if (readdepthAtPos > 500)
-    {
-        return;
-    }
-
-    auto ratio = (hit_position_second + hit_position_first) / (float) readdepthAtPos;
-    if (ratio < 0.05)
-    {
-        return;
-    }
-
-    variantresult.setPos(averagePos);
-    variantresult.setEnd(averagePos);
-    variantresult.setRPMapQ(*evidence.getMapQVector());
-    variantresult.setFrequency(hit_position_second + hit_position_first);
-    variantresult.setQuailtyPass(true);
 }
 
-bool RefiningInsertion::isBetWeen(int32_t primary,int32_t secondary,int32_t range) {
-    if (secondary < primary-range) {
+void RefiningInsertion::findBreakpoint()
+{
+    for (InsertionPositionDetail n : vectorSCStart)
+    {
+        if (n.getLongMapping() < 4)
+        {
+            continue;
+        }
+
+        if (n.getFrequency() < 1)
+        {
+            continue;
+        }
+
+        bool added;
+
+        for (InsertionPositionDetail m : vectorSCEnd)
+        {
+            if (m.getLongMapping() < 4)
+            {
+                continue;
+            }
+
+            if (m.getFrequency() < 1)
+            {
+                continue;
+            }
+
+            if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
+            {
+                BreakpointPosition tempBP;
+                tempBP.pos = n.getPosition();
+                tempBP.end = m.getPosition();
+                tempBP.frequency = n.getFrequency() + m.getFrequency();
+                tempBP.score = n.getFrequency() + m.getFrequency();
+                tempBP.longmapstart = n.getLongMapping();
+                tempBP.longmapend = m.getLongMapping();
+                for (auto x : n.getMapQList())
+                {
+                    tempBP.mappingqualitylist.push_back(x);
+                }
+                for (auto x : m.getMapQList())
+                {
+                    tempBP.mappingqualitylist.push_back(x);
+                }
+
+                if (tempBP.frequency <= 3)
+                {
+                    continue;
+                }
+                added = true;
+                vectorBP.push_back(tempBP);
+            }
+        }
+
+        if (!added && n.getFrequency() >= 4)
+        {
+            BreakpointPosition tempBP;
+            tempBP.pos = n.getPosition();
+            tempBP.end = n.getPosition();
+            tempBP.frequency = n.getFrequency();
+            tempBP.score = n.getFrequency();
+            tempBP.longmapstart = n.getLongMapping();
+            tempBP.longmapend = n.getLongMapping();
+            for (auto x : n.getMapQList())
+            {
+                tempBP.mappingqualitylist.push_back(x);
+            } 
+ 
+            added = true;
+            vectorBP.push_back(tempBP);
+        }
+    }
+}
+
+bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
+{
+    if (targetPos - overlapped > pos)
+    {
         return false;
     }
 
-    if (secondary > primary+range) {
+    if (targetPos + overlapped < pos)
+    {
         return false;
     }
 
     return true;
 }
 
-int RefiningInsertion::getHitByPos(std::map<int32_t, int> *map, int32_t pos)
+void RefiningInsertion::convertMapSC()
 {
-    return (*map)[pos];
+    convertMapSCToVector(&mapSCStart, &vectorSCStart);
+    std::sort(vectorSCStart.begin(), vectorSCStart.end());
+
+    convertMapSCToVector(&mapSCEnd, &vectorSCEnd);
+    std::sort(vectorSCEnd.begin(), vectorSCEnd.end());
 }
 
-int32_t RefiningInsertion::getPosMaxHitValue(std::map<int32_t, int> *map,std::map<int32_t, uint8_t> *mapMapQ)
+void RefiningInsertion::convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> *mapSC, std::vector<InsertionPositionDetail> *vectorSC)
 {
-    int hit = 0;
-    int32_t position = 0;
-
-    for (auto const &x : *map)
+    for (auto const &x : *mapSC)
     {
-        // if ((*mapMapQ)[x.first]<25) {
-        //     continue;
-        // }
-
-        if ((*mapMapQ)[x.first]==0) {
-            continue;
-        }
-
-        if (x.second > hit)
-        {
-            hit = x.second;
-            position = x.first;
-        }
+        vectorSC->push_back(x.second);
     }
+}
 
-    return position;
+void RefiningInsertion::clearMapSC()
+{
+    mapSCStart.clear();
+    mapSCEnd.clear();
 }

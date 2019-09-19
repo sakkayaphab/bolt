@@ -102,7 +102,6 @@ void RefiningDeletion::refineStartToEnd(const char *range)
     // std::cout << seqrefString << std::endl;
 
     std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
-    std::map<int32_t, int> SCReadLists;
 
     // Alignment alignment(&seqrefString);
     // alignment.genarateMatrix("DELSTART");
@@ -364,7 +363,6 @@ void RefiningDeletion::refineEndToStart(const char *range)
     // std::cout << seqrefString << std::endl;
 
     std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
-    std::map<int32_t, int> SCReadLists;
 
     // Alignment alignment(&seqrefString);
     // alignment.genarateMatrix("DELEND");

@@ -79,6 +79,13 @@ void RefineDepthBlock::execute()
             result = getRefineResultTranslocation(&variantlist);
             // result = variantlist;
         }
+        else if (variantlist.at(0).getSVType() == "INS")
+        {
+
+            result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getRefineResultInsertion(&variantlist);
+            // result = variantlist;
+        }
         else
         {
             result = variantlist;
@@ -196,6 +203,85 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultTranslocation(std::vector
         {
             continue;
         }
+
+        cache.push_back(n);
+    }
+
+    return cache;
+}
+
+std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evidence> *master)
+{
+    std::vector<Evidence> cache;
+    for (auto n : *master)
+    {
+        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+
+        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        auto nextPos = nextNumber(n.getPos(), roundConfig);
+        auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        auto currentRD = rdf.getBlock(currentPos);
+        auto nextRD = rdf.getBlock(nextPos);
+        auto previousRD = rdf.getBlock(previousPos);
+
+        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 4)
+        // {
+        //     continue;
+        // }
+
+        // if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        // auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        // auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        // auto currentEndRD = rdf.getBlock(currentEnd);
+        // auto nextEndRD = rdf.getBlock(nextEnd);
+        // auto previousEndRD = rdf.getBlock(previousEnd);
+
+        // if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        // if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
+
+        if (n.getFrequency() <= 2)
+        {
+            continue;
+        }
+
+        if (n.getMaxMapQ() < 40)
+        {
+            continue;
+        }
+
+        // if (n.getMinMapQ() == 0)
+        // {
+        //     continue;
+        // }
 
         cache.push_back(n);
     }

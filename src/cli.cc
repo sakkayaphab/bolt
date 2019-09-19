@@ -159,12 +159,12 @@ int Cli::debug()
     //    std::string  reference = "/data/users/wichadak/kan/reference/ucsc_hg19.fa";
     //    std::string sample = "/data/users/wichadak/kan/sample/NA12878_S1.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/G2223.remdup.uniqMap.TS.bam";
-    std::string sample = "/home/sakkayaphab/kan/wgsim/hx1f4s4full_3rdfixedv2.bam";
+    // std::string sample = "/home/sakkayaphab/kan/wgsim/hx1f4s4full_3rdfixedv2.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878_S1.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/G5091.bam";
 
-    // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
+    std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
 
     // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
@@ -174,10 +174,10 @@ int Cli::debug()
     // std::string sample = "/home/sakkayaphab/kan/wgsim/survi.100x.bam";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly19.fasta";
     //  std::string reference = "/home/sakkayaphab/kan/reference/ucsc_hg19.fa";
-    // std::string reference = "/home/sakkayaphab/kan/reference/hs37d5.fa";
+    std::string reference = "/home/sakkayaphab/kan/reference/hs37d5.fa";
 
     //   std::string reference = "/home/sakkayaphab/kan/reference/GRCh38_full_plus_hs38d1_analysis_set_minus_alts/GRCh38_full_plus_hs38d1_analysis_set_minus_alts.fa";
-    std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens/NCBI/GRCh38Decoy/Sequence/WholeGenomeFasta/genome.fa";
+    // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens/NCBI/GRCh38Decoy/Sequence/WholeGenomeFasta/genome.fa";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly18.fasta";
     // std::string reference = "/data/users/wichadak/kan/reference/ucsc_hg19.fa";
     // std::string output = "na12878";
@@ -199,7 +199,6 @@ int Cli::debug()
     caller.refineDelpthBlock();
     // caller.mergeSplitRead();
    
-
     // caller.mergeBreakpoint();
 
     // caller.debugEvidenceProvider();

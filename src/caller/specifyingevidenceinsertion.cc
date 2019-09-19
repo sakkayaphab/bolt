@@ -7,13 +7,36 @@ SpecifyingEvidenceInsertion::SpecifyingEvidenceInsertion()
 
 void SpecifyingEvidenceInsertion::updateRead()
 {
+
+    if (readparser.isUnmapped())
+    {
+        return;
+    }
+
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
 
-    if (read->core.flag & BAM_FMUNMAP)
+    if (readparser.isFirstRead() && !readparser.isReverse())
     {
-        checkRange();
-        return;
+
+        if (readparser.isMateUnmapped())
+        {
+            // std::cout << currentPos << " = " << currentMPos << std::endl;
+
+            checkRange();
+            return;
+        }
+    }
+
+    if (readparser.isSecondRead() && readparser.isReverse())
+    {
+        if (readparser.isMateUnmapped())
+        {
+            // std::cout << currentPos << " = " << currentMPos << std::endl;
+
+            // checkRange();
+            return;
+        }
     }
 
     if (!readparser.isPairOnSameChromosome())
@@ -21,66 +44,50 @@ void SpecifyingEvidenceInsertion::updateRead()
         return;
     }
 
-    if (read->core.flag & BAM_FREAD1)
+    if (readparser.isFirstRead())
     {
-        int diff = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
-        if (diff < 0)
+        if (readparser.isReverse())
         {
             return;
         }
 
-        if (diff < samplestat->getMedianSampleStat() - (samplestat->getSDSampleStat()))
+        if (!readparser.isMateReverse())
         {
-            checkRange();
             return;
         }
+
+        int diff = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+        if (diff < 50)
+        {
+            return;
+        }
+
+        if (diff < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat())
+        {
+            checkRange();
+        }
+        return;
     }
 }
 
-void SpecifyingEvidenceInsertion::checkRange()
+bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
-    std::string chr = bam_header->target_name[read->core.tid];
-    uint32_t pos = read->core.pos + 1;
-
-    std::string mchr = bam_header->target_name[read->core.mtid];
-    uint32_t mpos = read->core.mpos + 1;
-
-    if (mpos == 0)
-    {
-        mpos = pos;
-    }
-
-    if (pos == 0)
-    {
-        pos = mpos;
-    }
     bool added;
-
-    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
-    int positionOverlapped = findOverlapped(merge, pos, mpos);
-
-    if (positionOverlapped >= 0)
+    for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
-        preCollectSV.at(positionOverlapped).addAssociateRead(currentPos, currentMPos);
 
-        if (readparser.isMateUnmapped())
+        if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos))
         {
-            if (readparser.isFirstRead())
+            if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
             {
-                preCollectSV.at(positionOverlapped).setForwardDirection(true);
-                preCollectSV.at(positionOverlapped).NumberforwardDirection++;
-                if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
-                {
-                    preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
-                }
+                preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
             }
-            else
+
+            if (currentMPos != 0)
             {
-                preCollectSV.at(positionOverlapped).setBackwardDirection(true);
-                preCollectSV.at(positionOverlapped).NumberbackwardDirection++;
-                if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() == preCollectSV.at(positionOverlapped).getPosDiscordantRead())
+                if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
                 {
-                    preCollectSV.at(positionOverlapped).setEndDiscordantRead(pos);
+                    preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
                 }
 
                 if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
@@ -88,47 +95,22 @@ void SpecifyingEvidenceInsertion::checkRange()
                     preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
                 }
             }
+
+            preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+
+            preCollectSV.at(positionOverlapped).incrementFrequency();
+            added = true;
         }
-        else
-        {
-            if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
-            {
-                preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
-            }
-
-            if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
-            {
-                preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
-            }
-
-            if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
-            {
-                preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
-            }
-
-            if (readparser.isFirstRead())
-            {
-                preCollectSV.at(positionOverlapped).setForwardDirection(true);
-            }
-            else
-            {
-                preCollectSV.at(positionOverlapped).setBackwardDirection(true);
-            }
-        }
-
-        //        if (readparser.isFirstRead())
-        //        {
-        //            preCollectSV.at(positionOverlapped).setForwardDirection(true);
-        //        }
-        //        else
-        //        {
-        //            preCollectSV.at(positionOverlapped).setFoundEvidenceAtEnd(true);
-        //        }
-
-        preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
-        added = true;
-        preCollectSV.at(positionOverlapped).incrementFrequency();
     }
+
+    return added;
+}
+
+void SpecifyingEvidenceInsertion::checkRange()
+{
+    bool added = false;
+    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     checkProveEvidence();
 
@@ -136,42 +118,40 @@ void SpecifyingEvidenceInsertion::checkRange()
     {
         Evidence evidence;
         evidence.setVariantType(svtype);
-        evidence.setChr(chr);
-        evidence.setEndChr(chr);
-        evidence.setPosDiscordantRead(pos);
+        evidence.setChr(readparser.getChromosomeNameString());
+        evidence.setEndChr(readparser.getChromosomeNameString());
+
         if (readparser.isMateUnmapped())
         {
-            evidence.setEndDiscordantRead(mpos);
-            evidence.addAssociateRead(pos, mpos);
-            evidence.setLastEndDiscordantRead(mpos);
             evidence.setComment("MATEUNMAPPED");
+
+            evidence.setPosDiscordantRead(readparser.getPos());
+            evidence.setLastPosDiscordantRead(readparser.getPos());
+
+            evidence.setEndDiscordantRead(readparser.getPos());
+            evidence.setLastEndDiscordantRead(readparser.getPos());
+        }
+        else
+        {
             if (readparser.isFirstRead())
             {
-                evidence.setForwardDirection(true);
+                evidence.setPosDiscordantRead(readparser.getPos());
+                evidence.setLastPosDiscordantRead(readparser.getPos());
+                evidence.setEndDiscordantRead(readparser.getMatePos());
+                evidence.setLastEndDiscordantRead(readparser.getMatePos());
             }
             else
             {
-                evidence.setBackwardDirection(true);
+                evidence.setPosDiscordantRead(readparser.getMatePos());
+                evidence.setLastPosDiscordantRead(readparser.getMatePos());
+                evidence.setEndDiscordantRead(readparser.getPos());
+                evidence.setLastEndDiscordantRead(readparser.getPos());
             }
         }
-        else
-        {
-            evidence.setEndDiscordantRead(mpos);
-            evidence.addAssociateRead(pos, mpos);
-            evidence.setLastEndDiscordantRead(mpos);
-        }
 
-        if (readparser.isFirstRead())
-        {
-            evidence.setForwardDirection(true);
-        }
-        else
-        {
-            evidence.setBackwardDirection(true);
-        }
         evidence.addMapQ(readparser.getMapQuality());
         evidence.incrementFrequency();
-        evidence.setLastPosDiscordantRead(pos);
+
         preCollectSV.push_back(evidence);
     }
 }
@@ -198,80 +178,47 @@ void SpecifyingEvidenceInsertion::proveEvidence(int index)
 
 void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
 {
+
     int32_t pos = evidence->getPosDiscordantRead();
 
     int32_t lastpos = evidence->getLastPosDiscordantRead();
     int32_t end = evidence->getEndDiscordantRead();
     int32_t lastend = evidence->getLastEndDiscordantRead();
 
-    int32_t avgEnd = (lastpos + end) / 2;
-    int32_t diff = lastend - avgEnd;
+    if (evidence->getComment() == "MATEUNMAPPED")
+    {
 
-    
-    evidence->setPos(lastpos);
-    evidence->setEnd(end);
+        end = pos + samplestat->getMedianSampleStat() + samplestat->getSDSampleStat();
+        evidence->setPos(pos);
+        evidence->setEnd(end);
 
-    evidence->setCiPosLeft(-(lastpos-pos)-samplestat->getReadLength());
-    evidence->setCiPosRight(end-lastpos+samplestat->getReadLength());
+        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getMedianSampleStat());
+        evidence->setCiPosRight((end - pos)+ samplestat->getMedianSampleStat());
 
-    evidence->setCiEndLeft(lastpos-end);
-    evidence->setCiEndRight(lastend-end-samplestat->getReadLength());
+        evidence->setCiEndLeft(pos-end);
+        evidence->setCiEndRight(samplestat->getReadLength());
+    }
+    else
+    {
+        end = pos + samplestat->getMedianSampleStat() + samplestat->getSDSampleStat();
+        evidence->setPos(pos);
+        evidence->setEnd(end);
+
+        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getMedianSampleStat());
+        evidence->setCiPosRight((end - pos)+ samplestat->getMedianSampleStat());
+
+        evidence->setCiEndLeft(pos-end);
+        evidence->setCiEndRight(samplestat->getReadLength());
+    }
 }
 
 bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 {
-
-    if (evidence->getComment() == "MATEUNMAPPED")
-    {
-
-        if (evidence->getBackwardDirection() == false)
-        {
-            return false;
-        }
-
-        if (evidence->getForwardDirection() == false)
-        {
-            return false;
-        }
-
-        if (evidence->getFrequency() <= 2)
-        {
-            // if (evidence->getMaxMapQ() >= 30)
-            // {
-            return false;
-            // }
-        }
-
-        return true;
-    }
-
-    // if ((int) (evidence->getFrequency())<evidence->getNumberOfZeroMapQ()-4)
-    // {
-    //     return false;
-    // }
-
-    //  if (evidence->getAvgMapQ() < 20)
-    //     {
-    //         return false;
-    //     }
-
-    //     if (evidence->getMaxMapQ() < 40)
-    //     {
-    //         return false;
-    //     }
-
-    if (evidence->getFrequency() < 3)
+ 
+    if (evidence->getFrequency() <= 3)
     {
         return false;
     }
-
-    // if (evidence->getFrequency() >= samplestat->getMedianSampleStat())
-    // {
-    //     if (evidence->getMaxMapQ() >= 60)
-    //     {
-    //         return true;
-    //     }
-    // }
 
     return true;
 }
