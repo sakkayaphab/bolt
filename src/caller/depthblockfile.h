@@ -9,8 +9,9 @@ class DepthBlockFile
 private:
   std::string filepath;
   FileManager *filemanager;
-  int32_t avgReadDepthFocus=0;
+  // int32_t avgReadDepthFocus=0;
   std::map<int32_t, ReadDepthHelper::ReadDepthVector> mapReadDepthLineSegment;
+
 public:
   std::string getFilePath();
   DepthBlockFile();
@@ -20,6 +21,7 @@ public:
   ReadDepthHelper::ReadDepthVector getBlock(int32_t number);
   std::vector<std::string> split(const std::string &s, char delimiter);
   ReadDepthHelper::ReadDepthVector findBlockWithFile(int32_t number,std::string filepath,int32_t scope);
+  void addToMapReadDepthLineSegment(std::vector<std::string> *lineBuffer);
 };
 
 #endif

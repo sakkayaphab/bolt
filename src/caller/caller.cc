@@ -276,10 +276,11 @@ void Caller::catEvidenceFile()
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
-    struct dirent *dir;
+    
     d = opendir(filepath.getTempEvidencePath().c_str());
     if (d)
     {
+        struct dirent *dir;
         while (dir = readdir(d))
         {
 
@@ -291,6 +292,27 @@ void Caller::catEvidenceFile()
             if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
             {
                 std::string tempPath = filepath.getTempEvidencePath() + "/" + std::string(dir->d_name);
+                evidenceFilePathLists.push_back(tempPath);
+            }
+        }
+        closedir(d);
+    }
+
+    d = opendir(filepath.getSplitReadPath().c_str());
+    if (d)
+    {
+        struct dirent *dir;
+        while (dir = readdir(d))
+        {
+
+            if (std::string(dir->d_name).size() < 4)
+            {
+                continue;
+            }
+
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
+            {
+                std::string tempPath = filepath.getSplitReadPath() + "/" + std::string(dir->d_name);
                 evidenceFilePathLists.push_back(tempPath);
             }
         }
@@ -324,8 +346,6 @@ void Caller::catEvidenceFile()
             {
                 continue;
             }
-            std::string chr = n.substr(filepath.getTempEvidencePath().size() + 1, n.size() - filepath.getTempEvidencePath().size() - 9);
-            // std::cout << chr << std::endl;
 
             while (getline(myfile, line))
             {
@@ -437,6 +457,7 @@ void Caller::mergeReadDepthFile()
 
 void Caller::catfile()
 {
+    // std::cout << ""
     catEvidenceFile();
 }
 

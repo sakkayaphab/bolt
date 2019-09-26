@@ -260,5 +260,9 @@ void RefiningTranslocation::calculateFinalBreakpoint(std::map<std::pair<int32_t,
         return;
     }
 
+     if (evidence.getMark()=="SR") {
+        variantresult.setMark("SR");
+    }
+
     variantresult.setQuailtyPass(true);
 }

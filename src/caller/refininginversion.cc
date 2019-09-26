@@ -510,5 +510,9 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
         return;
     }
 
+     if (evidence.getMark()=="SR") {
+        variantresult.setMark("SR");
+    }
+
     variantresult.setQuailtyPass(true);
 }

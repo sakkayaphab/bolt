@@ -14,6 +14,7 @@ ExternalProject_Add(htslib
     LOG_TEST 0
     LOG_INSTALL 0
 )
+
 set(HTSLIB_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/external/htslib/include)
 if(APPLE)
     set(HTSLIB_LIBRARIES ${CMAKE_BINARY_DIR}/external/htslib/lib/libhts.dylib)

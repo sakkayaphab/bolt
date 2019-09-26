@@ -14,9 +14,9 @@ ReadDepthHelper::ReadDepthVector DepthBlockFile::getBlock(int32_t number)
     return mapReadDepthLineSegment[number];
 }
 
-ReadDepthHelper::ReadDepthVector DepthBlockFile::findBlockWithFile(int32_t number, std::string filepath,int32_t scope)
+ReadDepthHelper::ReadDepthVector DepthBlockFile::findBlockWithFile(int32_t number, std::string filepath, int32_t scope)
 {
-    
+
     std::string line;
     std::ifstream myfile(filepath);
     int count = 0;
@@ -26,7 +26,8 @@ ReadDepthHelper::ReadDepthVector DepthBlockFile::findBlockWithFile(int32_t numbe
         while (getline(myfile, line))
         {
             count += scope;
-            if (count!=number) {
+            if (count != number)
+            {
                 continue;
             }
 
@@ -48,8 +49,6 @@ ReadDepthHelper::ReadDepthVector DepthBlockFile::findBlockWithFile(int32_t numbe
             temp.SCF = std::stoi(token.at(13));
             temp.SCL = std::stoi(token.at(14));
             break;
-
-
         }
         myfile.close();
     }
@@ -69,54 +68,82 @@ std::vector<std::string> DepthBlockFile::split(const std::string &s, char delimi
     return tokens;
 }
 
-std::string DepthBlockFile::getFilePath() {
+std::string DepthBlockFile::getFilePath()
+{
     return filepath;
 }
 
 void DepthBlockFile::loadDataToCache(std::string filepath)
 {
-    if (DepthBlockFile::filepath==filepath) {
+    if (DepthBlockFile::filepath == filepath)
+    {
         return;
     }
     DepthBlockFile::filepath = filepath;
-    
+
     mapReadDepthLineSegment.clear();
     std::string line;
-    int sumRD = 0;
-    int count = 0;
+    // int32_t sumRD = 0;
+    // int count = 0;
+
+    std::cout << "loadDataToCache : " << filepath << std::endl; 
     std::ifstream myfile(filepath);
     if (myfile.is_open())
     {
+        std::vector<std::string> lineBuffer;
         while (getline(myfile, line))
         {
-            ReadDepthHelper::ReadDepthVector temp;
-            std::vector<std::string> token = split(line, '\t');
-            temp.pos = std::stol(token.at(0), nullptr, 0);
-            temp.depth = std::stoi(token.at(1));
-            temp.DEL1 = std::stoi(token.at(2));
-            temp.DUP1 = std::stoi(token.at(3));
-            temp.INS1 = std::stoi(token.at(4));
-            temp.INV1 = std::stoi(token.at(5));
-            temp.TRA1 = std::stoi(token.at(6));
+            lineBuffer.push_back(line);
 
-            temp.DEL2 = std::stoi(token.at(8));
-            temp.DUP2 = std::stoi(token.at(9));
-            temp.INS2 = std::stoi(token.at(10));
-            temp.INV2 = std::stoi(token.at(11));
-            temp.TRA2 = std::stoi(token.at(12));
+            if (line.size() > 10000)
+            {
+                addToMapReadDepthLineSegment(&lineBuffer);
+                lineBuffer.clear();
+            }
 
-            temp.SCF = std::stoi(token.at(13));
-            temp.SCL = std::stoi(token.at(14));
-
-            sumRD += temp.depth;
-            count++;
-            mapReadDepthLineSegment[temp.pos] = temp;
+            // sumRD += temp.depth;
+            // count++;
         }
+
+        if (lineBuffer.size() != 0)
+        {
+            addToMapReadDepthLineSegment(&lineBuffer);
+            lineBuffer.clear();
+        }
+
         myfile.close();
     }
     else
         std::cout << "Unable to open file";
 
-    avgReadDepthFocus = int(sumRD / count);
+    std::cout << "End + loadDataToCache : " << filepath << std::endl;
+    // avgReadDepthFocus = int(sumRD / count);
     // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
+}
+
+void DepthBlockFile::addToMapReadDepthLineSegment(std::vector<std::string> *lineBuffer)
+{
+    for (auto line : *lineBuffer)
+    {
+        ReadDepthHelper::ReadDepthVector temp;
+        std::vector<std::string> token = split(line, '\t');
+        temp.pos = std::stol(token.at(0), nullptr, 0);
+        temp.depth = std::stoi(token.at(1));
+        temp.DEL1 = std::stoi(token.at(2));
+        temp.DUP1 = std::stoi(token.at(3));
+        temp.INS1 = std::stoi(token.at(4));
+        temp.INV1 = std::stoi(token.at(5));
+        temp.TRA1 = std::stoi(token.at(6));
+
+        temp.DEL2 = std::stoi(token.at(8));
+        temp.DUP2 = std::stoi(token.at(9));
+        temp.INS2 = std::stoi(token.at(10));
+        temp.INV2 = std::stoi(token.at(11));
+        temp.TRA2 = std::stoi(token.at(12));
+
+        temp.SCF = std::stoi(token.at(13));
+        temp.SCL = std::stoi(token.at(14));
+
+        mapReadDepthLineSegment[temp.pos] = temp;
+    }
 }

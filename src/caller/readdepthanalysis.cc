@@ -79,6 +79,15 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
         return false;
     }
 
+    if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
+    {
+
+    }
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
+    {
+        return false;
+    }
+
     // if (sumStartINV - e.getFrequency()>=getDivider(readDepthStat.getReadDepthByChr(e.getChr()),3,10,1)) {
     //     return false;
     // }
@@ -155,8 +164,9 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
+
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 10, 1))
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
     {
         return false;
     }
@@ -278,8 +288,53 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
     return true;
 }
 
+bool ReadDepthAnalysis::filterDuplication(Evidence e)
+{
+    if (sumStartSCL <= 1 && sumStartSCF <= 1)
+    {
+        return false;
+    }
+
+    if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
+    {
+
+    }
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
+    {
+        return false;
+    }
+
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 8))
+    {
+        return false;
+    }
+
+    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    {
+        return false;
+    }
+
+    
+
+    // if (e.getMaxMapQ() < 15)
+    // {
+    //     return false;
+    // }
+
+    // if (e.getFrequency()<=1) {
+    //     return false;
+    // }
+
+    return true;
+}
+
 bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 {
+    if (e.getMark() == "SR")
+    {
+        return true;
+    }
+
     if (cachechr != e.getChr())
     {
         loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt");
@@ -342,27 +397,8 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (e.getVariantType() == "DUP")
     {
-        if (sumStartSCL <= 1 && sumStartSCF <= 1)
-    {
-        return false;
-    }
 
-        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 8))
-        {
-            return false;
-        }
-
-        if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-        {
-            return false;
-        }
-
-        if (e.getMaxMapQ() < 15)
-        {
-            return false;
-        }
-
-        return true;
+        return filterDuplication(e);
     }
 
     if (e.getVariantType() == "INV")

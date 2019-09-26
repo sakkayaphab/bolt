@@ -66,15 +66,15 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 120)
+    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength())
     {
         checkRange();
         return;
     }
 
-    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 90)
+    if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat())
     {
-        if (readparser.getMapQuality() >= 60)
+        if (readparser.getMapQuality() >= 40)
         {
             checkRange();
             return;

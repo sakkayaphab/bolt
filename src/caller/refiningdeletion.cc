@@ -62,7 +62,7 @@ void RefiningDeletion::first()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    //         std::cout << range  << std::endl;
+            // std::cout << range  << std::endl;
     refineStartToEnd(range);
 }
 
@@ -109,7 +109,6 @@ void RefiningDeletion::refineStartToEnd(const char *range)
     // alignment.setPosReference(positionStartReference);
     if (seqrefString.size() < 50)
     {
-        std::cout << "back" << std::endl;
         return;
     }
 
@@ -727,6 +726,10 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     if (bEnd - bPos < 20)
     {
         return;
+    }
+
+     if (evidence.getMark()=="SR") {
+        variantresult.setMark("SR");
     }
 
     variantresult.setQuailtyPass(true);

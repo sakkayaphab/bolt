@@ -17,27 +17,13 @@ void SplitRead::updateRead()
         return;
     }
 
-    findInversion();
+    // findInversion();
     findDeletion();
-    findTandemDuplication();
-
-    // if (readparser->isFirstRead()) {
-    //     // if (readparser->is)
-    // }
-
-    // if (satag.size() != 0)
-    // {
-    //     for (auto n : satag)
-    //     {
-    //         std::cout << n.chrname << " " << n.pos << " " << n.strand << std::endl;
-    //     }
-    // std::cout << "-----------" << std::endl;
-    // }
+    // findTandemDuplication();
 }
 
 void SplitRead::findInversion()
 {
-    // std::cout << "-----------" << std::endl;
     for (ReadParser::SATag sa : satag)
     {
         if (sa.cigar.size() != 2)
@@ -81,9 +67,9 @@ void SplitRead::findInversion()
             {
                 if (sa.cigar.at(0).getOperatorName() == 'M' && sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'S')
                 {
-                    mapINV[std::make_pair(readparser->getEnd(), sa.pos+sa.cigar.at(0).getLength())].NumberOfMatchRead++;
-                    mapINV[std::make_pair(readparser->getEnd(), sa.pos+sa.cigar.at(0).getLength())].MatchLists.push_back(sa.cigar.at(0).getLength());
-                    mapINV[std::make_pair(readparser->getEnd(), sa.pos+sa.cigar.at(0).getLength())].MapQLists.push_back(readparser->getMapQuality());
+                    mapINV[std::make_pair(readparser->getEnd(), sa.pos + sa.cigar.at(0).getLength())].NumberOfMatchRead++;
+                    mapINV[std::make_pair(readparser->getEnd(), sa.pos + sa.cigar.at(0).getLength())].MatchLists.push_back(sa.cigar.at(0).getLength());
+                    mapINV[std::make_pair(readparser->getEnd(), sa.pos + sa.cigar.at(0).getLength())].MapQLists.push_back(readparser->getMapQuality());
                 }
             }
         }
@@ -118,9 +104,9 @@ void SplitRead::findInversion()
             {
                 if (sa.cigar.at(0).getOperatorName() == 'M' && sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'S')
                 {
-                    mapINV[std::make_pair(sa.pos+sa.cigar.at(0).getLength(), readparser->getEnd())].NumberOfMatchRead++;
-                    mapINV[std::make_pair(sa.pos+sa.cigar.at(0).getLength(), readparser->getEnd())].MatchLists.push_back(sa.cigar.at(0).getLength());
-                    mapINV[std::make_pair(sa.pos+sa.cigar.at(0).getLength(), readparser->getEnd())].MapQLists.push_back(readparser->getMapQuality());
+                    mapINV[std::make_pair(sa.pos + sa.cigar.at(0).getLength(), readparser->getEnd())].NumberOfMatchRead++;
+                    mapINV[std::make_pair(sa.pos + sa.cigar.at(0).getLength(), readparser->getEnd())].MatchLists.push_back(sa.cigar.at(0).getLength());
+                    mapINV[std::make_pair(sa.pos + sa.cigar.at(0).getLength(), readparser->getEnd())].MapQLists.push_back(readparser->getMapQuality());
                 }
             }
         }
@@ -210,17 +196,8 @@ void SplitRead::findDeletion()
 void SplitRead::findTandemDuplication()
 {
 
-    // if (satag.size() != 1)
-    // {
-    //     return;
-    // }
-
     for (ReadParser::SATag sa : satag)
     {
-        // if (sa.mapQ < 30)
-        // {
-        //     continue;
-        // }
 
         if (sa.cigar.size() != 2)
         {
@@ -234,10 +211,10 @@ void SplitRead::findTandemDuplication()
 
         if (readparser->getPos() < sa.pos)
         {
-            if (sa.pos - readparser->getPos() > (samplestate->getReadLength() * 1.5))
-            {
-                continue;
-            }
+            // if (sa.pos - readparser->getPos() > (samplestate->getReadLength() * 1.5))
+            // {
+            //     continue;
+            // }
 
             if (readparser->isReverse() && sa.strand == "-")
             {
@@ -268,10 +245,10 @@ void SplitRead::findTandemDuplication()
         else
         {
 
-            if (readparser->getPos() - sa.pos > (samplestate->getReadLength() * 1.5))
-            {
-                continue;
-            }
+            // if (readparser->getPos() - sa.pos > (samplestate->getReadLength() * 1.5))
+            // {
+            //     continue;
+            // }
 
             if (readparser->isReverse() && sa.strand == "-")
             {
@@ -304,15 +281,15 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-    // printDeletion();
-    // printDuplication();
+    printDeletion();
+    printDuplication();
     printInversion();
 }
 
-void SplitRead::printDeletion()
+std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype)
 {
-    std::cout << "Deletion" << std::endl;
-    for (auto const &x : mapDEL)
+    std::vector<Evidence> vecTemp;
+    for (auto const &x : *mapSV)
     {
         if (x.second.NumberOfMatchRead >= 2)
         {
@@ -322,137 +299,151 @@ void SplitRead::printDeletion()
             evidence.setChr(chrname);
             evidence.setEndChr(chrname);
             evidence.setFrequency(x.second.NumberOfMatchRead);
-            evidence.setVariantType("DEL");
+            evidence.setVariantType(svtype);
             evidence.setMark("SR");
             evidence.setMapQList(x.second.MapQLists);
 
-            if (evidence.getEnd() - evidence.getPos() < 100)
-            {
-                continue;
-            }
-
-            if (evidence.getMaxMapQ() < 30)
-            {
-                continue;
-            }
-
-            if (evidence.getMinMapQ() == 0)
-            {
-                continue;
-            }
-
-            vecDEL.push_back(evidence);
-
-            // std::cout
-            //     << " pos : " << x.first.first
-            //     << " end : " << x.first.second
-            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-            //     << std::endl;
+            vecTemp.push_back(evidence);
         }
     }
 
-    removeDuplicateResult(&vecDEL);
-    for (auto x : vecDEL)
+    return vecTemp;
+}
+
+void SplitRead::mergeEvidence(std::vector<Evidence> *vecTemp)
+{
+    std::vector<Evidence> newEvidenceTempList;
+    std::sort(vecTemp->begin(), vecTemp->end());
+
+    for (auto m : *vecTemp)
     {
-        writeFile(x);
+        bool incremented = false;
+        for (int32_t i = 0; i < newEvidenceTempList.size(); i++)
+        {
+            if (checkBetween(m.getPos(), newEvidenceTempList.at(i).getPos(), samplestate->getReadLength()) && checkBetween(m.getEnd(), newEvidenceTempList.at(i).getEnd(), samplestate->getReadLength()))
+            {
+                incremented = true;
+                for (auto x : *m.getMapQVector())
+                {
+                    newEvidenceTempList.at(i).addMapQ(x);
+                }
+                break;
+            }
+        }
+
+        if (!incremented)
+        {
+            newEvidenceTempList.push_back(m);
+        }
     }
+
+    *vecTemp = newEvidenceTempList;
+}
+
+void SplitRead::setAllCIEvidence(std::vector<Evidence> *elist)
+{
+    for (int32_t i = 0; i < elist->size(); i++)
+    {
+        elist->at(i).setCiPosLeft(-samplestate->getReadLength());
+        elist->at(i).setCiPosRight(samplestate->getReadLength());
+        elist->at(i).setCiEndLeft(-samplestate->getReadLength());
+        elist->at(i).setCiEndRight(samplestate->getReadLength());
+    }
+}
+
+void SplitRead::filterEvidenceList(std::vector<Evidence> *elist)
+{
+    std::vector<Evidence> newEvidenceTempList;
+
+    for (auto n : *elist)
+    {
+        if (n.getMaxMapQ() < 60)
+        {
+            continue;
+        }
+
+        if (n.getMinMapQ() == 0)
+        {
+            continue;
+        }
+
+        newEvidenceTempList.push_back(n);
+    }
+
+    *elist = newEvidenceTempList;
+}
+
+void SplitRead::filterLengthMinEvidenceList(std::vector<Evidence> *elist, int32_t min)
+{
+    std::vector<Evidence> newEvidenceTempList;
+
+    for (auto n : *elist)
+    {
+        if (n.getSvLength() < min)
+        {
+            continue;
+        }
+
+        newEvidenceTempList.push_back(n);
+    }
+
+    *elist = newEvidenceTempList;
+}
+
+void  SplitRead::filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t max)
+{
+    std::vector<Evidence> newEvidenceTempList;
+
+    for (auto n : *elist)
+    {
+        if (n.getSvLength() > max)
+        {
+            continue;
+        }
+
+        newEvidenceTempList.push_back(n);
+    }
+
+    *elist = newEvidenceTempList;
 }
 
 void SplitRead::printDuplication()
 {
-    //   std::cout << "duplication" << std::endl;
-    for (auto const &x : mapDUP)
-    {
-        if (x.second.NumberOfMatchRead >= 2)
-        {
-            Evidence evidence;
-            evidence.setPos(x.first.first);
-            evidence.setEnd(x.first.second);
-            evidence.setChr(chrname);
-            evidence.setEndChr(chrname);
-            evidence.setFrequency(x.second.NumberOfMatchRead);
-            evidence.setVariantType("DUP");
-            evidence.setMark("SR");
-            // evidence.LNGMATCH = x.second.
-            evidence.setMapQList(x.second.MapQLists);
+    auto vecTemp = convertMapToEvidenceList(&mapDUP, "DUP");
+    mergeEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp);
+    filterEvidenceList(&vecTemp);
+    filterLengthMinEvidenceList(&vecTemp,100);
+    filterLengthMaxEvidenceList(&vecTemp,samplestate->getReadLength()*2);
 
-            if (evidence.getEnd() - evidence.getPos() < 100)
-            {
-                continue;
-            }
-
-            if (evidence.getMaxMapQ() < 50)
-            {
-                continue;
-            }
-
-            if (evidence.getMinMapQ() == 0)
-            {
-                continue;
-            }
-
-            vecDUP.push_back(evidence);
-
-            // std::cout
-            //     << " pos : " << x.first.first
-            //     << " end : " << x.first.second
-            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-            //     << std::endl;
-        }
-    }
-
-    // removeDuplicateResult(&vecDUP);
-    for (auto x : vecDUP)
+    for (auto x : vecTemp)
     {
         writeFile(x);
     }
 }
 
-
 void SplitRead::printInversion()
 {
-    for (auto const &x : mapINV)
+    auto vecTemp = convertMapToEvidenceList(&mapINV, "INV");
+    mergeEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp);
+
+    for (auto x : vecTemp)
     {
-        if (x.second.NumberOfMatchRead >= 1)
-        {
-            Evidence evidence;
-            evidence.setPos(x.first.first);
-            evidence.setEnd(x.first.second);
-            evidence.setChr(chrname);
-            evidence.setEndChr(chrname);
-            evidence.setFrequency(x.second.NumberOfMatchRead);
-            evidence.setVariantType("INV");
-            evidence.setMark("SR");
-            // evidence.LNGMATCH = x.second.
-            evidence.setMapQList(x.second.MapQLists);
-
-            if (evidence.getEnd() - evidence.getPos() < 100)
-            {
-                continue;
-            }
-
-            if (evidence.getMaxMapQ() < 50)
-            {
-                continue;
-            }
-
-            if (evidence.getMinMapQ() == 0)
-            {
-                continue;
-            }
-
-            vecINV.push_back(evidence);
-
-            // std::cout
-            //     << " pos : " << x.first.first
-            //     << " end : " << x.first.second
-            //     << " NumberOfMatchRead : " << x.second.NumberOfMatchRead
-            //     << std::endl;
-        }
+        writeFile(x);
     }
+}
 
-    // removeDuplicateResult(&vecDUP);
-    for (auto x : vecINV)
+void SplitRead::printDeletion()
+{
+    auto vecTemp = convertMapToEvidenceList(&mapDEL, "DEL");
+    mergeEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp);
+    filterEvidenceList(&vecTemp);
+    filterLengthMinEvidenceList(&vecTemp,100);
+    // filterLengthMaxEvidenceList(&vecTemp,samplestate->getReadLength()*2);
+
+    for (auto x : vecTemp)
     {
         writeFile(x);
     }
@@ -488,10 +479,9 @@ void SplitRead::removeDuplicateResult(std::vector<Evidence> *vec)
     *vec = temp;
 }
 
-
-
 bool SplitRead::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
 {
+
     if (targetPos - overlapped > pos)
     {
         return false;

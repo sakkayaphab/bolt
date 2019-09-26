@@ -192,7 +192,7 @@ public:
 
   bool operator<(const Evidence &otherEvidence) const
   {
-    return posDiscordantRead < otherEvidence.posDiscordantRead;
+    return pos < otherEvidence.pos;
   }
 
   int32_t getPos();
@@ -220,6 +220,8 @@ public:
 
   bool haveSomeMapQMoreThan(uint8_t qual);
   bool haveSomeMapQLessThan(uint8_t qual);
+
+  
 
   //    std::string getIsFoundEvidenceAtStartString();
   //    std::string getIsFoundEvidenceAtEndString();

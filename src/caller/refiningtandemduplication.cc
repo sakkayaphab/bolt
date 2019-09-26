@@ -422,5 +422,9 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         return;
     }
 
+    if (evidence.getMark()=="SR") {
+        variantresult.setMark("SR");
+    }
+
     variantresult.setQuailtyPass(true);
 }

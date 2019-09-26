@@ -65,6 +65,7 @@ public:
     bool filterDeletion(Evidence e);
     bool filterInversion(Evidence e);
     bool filterInsertion(Evidence e);
+     bool filterDuplication(Evidence e);
     void loadavgReadDepthFocusStat();
     bool filterTranslocation(Evidence e);
     

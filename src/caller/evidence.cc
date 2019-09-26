@@ -492,8 +492,19 @@ std::string Evidence::getInfoString()
     }
     if (getRPMapQ()->size() != 0)
     {
-        result.append("BOLT_RPMQL=" +convertMapQlistToCommaString(getRPMapQ()) + ";");
+        result.append("BOLT_RPMQL=" + convertMapQlistToCommaString(getRPMapQ()) + ";");
     }
+
+    if (getCiPosLeft()!=0 || getCiPosRight()!=0) {
+            result.append("CIPOS=" + std::to_string(getCiPosLeft()) + "," + std::to_string(getCiPosRight()) + ";");
+
+    }
+    if (getCiEndLeft()!=0 || getCiEndRight()!=0) {
+           result.append("CIEND=" + std::to_string(getCiEndLeft()) + "," + std::to_string(getCiEndRight()) + ";");
+
+    }
+
+    
 
     return result;
 }
@@ -528,7 +539,8 @@ void Evidence::setRPMapQ(std::vector<uint8_t> rpmapq)
     Evidence::rpmapqlist = rpmapq;
 }
 
-std::vector<uint8_t> *Evidence::getRPMapQ() {
+std::vector<uint8_t> *Evidence::getRPMapQ()
+{
     return &rpmapqlist;
 }
 
@@ -693,7 +705,8 @@ std::string Evidence::convertToVcfString()
     {
         buf.append("FREQ=" + std::to_string(getFrequency()) + ";");
     }
-    if (rpmapqlist.size()!=0) {
+    if (rpmapqlist.size() != 0)
+    {
         buf.append("BOLT_RPMQL=" + convertMapQlistToCommaString(&rpmapqlist) + ";");
     }
 

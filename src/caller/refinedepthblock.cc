@@ -296,13 +296,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
     {
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
-        auto nextPos = nextNumber(n.getPos(), roundConfig);
-        auto previousPos = previousNumber(n.getPos(), roundConfig);
-
-        auto currentRD = rdf.getBlock(currentPos);
-        auto nextRD = rdf.getBlock(nextPos);
-        auto previousRD = rdf.getBlock(previousPos);
+        if (n.getMark() == "SR")
+        {
+            cache.push_back(n);
+            continue;
+        }
 
         if (n.getMark() == "")
         {
@@ -311,6 +309,14 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
                 continue;
             }
         }
+
+        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        auto nextPos = nextNumber(n.getPos(), roundConfig);
+        auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        auto currentRD = rdf.getBlock(currentPos);
+        auto nextRD = rdf.getBlock(nextPos);
+        auto previousRD = rdf.getBlock(previousPos);
 
         if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 4)
         {
@@ -408,6 +414,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
+        if (n.getMark() == "SR")
+        {
+            cache.push_back(n);
+            continue;
+        }
+
         if (n.getMark() == "")
         {
             if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
@@ -425,14 +437,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         {
             continue;
         }
-
-        // if (n.getSvLength() > 2000)
-        // {
-        //     if (previousRD.DEL1 + previousRD.DEL2 >= n.getFrequency())
-        //     {
-        //         continue;
-        //     }
-        // }
 
         if (n.getSvLength() > 500)
         {
@@ -508,7 +512,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             continue;
         }
 
-        if (n.getMaxMapQ() < 30)
+        if (n.getMaxMapQ() < 40)
         {
             continue;
         }
@@ -534,39 +538,26 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-        // if (currentRD.depth==0) {
-        //     continue;
-        // }
+        if (n.getMark() == "SR")
+        {
+            cache.push_back(n);
+            continue;
+        }
 
-        // if (previousRD.TRA1+previousRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
+        if (n.getMark() == "")
+        {
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+            {
+                continue;
+            }
+        }
 
-        // if (previousRD.INV1+previousRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.INS1+currentRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.INV1+currentRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.TRA1+currentRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //    continue;
-        // }
-
+        bool startpass = true;
         if (n.getSvLength() > 2000)
         {
             if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
             {
+                // startpass  = false;
                 continue;
             }
 
@@ -576,49 +567,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
-        // if (nextRD.INV1+nextRD.INV2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (nextRD.TRA1+nextRD.TRA2 >= n.getFrequency())
-        // {
-        //    continue;
-        // }
-
-        // if (n.getSvLength() > 2000)
-        // {
-        //     if (currentRD.DUP1 + currentRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (currentRD.INV1 + currentRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (previousRD.DUP1 + previousRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (previousRD.INV1 + previousRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (nextRD.DUP1 + previousRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (nextRD.INV1 + previousRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-        // }
-
         auto currentEnd = roundNumber(n.getEnd(), roundConfig);
         auto nextEnd = nextNumber(n.getEnd(), roundConfig);
         auto previousEnd = previousNumber(n.getEnd(), roundConfig);
@@ -627,25 +575,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
 
-        // if (currentEndRD.depth==0) {
-        //     continue;
-        // }
-
-        // if (currentEndRD.INS1+currentEndRD.INS2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
-
-        // if (currentEndRD.INV1+currentEndRD.INV2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //     continue;
-        // }
-
-        // if (currentEndRD.TRA1+currentEndRD.TRA2 >= getDivider(readDepthStat.getReadDepthByChr(n.getChr()),1,minimumdivide,1))
-        // {
-        //    continue;
-        // }
-
+        bool endpass = true;
         if (n.getSvLength() > 2000)
         {
             if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
@@ -658,50 +588,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
         }
-        // if (previousEndRD.INV1+previousEndRD.INV2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
 
-        // if (previousEndRD.TRA1+previousEndRD.TRA2 >= n.getFrequency())
-        // {
-        //    continue;
-        // }
-
-        // if (n.getSvLength() > 2000)
-        // {
-        //     if (currentEndRD.DUP1 + currentEndRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (currentEndRD.INV1 + currentEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (previousEndRD.DUP1 + previousEndRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (previousEndRD.INV1 + previousEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (nextEndRD.DUP1 + previousEndRD.DUP2 >= 10)
-        //     {
-        //         continue;
-        //     }
-
-        //     if (nextEndRD.INV1 + previousEndRD.INV2 >= 10)
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        if (n.getMaxMapQ() < 40)
+        if (n.getMaxMapQ() < 20)
         {
             continue;
         }
@@ -716,22 +604,22 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-        // std::cout << n.getFrequency() << " = " << readDepthStat.getReadDepthByChr(n.getChr()) << " - " << n.getChr() << std::endl;
+        // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
+        // {
+        //     continue;
+        // }
 
-        if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
-        {
-            continue;
-        }
+        // if (n.getSvLength() < 300)
+        // {
+        //     if (n.getMaxMapQ() < 40)
+        //     {
+        //         continue;
+        //     }
+        // }
 
-        if (n.getSvLength() < 300)
-        {
-            if (n.getMaxMapQ() < 10)
-            {
-                continue;
-            }
-        }
-
+        // if (startpass && endpass) {
         cache.push_back(n);
+        // }
     }
 
     return cache;
@@ -787,16 +675,39 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
     std::ifstream myfile(filepaht);
     if (myfile.is_open())
     {
+        std::cout << "load evidence :" << filepaht << std::endl;
         while (getline(myfile, line))
         {
             Evidence e;
             e.setEvidenceByString(line);
             if (e.getPos() != 0)
             {
+
+                if (e.getMark() == "SR")
+                {
+                    cache.push_back(e);
+                }
+                else
+                {
+                    if (e.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+                    {
+                        continue;
+                    }
+
+                    if (e.getFrequency() <= 1)
+                    {
+                        continue;
+                    }
+
+                    cache.push_back(e);
+                    // cache.push_back(n);
+                    // continue;
+                }
+
                 // if (e.getSvLength()<500 && e.getAvgMapQ()<6) {
 
                 // } else {
-                cache.push_back(e);
+
                 // }
             }
 
@@ -811,6 +722,7 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
             //     << std::endl;
         }
         myfile.close();
+        std::cout << "End + load evidence :" << filepaht << std::endl;
     }
 
     return cache;
@@ -841,7 +753,8 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
 
             if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".vcf")
             {
-                std::string tempPath = filemanager->getVariantPath() + "/" + std::string(dir->d_name);
+                std::string tempPath = filemanager->getVariantPath() + std::string(dir->d_name);
+                // std::cout << "tempPath : " << tempPath << std::endl;
                 evidenceFilePathLists.push_back(tempPath);
             }
         }

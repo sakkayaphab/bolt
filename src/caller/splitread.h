@@ -20,8 +20,6 @@ private:
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
 
-  std::vector<Evidence> vecDEL;
-  std::vector<Evidence> vecDUP;
   std::vector<Evidence> vecINV;
 
   int vcfIdNumber = 0;
@@ -39,7 +37,13 @@ public:
   void printDeletion();
   void printDuplication();
   void printInversion();
-  
+  std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype);
+  void mergeEvidence(std::vector<Evidence> *elist);
+  void setAllCIEvidence(std::vector<Evidence> *elist);
+  void filterEvidenceList(std::vector<Evidence> *elist);
+  void filterLengthMinEvidenceList(std::vector<Evidence> *elist,int32_t min);
+  void filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t min);
+
   
 };
 
