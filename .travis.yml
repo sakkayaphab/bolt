@@ -5,3 +5,4 @@ compiler: gcc
 script: 
   - cmake .
   - make
+  - ./bin/bolt
