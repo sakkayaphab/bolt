@@ -188,7 +188,7 @@ void EvidenceFinder::findEvidence()
     splitread.printResult();
 
     // std::cout << "---------------------------------------" << std::endl;
-    // std::cout << "✓ " << *target_chromosome << std::endl;
+    std::cout << "✓ " << *target_chromosome << std::endl;
     // std::cout << "number of read : " << countT << std::endl;
     // std::cout << "number of region deletion : " << countDEL << std::endl;
     // std::cout << "size of read depth line segment : " << ReadDepthLineSegment.size() << std::endl;

@@ -232,7 +232,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         {
 
             // continue;
-            if (n.matchCount <= 4)
+            if (n.matchCount <= 3)
             {
                 continue;
             }
@@ -472,7 +472,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
         for (auto n : result)
         {
             // continue;
-            if (n.matchCount <= 4)
+            if (n.matchCount <= 3)
             {
                 continue;
             }

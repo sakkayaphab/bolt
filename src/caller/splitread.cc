@@ -440,8 +440,8 @@ void SplitRead::printDeletion()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp);
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp,100);
-    // filterLengthMaxEvidenceList(&vecTemp,samplestate->getReadLength()*2);
+    filterLengthMinEvidenceList(&vecTemp,50);
+    filterLengthMaxEvidenceList(&vecTemp,1000000);
 
     for (auto x : vecTemp)
     {

@@ -53,7 +53,8 @@ void RefineDepthBlock::execute()
         std::vector<Evidence> result;
         if (variantlist.at(0).getSVType() == "DEL")
         {
-            result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultDeletion(&result);
             // } else if (variantlist.at(0).getSVType()=="DUP") {
             //     // result = getRefineResultDuplication(&result);
@@ -62,6 +63,7 @@ void RefineDepthBlock::execute()
         {
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultInversion(&variantlist);
             // result = variantlist;
         }
@@ -69,6 +71,7 @@ void RefineDepthBlock::execute()
         {
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultDuplication(&variantlist);
             // result = variantlist;
         }
@@ -76,13 +79,15 @@ void RefineDepthBlock::execute()
         {
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultTranslocation(&variantlist);
             // result = variantlist;
         }
         else if (variantlist.at(0).getSVType() == "INS")
         {
 
-            result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            // result = getResultWithOutOverlapped(&variantlist, &variantlist);
+            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultInsertion(&variantlist);
             // result = variantlist;
         }
@@ -540,13 +545,17 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
 
         if (n.getMark() == "SR")
         {
+            if (n.getSvLength() < 100)
+            {
+                continue;
+            }
             cache.push_back(n);
             continue;
         }
 
         if (n.getMark() == "")
         {
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 1))
             {
                 continue;
             }
@@ -609,17 +618,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         //     continue;
         // }
 
-        // if (n.getSvLength() < 300)
-        // {
-        //     if (n.getMaxMapQ() < 40)
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        // if (startpass && endpass) {
         cache.push_back(n);
-        // }
     }
 
     return cache;
@@ -646,6 +645,35 @@ std::vector<Evidence> RefineDepthBlock::getResultWithOutOverlapped(std::vector<E
     {
         bool found = false;
         for (auto m : *slave)
+        {
+            if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
+            {
+                continue;
+            }
+
+            if (m.getPos() - 100 <= n.getPos() && n.getPos() <= m.getPos() + 100)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            cache.push_back(n);
+        }
+    }
+
+    return cache;
+}
+
+std::vector<Evidence> RefineDepthBlock::getResultRemoveOverlapped(std::vector<Evidence> *master, std::vector<Evidence> *slave)
+{
+    std::vector<Evidence> cache;
+    for (auto n : *master)
+    {
+        bool found = false;
+        for (auto m : cache)
         {
             if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
             {
@@ -760,25 +788,6 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
         }
         closedir(d);
     }
-
-    // d = opendir(filemanager->getSplitReadPath().c_str());
-    // if (d)
-    // {
-    //     while (dir = readdir(d))
-    //     {
-    //         if (std::string(dir->d_name).size() < 4)
-    //         {
-    //             continue;
-    //         }
-
-    //         if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-    //         {
-    //             std::string tempPath = filemanager->getSplitReadPath() + "/" + std::string(dir->d_name);
-    //             evidenceFilePathLists.push_back(tempPath);
-    //         }
-    //     }
-    //     closedir(d);
-    // }
 
     return evidenceFilePathLists;
 }

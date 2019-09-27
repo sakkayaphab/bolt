@@ -25,6 +25,7 @@ public:
   void setSampleStat(SampleStat *samplestat);
   std::vector<Evidence> getEvidenceByFilepath(std::string filepaht);
   std::vector<Evidence> getResultWithOutOverlapped(std::vector<Evidence> *master, std::vector<Evidence> *slave);
+  std::vector<Evidence> getResultRemoveOverlapped(std::vector<Evidence> *master, std::vector<Evidence> *slave);
   std::vector<Evidence> getRefineResultDeletion(std::vector<Evidence> *master);
   std::vector<Evidence> getRefineResultDuplication(std::vector<Evidence> *master);
   std::vector<Evidence> getRefineResultInversion(std::vector<Evidence> *master);
