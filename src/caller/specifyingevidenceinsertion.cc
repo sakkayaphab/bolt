@@ -62,7 +62,7 @@ void SpecifyingEvidenceInsertion::updateRead()
             return;
         }
 
-        if (diff < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat())
+        if (diff < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat())
         {
             checkRange();
         }
@@ -109,7 +109,7 @@ bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t
 void SpecifyingEvidenceInsertion::checkRange()
 {
     bool added = false;
-    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     checkProveEvidence();
@@ -158,7 +158,7 @@ void SpecifyingEvidenceInsertion::checkRange()
 
 void SpecifyingEvidenceInsertion::proveEvidence(int index)
 {
-    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
@@ -188,24 +188,24 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
     if (evidence->getComment() == "MATEUNMAPPED")
     {
 
-        end = pos + samplestat->getMedianSampleStat() + samplestat->getSDSampleStat();
+        end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getMedianSampleStat());
-        evidence->setCiPosRight((end - pos)+ samplestat->getMedianSampleStat());
+        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getAverageSampleStat());
+        evidence->setCiPosRight((end - pos)+ samplestat->getAverageSampleStat());
 
         evidence->setCiEndLeft(pos-end);
         evidence->setCiEndRight(samplestat->getReadLength());
     }
     else
     {
-        end = pos + samplestat->getMedianSampleStat() + samplestat->getSDSampleStat();
+        end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getMedianSampleStat());
-        evidence->setCiPosRight((end - pos)+ samplestat->getMedianSampleStat());
+        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getAverageSampleStat());
+        evidence->setCiPosRight((end - pos)+ samplestat->getAverageSampleStat());
 
         evidence->setCiEndLeft(pos-end);
         evidence->setCiEndRight(samplestat->getReadLength());

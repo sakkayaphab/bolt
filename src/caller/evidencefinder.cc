@@ -245,12 +245,12 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
         // }
 
         // insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
-        // if (insertSizeFirstRead>samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
+        // if (insertSizeFirstRead>samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
         //     // rdd->ABN_READ++;
         //     return;
         // }
 
-        // if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        // if (insertSizeFirstRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
         // {
         //     // rdd->ABN_READ++;
         //     return;
@@ -283,12 +283,12 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
         // }
 
         // insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
-        // if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200) {
+        // if (insertSizeSecondRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200) {
         //     // rdd->ABN_READ++;
         //     return;
         // }
 
-        // if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
+        // if (insertSizeSecondRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200) {
         //     // rdd->ABN_READ++;
         //     return;
         // }
@@ -401,13 +401,13 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
     //             return;
     //         }
 
-    //         if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+    //         if (insertSizeSecondRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
     //         {
     //             rdd->DEL2++;
     //             return;
     //         }
 
-    //         if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+    //         if (insertSizeSecondRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
     //         {
     //             rdd->INS2++;
     //             return;
@@ -441,7 +441,7 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
     //             return;
     //         }
 
-    //         if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+    //         if (insertSizeFirstRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
     //         {
     //             rdd->DEL1++;
     //             return;
@@ -452,7 +452,7 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
     //             return;
     //         }
 
-    //         if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+    //         if (insertSizeFirstRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
     //         {
     //             rdd->INS1++;
     //             return;
@@ -569,7 +569,7 @@ bool EvidenceFinder::isDeletion()
     {
         insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
 
-        if (insertSizeFirstRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        if (insertSizeFirstRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
         {
             return true;
         }
@@ -579,7 +579,7 @@ bool EvidenceFinder::isDeletion()
     {
         insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
 
-        if (insertSizeSecondRead > samplestat->getMedianSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        if (insertSizeSecondRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
         {
             return true;
         }
@@ -721,7 +721,7 @@ bool EvidenceFinder::isInsertion()
             return false;
         }
 
-        if (insertSizeFirstRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        if (insertSizeFirstRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
         {
             return true;
         }
@@ -735,7 +735,7 @@ bool EvidenceFinder::isInsertion()
             return false;
         }
 
-        if (insertSizeSecondRead < samplestat->getMedianSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        if (insertSizeSecondRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
         {
             return true;
         }

@@ -79,8 +79,8 @@ void Caller::showinfo()
 
     std::cout << "+" << std::setfill('-') << std::setw(80) << "-" << std::endl;
     std::cout << "| Read length => " << samplestat.getReadLength() << std::endl;
-    std::cout << "| Insert size median => " << samplestat.getMedianSampleStat() << std::endl;
-    std::cout << "| Insert size sd => " << samplestat.getSDSampleStat() << std::endl;
+    std::cout << "| Average insert size => " << samplestat.getAverageSampleStat() << std::endl;
+    std::cout << "| Standard deviation  => " << samplestat.getSDSampleStat() << std::endl;
     std::cout << "+" << std::setfill('-') << std::setw(80) << "-" << std::endl;
 }
 
@@ -134,6 +134,7 @@ bam_hdr_t *Caller::getBamHeader()
 
 void Caller::execute()
 {
+    
     // find evidence by using threads
 
     // tbb::task_scheduler_init init(35);

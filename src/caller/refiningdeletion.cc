@@ -12,7 +12,6 @@ RefiningDeletion::RefiningDeletion()
 
 RefiningDeletion::~RefiningDeletion()
 {
-
 }
 
 void RefiningDeletion::execute()
@@ -62,7 +61,7 @@ void RefiningDeletion::first()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-            // std::cout << range  << std::endl;
+    // std::cout << range  << std::endl;
     refineStartToEnd(range);
 }
 
@@ -88,8 +87,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
     readparser.setBamHeader(bam_header);
     readparser.setBamRead(read);
 
-        // std::cout << "refineStartToEnd NULL" << std::endl;
-
+    // std::cout << "refineStartToEnd NULL" << std::endl;
 
     int32_t positionStartReference = evidence.getEnd() + evidence.getCiEndLeft();
     std::string seqrefString = fastareader.getSeqbyPosition(std::string(evidence.getEndChr()),
@@ -162,11 +160,10 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             continue;
 
             // if (haveIndel(cigar)) {
-                
+
             // }else {
             //     continue;
             // }
-
 
             SCsize = 0;
             // if (evidence.getSvLength()<250) {
@@ -261,7 +258,8 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                     continue;
                 }
 
-                if (n.matchCount<20) {
+                if (n.matchCount < 20)
+                {
                     continue;
                 }
 
@@ -269,7 +267,6 @@ void RefiningDeletion::refineStartToEnd(const char *range)
                 {
                     continue;
                 }
-
             }
 
             // if (n.matchCount <= 20) {
@@ -377,7 +374,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
     ssa.setPosReference(positionStartReference);
     ssa.buildReference();
     std::vector<ReadParser::Cigar> cigar;
-    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     bool SCRead = false;
     int32_t SCsize = 0;
     int32_t AlterSCsize = 0;
@@ -416,10 +413,10 @@ void RefiningDeletion::refineEndToStart(const char *range)
         {
             continue;
             // if (haveIndel(cigar)) {
-                
+
             // }else {
             //     continue;
-                
+
             // }
 
             SCsize = 0;
@@ -488,7 +485,8 @@ void RefiningDeletion::refineEndToStart(const char *range)
             {
                 // continue;
 
-                if (readparser.getStartToEndMissMatchPosMD()==0) {
+                if (readparser.getStartToEndMissMatchPosMD() == 0)
+                {
                     continue;
                 }
 
@@ -497,7 +495,8 @@ void RefiningDeletion::refineEndToStart(const char *range)
                     continue;
                 }
 
-                if (n.matchCount<20) {
+                if (n.matchCount < 20)
+                {
                     continue;
                 }
 
@@ -534,7 +533,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             // {
             //     continue;
             // }
-                //  std::cout << "> n.pos : " << mPos << " n.end : " << mEnd << " n.matchCount" << n.matchCount << std::endl;
+            //  std::cout << "> n.pos : " << mPos << " n.end : " << mEnd << " n.matchCount" << n.matchCount << std::endl;
             //  std::cout << "mPos : " << mPos << std::endl;
             //  std::cout << "mEnd : " << mEnd << std::endl;
             //      std::cout << "pattern : " << n.pattern << std::endl;
@@ -594,7 +593,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     int bMaxMatchSize = 0;
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
-    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
 
     int lastscore = 0;
@@ -605,46 +604,36 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 24)
+        if (maxMatchSize < 20)
         {
             continue;
         }
-
-        // std::cout << x.first.first << " - " << x.first.second << std::endl;
-
-        // if (maxMatchSize > 80)
-        // {
-        //     continue;
-        // }
+ 
 
         if (maxQuality == 0)
         {
             continue;
         }
-
-        // if (x.second.maxAlterSC >= x.second.maxSC && x.second.alignWithSoftClipped)
-        // {
-        //     continue;
-        // }
+ 
 
         bFrequency = x.second.NumberOfMatchRead;
 
-        if (evidence.getSvLength() < 500)
-        {
-            
-            if (bFrequency <= 1)
-            {
-                continue;
-            }
-        }
-        else
-        {
+        // if (evidence.getSvLength() < 500)
+        // {
 
-            if (bFrequency <= 1)
-            {
-                continue;
-            }
-        }
+        //     if (bFrequency <= 1)
+        //     {
+        //         continue;
+        //     }
+        // }
+        // else
+        // {
+
+        //     if (bFrequency <= 1)
+        //     {
+        //         continue;
+        //     }
+        // }
 
         // if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
         // {
@@ -676,8 +665,6 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         int score = (number) * (2 * maxMatchSize);
 
-        
-
         if (score > lastscore)
         {
             lastscore = score;
@@ -689,15 +676,14 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         }
     }
 
-    // int CountZeroMapQ = getNumberMapQ(bMapQList,0,0);
-    // int CountNotZeroMapQ = getNumberMapQ(bMapQList,1,255);
-
-    // if (CountNotZeroMapQ>=CountZeroMapQ) {
-    //     return;
+    // if (evidence.getMark() == "SR")
+    // {
+    //    if (bPos==0||bEnd==0) {
+    //        bPos = evidence.getPos();
+    //        bEnd = evidence.getEnd();
+    //    }
     // }
-
-    
-
+ 
 
     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
@@ -728,17 +714,21 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         return;
     }
 
-     if (evidence.getMark()=="SR") {
+    if (evidence.getMark() == "SR")
+    {
         variantresult.setMark("SR");
     }
 
     variantresult.setQuailtyPass(true);
 }
 
-int RefiningDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist,uint8_t start,uint8_t end) {
-    int count =0;
-    for (auto n:mapqlist) {
-        if (n>=start && n<= end) {
+int RefiningDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist, uint8_t start, uint8_t end)
+{
+    int count = 0;
+    for (auto n : mapqlist)
+    {
+        if (n >= start && n <= end)
+        {
             count++;
         }
     }

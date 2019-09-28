@@ -11,7 +11,7 @@ void SampleStat::setSamplePath(std::string t_sample_path)
 
 SampleStat::SampleStat()
 {
-    countMax = 50000;
+    countMax = 100000;
 }
 
 void SampleStat::setNumberOfRead(int number)
@@ -31,7 +31,7 @@ void SampleStat::findReadLength()
     bam1_t *aln = bam_init1();                           //initialize an alignment
 
     int count = 0;
-    
+
     std::map<int, int> mapReadLength;
     while (sam_read1(fp_in, bamHdr, aln) > 0)
     {
@@ -43,11 +43,12 @@ void SampleStat::findReadLength()
         }
     }
 
-    int maxhit=0;
+    int maxhit = 0;
     int32_t lengthSeq = 0;
     for (const auto &p : mapReadLength)
     {
-        if (maxhit<p.second) {
+        if (maxhit < p.second)
+        {
             maxhit = p.second;
             lengthSeq = p.first;
         }
@@ -60,50 +61,44 @@ void SampleStat::findReadLength()
     read_length = lengthSeq;
 }
 
-void SampleStat::findSDSampleStat()
+void SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist)
 {
-    samFile *fp_in = hts_open(sample_path.c_str(), "r");
-    bam_hdr_t *bamHdr = sam_hdr_read(fp_in);
-    bam1_t *aln = bam_init1();
-
     int count = 0;
     int64_t UPPER = 0;
 
-    while (sam_read1(fp_in, bamHdr, aln) > 0)
+    for (auto n : *insertlist)
     {
-
-        if (count > countMax)
-        {
-            break;
-        }
-
-        int32_t pos = aln->core.pos + 1;
-        int32_t matepos = aln->core.mpos + 1;
-        if (pos > matepos)
-        {
-            continue;
-        }
-
-        if ((matepos - pos) > 0 && (matepos - pos) < 2000)
-        {
-            int diff = (matepos - pos);
-            UPPER += pow((diff - (insertsize_median)), 2);
-            count++;
-        }
-        else
-        {
-            continue;
-        }
+        UPPER += pow((n - (insertsize_median)), 2);
+        count++;
     }
 
-    bam_destroy1(aln);
-    bam_hdr_destroy(bamHdr);
-    sam_close(fp_in);
-
-    insertsize_sd = (int)sqrt(UPPER / (countMax));
+    insertsize_sd = (int)sqrt(UPPER / (count));
 }
 
-void SampleStat::findMedianSampleStat()
+void SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist)
+{
+    int64_t sumINS = 0;
+    int64_t count = 0;
+    for (auto n : *insertlist)
+    {
+        sumINS += n;
+        count++;
+    }
+
+    insertsize_median = (sumINS / count);
+}
+
+void SampleStat::execute()
+{
+    SampleStat();
+    findReadLength();
+    auto insertsizelist = getInsertSizeList(countMax);
+
+    findMedianSampleStat(&insertsizelist);
+    findSDSampleStat(&insertsizelist);
+}
+
+std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
 {
     samFile *fp_in = hts_open(sample_path.c_str(), "r");
     bam_hdr_t *bamHdr = sam_hdr_read(fp_in);
@@ -112,6 +107,7 @@ void SampleStat::findMedianSampleStat()
     int count = 0;
     int64_t sumINS = 0;
     std::string chr;
+    std::vector<int32_t> insertsizeList;
     while (sam_read1(fp_in, bamHdr, aln) > 0)
     {
         chr = bamHdr->target_name[aln->core.tid];
@@ -133,10 +129,14 @@ void SampleStat::findMedianSampleStat()
             continue;
         }
 
-        if ((matepos - pos) > 0 && (matepos - pos) < 2000)
+        if (aln->core.qual < 30)
         {
-            int diff = (matepos+getReadLength())- pos;
-            sumINS += diff;
+            continue;
+        }
+
+        if ((matepos - pos) > 0 && (matepos - pos) < 100000)
+        {
+            insertsizeList.push_back(matepos - pos);
             count++;
         }
         else
@@ -149,15 +149,7 @@ void SampleStat::findMedianSampleStat()
     bam_hdr_destroy(bamHdr);
     sam_close(fp_in);
 
-    insertsize_median = (sumINS / count);
-}
-
-void SampleStat::execute()
-{
-    SampleStat();
-    findReadLength();
-    findMedianSampleStat();
-    findSDSampleStat();
+    return insertsizeList;
 }
 
 int32_t SampleStat::getReadLength()
@@ -165,12 +157,12 @@ int32_t SampleStat::getReadLength()
     return read_length;
 }
 
-int SampleStat::getMedianSampleStat()
+int32_t SampleStat::getAverageSampleStat()
 {
     return insertsize_median;
 }
 
-int SampleStat::getSDSampleStat()
+int32_t SampleStat::getSDSampleStat()
 {
     return insertsize_sd;
 }

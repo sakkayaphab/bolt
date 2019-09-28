@@ -166,7 +166,7 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     {
 
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 40, 1))
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 30, 1))
     {
         return false;
     }

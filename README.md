@@ -1,5 +1,5 @@
 # Bolt
-[![Build status](https://ci.appveyor.com/api/projects/status/ack0wba2gh88nxcr/branch/master?svg=true)](https://ci.appveyor.com/project/sakkayaphab/bolt/branch/master)
+[![Build Status](https://travis-ci.org/sakkayaphab/bolt.svg?branch=master)](https://travis-ci.org/sakkayaphab/bolt)
 
 
 ## Installation
@@ -15,6 +15,8 @@ make
 cd bin
 ./bolt
 ```
+[user guide][UserGuide]
+[UserGuide]:docs/README.md
 
 ## Third party software
 See LICENSE-THIRD-PARTY for details.

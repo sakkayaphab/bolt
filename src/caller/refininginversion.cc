@@ -431,7 +431,7 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
     int bMaxMatchSize = 0;
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
-    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
     int lastscore = 0;
 

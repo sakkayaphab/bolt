@@ -2,6 +2,7 @@
 #define SAMPLESTAT_H
 #include <htslib/sam.h>
 #include <string>
+#include <vector>
 
 class SampleStat
 {
@@ -14,12 +15,13 @@ private:
   int read_length=0;
   
   //config
-  int countMax;
+  int countMax=100000;
 
 
   void findReadLength();
-  void findMedianSampleStat();
-  void findSDSampleStat();
+  void findMedianSampleStat(std::vector<int32_t> *insertlist);
+  void findSDSampleStat(std::vector<int32_t> *insertlist);
+  std::vector<int32_t> getInsertSizeList(int64_t numberofread);
 
 public:
   SampleStat(std::string samplepath);
@@ -28,8 +30,8 @@ public:
   void setSamplePath(std::string t_sample_path);
   void setNumberOfRead(int number);
   int32_t getReadLength();
-  int getMedianSampleStat();
-  int getSDSampleStat();
+  int32_t getAverageSampleStat();
+  int32_t getSDSampleStat();
 };
 
 #endif

@@ -83,7 +83,7 @@ bool SpecifyingEvidenceTandemDuplication::incrementSVFreq(int32_t overlappedpos,
 void SpecifyingEvidenceTandemDuplication::checkRange()
 {
     bool added = false;
-    int32_t merge = int32_t(samplestat->getMedianSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     // bool added;
@@ -141,7 +141,7 @@ void SpecifyingEvidenceTandemDuplication::checkRange()
 
 void SpecifyingEvidenceTandemDuplication::proveEvidence(int index)
 {
-    int32_t plus = samplestat->getMedianSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
@@ -168,7 +168,7 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     int32_t firstEnd = 0;
     int32_t lastEnd = 0;
     int32_t avgEnd = 0;
-    // int32_t svlength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    // int32_t svlength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // if (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead() < 0)
     // {
     //     std::cout << "getLastPosDiscordantRead" << std::endl;
@@ -180,8 +180,8 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     //     std::cout << evidence->getLastEndDiscordantRead() << " == " << evidence->getEndDiscordantRead() << std::endl;
     // }
 
-    int32_t difflengthPos = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getMedianSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t difflengthPos = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
     int32_t notUsed = (samplestat->getSDSampleStat()) + (samplestat->getReadLength());
 
     // if (difflengthEnd > 1000000)
@@ -264,7 +264,7 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     //     return false;
     // }
     
-    int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getMedianSampleStat();
+    int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
     // if (svLength>1000000) {
     //     return false;

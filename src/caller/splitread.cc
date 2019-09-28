@@ -128,6 +128,10 @@ void SplitRead::findDeletion()
             continue;
         }
 
+        // if (sa.mapQ<30) {
+        //     continue;
+        // }
+
         if (readparser->getPos() < sa.pos)
         {
             // if (sa.pos - readparser->getPos() > (samplestate->getReadLength()*1.5))

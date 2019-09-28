@@ -53,6 +53,8 @@ void RefineDepthBlock::execute()
         std::vector<Evidence> result;
         if (variantlist.at(0).getSVType() == "DEL")
         {
+            // result = getRefineResultDeletion(&variantlist);
+
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
             result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultDeletion(&result);
@@ -531,10 +533,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
 std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evidence> *master)
 {
     std::vector<Evidence> cache;
+    int count = 0;
     for (auto n : *master)
     {
 
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
         auto previousPos = previousNumber(n.getPos(), roundConfig);
@@ -545,18 +549,33 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
 
         if (n.getMark() == "SR")
         {
-            if (n.getSvLength() < 100)
-            {
+            if (n.getFrequency()<=1) {
                 continue;
             }
+            
+            if (n.LNGMATCH < 15)
+            {
+                
+                continue;
+            }
+            // if (n.getSvLength() < 100)
+            // {
+            //     continue;
+            // }
             cache.push_back(n);
             continue;
         }
-
-        if (n.getMark() == "")
+        else
         {
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 1))
+            if (n.getFrequency()<=1) {
+                continue;
+            }
+            //  count++;
+            // std::cout << count << " " << n.LNGMATCH  << "/" << getDivider(samplestat->getReadLength(), 10, 100, 1) << " , " << samplestat->getReadLength() << std::endl;
+            // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 1))
+            if (n.LNGMATCH < 15)
             {
+                
                 continue;
             }
         }
@@ -612,11 +631,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         {
             continue;
         }
-
-        // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
-        // {
-        //     continue;
-        // }
+ 
 
         cache.push_back(n);
     }
