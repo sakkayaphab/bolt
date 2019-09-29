@@ -15,6 +15,10 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
+    // if (readparser.isProperlyAligned()) {
+    //     return;
+    // }
+
     if (readparser.getPos() > readparser.getMatePos())
     {
         return;
@@ -30,7 +34,8 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    if (readparser.isReverse()) {
+    if (readparser.isReverse())
+    {
         return;
     }
 
@@ -66,7 +71,10 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat())
+    // std::cout << "2 : " << (2*samplestat->getSDSampleStat()) << std::endl;
+    // std::cout << "1 : " << (samplestat->getSDSampleStat()) << std::endl;
+
+    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (2 * samplestat->getSDSampleStat()))
     {
         checkRange();
         return;
@@ -368,6 +376,11 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
     if (svLength > 1000000)
+    {
+        return false;
+    }
+
+    if (evidence->getFrequency() <= 1)
     {
         return false;
     }

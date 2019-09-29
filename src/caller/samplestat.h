@@ -9,8 +9,8 @@ class SampleStat
 private:
   std::string sample_path;
 
-  int insertsize_median=0;
-  int insertsize_sd=0;
+  int32_t insertsize_avg=0;
+  int32_t insertsize_sd=0;
   int avg_rd=0;
   int read_length=0;
   
@@ -19,8 +19,8 @@ private:
 
 
   void findReadLength();
-  void findMedianSampleStat(std::vector<int32_t> *insertlist);
-  void findSDSampleStat(std::vector<int32_t> *insertlist);
+  int32_t findMedianSampleStat(std::vector<int32_t> *insertlist);
+  int32_t findSDSampleStat(std::vector<int32_t> *insertlist,int32_t insertsize_avg);
   std::vector<int32_t> getInsertSizeList(int64_t numberofread);
 
 public:

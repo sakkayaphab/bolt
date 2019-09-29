@@ -110,7 +110,7 @@ int32_t ReadParser::getPosOfSeq()
     int32_t shift = 0;
     if (cigars.at(0).getOperatorName() == 'S')
     {
-        shift = (int32_t) cigars.at(0).getLength();
+        shift = (int32_t)cigars.at(0).getLength();
     }
 
     return getPos() - shift;
@@ -118,7 +118,7 @@ int32_t ReadParser::getPosOfSeq()
 
 int32_t ReadParser::getEndOfSeq()
 {
-    return getPosOfSeq() + (int32_t) source_bamread->core.l_qseq;
+    return getPosOfSeq() + (int32_t)source_bamread->core.l_qseq;
 }
 
 bool ReadParser::isMateUnmapped()
@@ -625,21 +625,20 @@ std::vector<ReadParser::AlignMD> ReadParser::getAlignMD()
 std::vector<ReadParser::SATag> ReadParser::getSATag()
 {
     std::vector<SATag> saTag;
-    
+
     // std::vector<ReadParser::AlignMD> alignMDs;
     const char *satagchar = "SA";
     auto aux = bam_aux_get(source_bamread, satagchar);
-    if (aux==0) {
+    if (aux == 0)
+    {
         return saTag;
     }
     auto auxChar = bam_aux2Z(aux);
     std::string auxString(auxChar);
-    
-    
+
     std::vector<std::string> saString = splitText(auxString, ';');
     std::vector<std::string> subSplit;
 
-    
     for (auto n : saString)
     {
         subSplit = splitText(n, ',');
@@ -654,7 +653,7 @@ std::vector<ReadParser::SATag> ReadParser::getSATag()
             // for (auto n:tempSAtag.cigar) {
             //     std::cout << n.getOperatorName() << " " << n.getLength() << std::endl;
             // }
-            
+
             tempSAtag.mapQ = (uint8_t)atoi(subSplit.at(4).c_str());
             tempSAtag.NM = atoi(subSplit.at(5).c_str());
 
@@ -681,23 +680,35 @@ std::vector<std::string> ReadParser::splitText(std::string s, char delimiter)
     return tokens;
 }
 
-std::vector<ReadParser::Cigar> ReadParser::getCigarByString(std::string cigartext) {
+std::vector<ReadParser::Cigar> ReadParser::getCigarByString(std::string cigartext)
+{
     std::vector<ReadParser::Cigar> cigar;
     std::string digitstring;
-    for (auto n:cigartext) {
+    for (auto n : cigartext)
+    {
         if (isdigit(n))
         {
             digitstring += n;
         }
-        else {
+        else
+        {
             Cigar tempCigar;
             tempCigar.setLength(atoi(digitstring.c_str()));
             digitstring = "";
             tempCigar.setOperatorName(n);
             cigar.push_back(tempCigar);
-            
         }
     }
 
     return cigar;
+}
+
+bool ReadParser::isProperlyAligned()
+{
+    if ((source_bamread->core.flag & BAM_FPROPER_PAIR))
+    {
+        return true;
+    }
+
+    return false;
 }

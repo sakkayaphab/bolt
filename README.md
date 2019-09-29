@@ -15,7 +15,9 @@ make
 cd bin
 ./bolt
 ```
-[user guide][UserGuide]
+for [user guide][UserGuide]
+
+
 [UserGuide]:docs/README.md
 
 ## Third party software

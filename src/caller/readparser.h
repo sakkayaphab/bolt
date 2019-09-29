@@ -176,6 +176,7 @@ public:
   std::vector<SATag> getSATag();
   std::vector<std::string> splitText(std::string text, char delimiter);
    std::vector<ReadParser::Cigar> getCigarByString(std::string cigartext);
+   bool isProperlyAligned();
   
 };
 

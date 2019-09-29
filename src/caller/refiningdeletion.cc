@@ -604,17 +604,15 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 20)
+        if (maxMatchSize < 25)
         {
             continue;
         }
- 
 
         if (maxQuality == 0)
         {
             continue;
         }
- 
 
         bFrequency = x.second.NumberOfMatchRead;
 
@@ -676,21 +674,30 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         }
     }
 
-    // if (evidence.getMark() == "SR")
-    // {
-    //    if (bPos==0||bEnd==0) {
-    //        bPos = evidence.getPos();
-    //        bEnd = evidence.getEnd();
-    //    }
-    // }
- 
+    if (evidence.getMark() == "SR")
+    {
+        
+        if (evidence.getFrequency() >= 2 && (bPos==0 || bEnd==0))
+        {
+            if (bPos == 0 || bEnd == 0)
+            {
+                bPos = evidence.getPos();
+                bEnd = evidence.getEnd();
+                bHit = evidence.getFrequency();
+                variantresult.setMapQList(*evidence.getMapQVector());
+
+            }
+        }
+    }else {
+        variantresult.setMapQList(bMapQList);
+    }
 
     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
     variantresult.setRPMapQ(*evidence.getMapQVector());
 
-    variantresult.setMapQList(bMapQList);
+    
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     variantresult.LNGMATCH = bMaxMatchSize;

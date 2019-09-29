@@ -61,21 +61,21 @@ void SampleStat::findReadLength()
     read_length = lengthSeq;
 }
 
-void SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist)
+int32_t SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist,int32_t insertsize_avg)
 {
     int count = 0;
     int64_t UPPER = 0;
 
     for (auto n : *insertlist)
     {
-        UPPER += pow((n - (insertsize_median)), 2);
+        UPPER += pow((n - (insertsize_avg)), 2);
         count++;
     }
 
-    insertsize_sd = (int)sqrt(UPPER / (count));
+    return (int32_t)sqrt(UPPER / (int64_t)(count));
 }
 
-void SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist)
+int32_t SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist)
 {
     int64_t sumINS = 0;
     int64_t count = 0;
@@ -85,7 +85,7 @@ void SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist)
         count++;
     }
 
-    insertsize_median = (sumINS / count);
+    return (int32_t)(sumINS / count);
 }
 
 void SampleStat::execute()
@@ -94,8 +94,10 @@ void SampleStat::execute()
     findReadLength();
     auto insertsizelist = getInsertSizeList(countMax);
 
-    findMedianSampleStat(&insertsizelist);
-    findSDSampleStat(&insertsizelist);
+    int32_t avginsert = findMedianSampleStat(&insertsizelist);
+    int32_t sdinsert = findSDSampleStat(&insertsizelist,avginsert);
+    insertsize_avg = avginsert;
+    insertsize_sd = sdinsert;
 }
 
 std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
@@ -121,6 +123,26 @@ std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
             break;
         }
 
+        if (aln->core.tid != aln->core.mtid)
+        {
+            continue;
+        }
+
+        if ((aln->core.flag & BAM_FREAD2))
+        {
+            continue;
+        }
+
+        if ((aln->core.flag & BAM_FREVERSE))
+        {
+            continue;
+        }
+
+        if (!(aln->core.flag & BAM_FMREVERSE))
+        {
+            continue;
+        }
+
         int32_t pos = aln->core.pos + 1;
         int32_t matepos = aln->core.mpos + 1;
 
@@ -134,6 +156,7 @@ std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
             continue;
         }
 
+    
         if ((matepos - pos) > 0 && (matepos - pos) < 100000)
         {
             insertsizeList.push_back(matepos - pos);
@@ -159,7 +182,7 @@ int32_t SampleStat::getReadLength()
 
 int32_t SampleStat::getAverageSampleStat()
 {
-    return insertsize_median;
+    return insertsize_avg;
 }
 
 int32_t SampleStat::getSDSampleStat()

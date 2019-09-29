@@ -195,10 +195,10 @@ int Cli::debug()
     Caller caller(sample, reference, output);
     caller.showinfo();
     // caller.setParallel(40);
-    // caller.execute();
-    // caller.catfile();
-    // caller.findBreakPoint();
-    // caller.refineDelpthBlock();
+    caller.execute();
+    caller.catfile();
+    caller.findBreakPoint();
+    caller.refineDelpthBlock();
     // caller.mergeSplitRead();
    
     // caller.mergeBreakpoint();

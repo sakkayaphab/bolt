@@ -163,7 +163,6 @@ void Caller::execute()
     int i = 0;
     for (; !done; ++number_active)
     {
-
         i++;
         std::string tp(bam_header.target_name[i - 1]);
         Task task(samplestat, &filepath, tp);
@@ -343,7 +342,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }
