@@ -17,9 +17,9 @@ void SplitRead::updateRead()
         return;
     }
 
-    // findInversion();
+    findInversion();
     findDeletion();
-    // findTandemDuplication();
+    findTandemDuplication();
 }
 
 void SplitRead::findInversion()
@@ -285,8 +285,8 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-    printDeletion();
-    printDuplication();
+    // printDeletion();
+    // printDuplication();
     printInversion();
 }
 
@@ -295,14 +295,15 @@ std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int
     std::vector<Evidence> vecTemp;
     for (auto const &x : *mapSV)
     {
-        if (x.second.NumberOfMatchRead >= 2)
+    
+        if (x.second.MapQLists.size() >= 2)
         {
             Evidence evidence;
             evidence.setPos(x.first.first);
             evidence.setEnd(x.first.second);
             evidence.setChr(chrname);
             evidence.setEndChr(chrname);
-            evidence.setFrequency(x.second.NumberOfMatchRead);
+            evidence.setFrequency(x.second.MapQLists.size());
             evidence.setVariantType(svtype);
             evidence.setMark("SR");
             evidence.setMapQList(x.second.MapQLists);
@@ -348,11 +349,45 @@ void SplitRead::setAllCIEvidence(std::vector<Evidence> *elist)
 {
     for (int32_t i = 0; i < elist->size(); i++)
     {
-        elist->at(i).setCiPosLeft(-samplestate->getReadLength());
-        elist->at(i).setCiPosRight(samplestate->getReadLength());
-        elist->at(i).setCiEndLeft(-samplestate->getReadLength());
-        elist->at(i).setCiEndRight(samplestate->getReadLength());
+        elist->at(i).setCiPosLeft(-samplestate->getReadLength() * 2);
+        elist->at(i).setCiPosRight(samplestate->getReadLength() * 2);
+        elist->at(i).setCiEndLeft(-samplestate->getReadLength() * 2);
+        elist->at(i).setCiEndRight(samplestate->getReadLength() * 2);
     }
+}
+
+void SplitRead::filterFrequencyLowerThan(int number, std::vector<Evidence> *elist)
+{
+    std::vector<Evidence> newEvidenceTempList;
+
+    for (auto n : *elist)
+    {
+        if (n.getFrequency() <= number)
+        {
+            continue;
+        }
+
+        newEvidenceTempList.push_back(n);
+    }
+
+    *elist = newEvidenceTempList;
+}
+
+void SplitRead::filterMapQLowerThan(uint8_t mapq, std::vector<Evidence> *elist)
+{
+    std::vector<Evidence> newEvidenceTempList;
+
+    for (auto n : *elist)
+    {
+        if (n.getMaxMapQ() < mapq)
+        {
+            continue;
+        }
+
+        newEvidenceTempList.push_back(n);
+    }
+
+    *elist = newEvidenceTempList;
 }
 
 void SplitRead::filterEvidenceList(std::vector<Evidence> *elist)
@@ -394,7 +429,7 @@ void SplitRead::filterLengthMinEvidenceList(std::vector<Evidence> *elist, int32_
     *elist = newEvidenceTempList;
 }
 
-void  SplitRead::filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t max)
+void SplitRead::filterLengthMaxEvidenceList(std::vector<Evidence> *elist, int32_t max)
 {
     std::vector<Evidence> newEvidenceTempList;
 
@@ -417,8 +452,8 @@ void SplitRead::printDuplication()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp);
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp,100);
-    filterLengthMaxEvidenceList(&vecTemp,samplestate->getReadLength()*2);
+    filterLengthMinEvidenceList(&vecTemp, 100);
+    filterLengthMaxEvidenceList(&vecTemp, samplestate->getReadLength() * 2);
 
     for (auto x : vecTemp)
     {
@@ -431,6 +466,11 @@ void SplitRead::printInversion()
     auto vecTemp = convertMapToEvidenceList(&mapINV, "INV");
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp);
+    filterEvidenceList(&vecTemp);
+    filterLengthMinEvidenceList(&vecTemp, 50);
+    filterLengthMaxEvidenceList(&vecTemp, 1000000);
+    filterFrequencyLowerThan(1, &vecTemp);
+    // filterMapQLowerThan(60, &vecTemp);
 
     for (auto x : vecTemp)
     {
@@ -444,8 +484,8 @@ void SplitRead::printDeletion()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp);
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp,50);
-    filterLengthMaxEvidenceList(&vecTemp,1000000);
+    filterLengthMinEvidenceList(&vecTemp, 50);
+    filterLengthMaxEvidenceList(&vecTemp, 1000000);
 
     for (auto x : vecTemp)
     {

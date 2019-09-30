@@ -12,15 +12,19 @@ class RefiningInversion : public RefiningSV
 private:
   int minimum = 2;
   int minimumMaxMatchSeq = 10;
-    void first();
+  void first();
   void second();
   void refineStartToEnd(const char *range);
   void refineEndToStart(const char *range);
 
+  Evidence resultFirst;
+  Evidence resultSecond;
+
 public:
   RefiningInversion();
-     void execute();
-     void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  void execute();
+  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence getBestResult(Evidence r1, Evidence r2);
 };
 
 #endif

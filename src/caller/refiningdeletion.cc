@@ -676,7 +676,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
     if (evidence.getMark() == "SR")
     {
-        
+        variantresult.setMark("SR");
         if (evidence.getFrequency() >= 2 && (bPos==0 || bEnd==0))
         {
             if (bPos == 0 || bEnd == 0)
@@ -692,12 +692,11 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         variantresult.setMapQList(bMapQList);
     }
 
-    variantresult.setPos(bPos);
+     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
+    variantresult.setMapQList(*evidence.getMapQVector());
     variantresult.setRPMapQ(*evidence.getMapQVector());
-
-    
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     variantresult.LNGMATCH = bMaxMatchSize;
@@ -720,11 +719,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     {
         return;
     }
-
-    if (evidence.getMark() == "SR")
-    {
-        variantresult.setMark("SR");
-    }
+ 
 
     variantresult.setQuailtyPass(true);
 }

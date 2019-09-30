@@ -342,7 +342,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "DUP")
+            if (svtype != "INV")
             {
                 continue;
             }
@@ -597,7 +597,7 @@ int Caller::findBreakPoint()
         VariantResultFilter vrf;
         if (vrf.passFilterSV(&variantresult))
         {
-            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
 
             mxWriteFile.lock();
             // rda.analyzeByBreakPoint(variantresult);

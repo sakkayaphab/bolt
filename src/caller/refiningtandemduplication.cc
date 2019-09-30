@@ -151,11 +151,11 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
                 continue;
             }
 
-            // std::cout << "Read Pos : " << readparser.getPos() << std::endl; 
+            // std::cout << "Read Pos : " << readparser.getPos() << std::endl;
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd << std::endl;
             // std::cout << "seq : " << readparser.getSequence().substr(0,n.endseq) << std::endl;
-            
+
             // std::cout << "pattern : " << n.matchSeqPattern << std::endl;
             // std::cout << "mEnd : " << mEnd << std::endl;
             // std::cout << "---------- MD TAG ----------" << std::endl;
@@ -272,7 +272,7 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
             continue;
         }
 
-         if (cigar.at(cigar.size() - 1).getLength() <= 2)
+        if (cigar.at(cigar.size() - 1).getLength() <= 2)
         {
             continue;
         }
@@ -364,7 +364,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize == 0)
+        if (maxMatchSize < 15)
         {
             continue;
         }
@@ -394,12 +394,31 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         }
     }
 
-    variantresult.setPos(bPos);
+    if (evidence.getMark() == "SR")
+    {
+        variantresult.setMark("SR");
+        if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
+        {
+            if (bPos == 0 || bEnd == 0)
+            {
+                bPos = evidence.getPos();
+                bEnd = evidence.getEnd();
+                bHit = evidence.getFrequency();
+                variantresult.setMapQList(*evidence.getMapQVector());
+            }
+        }
+    }
+    else
+    {
+        variantresult.setMapQList(bMapQList);
+    }
+
+     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
-    variantresult.setMapQList(bMapQList);
-    variantresult.setChr(evidence.getChr());
+    variantresult.setMapQList(*evidence.getMapQVector());
     variantresult.setRPMapQ(*evidence.getMapQVector());
+    variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     variantresult.LNGMATCH = bMaxMatchSize;
 
@@ -417,13 +436,9 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         return;
     }
 
-    if (bEnd - bPos <= 0)
+    if (bEnd - bPos < 20)
     {
         return;
-    }
-
-    if (evidence.getMark()=="SR") {
-        variantresult.setMark("SR");
     }
 
     variantresult.setQuailtyPass(true);

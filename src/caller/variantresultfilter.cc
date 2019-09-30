@@ -11,6 +11,8 @@ bool VariantResultFilter::passFilterSV(Evidence *variantresult)
         return false;
     }
 
+    //  std::cout << variantresult->getResultVcfFormatString() << std::endl;
+
     if (variantresult->getVariantType() == "INS")
     {
         return passFilterInsertion(variantresult);
@@ -81,16 +83,6 @@ bool VariantResultFilter::passFilterInsertion(Evidence *variantresult)
 
 bool VariantResultFilter::passFilterInversion(Evidence *variantresult)
 {
-    // if (variantresult->getMaxMapQ() < 10)
-    // {
-    //     return false;
-    // }
-
-    // if (variantresult->getFrequency() < 3)
-    // {
-    //     return false;
-    // }
-
     return true;
 }
 

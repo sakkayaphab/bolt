@@ -13,15 +13,47 @@ void RefiningInversion::execute()
     prepareBamReader();
 
     first();
-    if (variantresult.isQuailtyPass())
-    {
-        return;
-    }
+    // if (variantresult.isQuailtyPass())
+    // {
+    //     return;
+    // }
     second();
-    if (variantresult.isQuailtyPass())
+
+    variantresult = getBestResult(resultFirst, resultSecond);
+    // std::cout << variantresult.getPos() << " " << variantresult.isQuailtyPass() << std::endl;
+
+    // if (variantresult.isQuailtyPass())
+    // {
+    //     // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+    //     return;
+    // }
+}
+
+Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
+{
+
+    if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
     {
-        return;
+        Evidence result;
+        return result;
     }
+
+    if (r1.isQuailtyPass() && r2.isQuailtyPass())
+    {
+        if (r1.LNGMATCH > r2.LNGMATCH)
+        {
+            return r1;
+        }
+
+        return r2;
+    }
+
+    if (r1.isQuailtyPass())
+    {
+        return r1;
+    }
+
+    return r2;
 }
 
 void RefiningInversion::first()
@@ -138,6 +170,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
                 {
                     continue;
                 }
+
                 // std::cout << "mPos : " << mPos << std::endl;
                 // std::cout << "mtEnd : " << mEnd << std::endl;
                 // std::cout << "pattern : " << n.pattern << std::endl;
@@ -228,7 +261,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
         }
     }
 
-    RefiningInversion::calculateFinalBreakpoint(&listPosition);
+    resultFirst = RefiningInversion::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
@@ -415,15 +448,14 @@ void RefiningInversion::refineEndToStart(const char *range)
         }
     }
 
-    RefiningInversion::calculateFinalBreakpoint(&listPosition);
+    resultSecond = RefiningInversion::calculateFinalBreakpoint(&listPosition);
     // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
 
-void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
-
     int32_t bPos = 0;
     int32_t bEnd = 0;
     int32_t bHit = 0;
@@ -442,30 +474,10 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 20)
+        if (maxMatchSize < 15)
         {
             continue;
         }
-            // std::cout << "calculateFinalBreakpoint INV :" << svlength << std::endl;
-
-        // if (x.first.second - x.first.first < 1000)
-        // {
-        //     if (x.second.NumberOfMatchRead <= 1)
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        // std::cout << "maxMatchSize : " << maxMatchSize << std::endl;
-        // if (maxMatchSize > 80)
-        // {
-        //     continue;
-        // }
-
-        // if (maxQuality == 0)
-        // {
-        //     continue;
-        // }
 
         int number = x.second.NumberOfMatchRead;
 
@@ -482,37 +494,60 @@ void RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int
         }
     }
 
-    variantresult.setPos(bPos);
-    variantresult.setEnd(bEnd);
-    variantresult.setFrequency(bHit);
-    variantresult.setMapQList(bMapQList);
-    variantresult.setChr(evidence.getChr());
-    variantresult.setEndChr(evidence.getEndChr());
-    variantresult.setRPMapQ(*evidence.getMapQVector());
-    variantresult.LNGMATCH = bMaxMatchSize;
+    std::cout << bPos << " / " << bEnd << std::endl;
+
+    Evidence result;
+
+    if (evidence.getMark() == "SR")
+    {
+        result.setMark("SR");
+        result.setMapQList(bMapQList);
+
+        if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
+        {
+            if (bPos == 0 || bEnd == 0)
+            {
+                bPos = evidence.getPos();
+                bEnd = evidence.getEnd();
+                bHit = evidence.getFrequency();
+                result.setMapQList(*evidence.getMapQVector());
+            }
+        }
+    }
+    else
+    {
+        result.setMapQList(bMapQList);
+    }
+
+    result.setPos(bPos);
+    result.setEnd(bEnd);
+    result.setFrequency(bHit);
+    result.setRPMapQ(*evidence.getMapQVector());
+    result.setChr(evidence.getChr());
+    result.setEndChr(evidence.getEndChr());
+    result.LNGMATCH = bMaxMatchSize;
+    result.setVariantType("INV");
+
+    if (bHit <= 1)
+    {
+        return result;
+    }
 
     if (bPos == 0)
     {
-        return;
+        return result;
     }
     if (bEnd == 0)
     {
-        return;
+        return result;
     }
 
-    // if (bEnd - bPos > 1000000)
-    // {
-    //     return;
-    // }
-
-    if (bEnd - bPos <= 0)
+    if (bEnd - bPos > 1000000)
     {
-        return;
+        return result;
     }
 
-     if (evidence.getMark()=="SR") {
-        variantresult.setMark("SR");
-    }
+    result.setQuailtyPass(true);
 
-    variantresult.setQuailtyPass(true);
+    return result;
 }

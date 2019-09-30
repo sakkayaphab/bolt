@@ -43,6 +43,9 @@ public:
   void filterEvidenceList(std::vector<Evidence> *elist);
   void filterLengthMinEvidenceList(std::vector<Evidence> *elist,int32_t min);
   void filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t min);
+    void filterMapQLowerThan(uint8_t mapq,std::vector<Evidence> *elist);
+     void filterFrequencyLowerThan(int number,std::vector<Evidence> *elist);
+
 
   
 };

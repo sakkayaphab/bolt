@@ -266,9 +266,9 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
-    // if (svLength>1000000) {
-    //     return false;
-    // }
+    if (svLength>1000000) {
+        return false;
+    }
 
     // if (svLength < 500)
     // {

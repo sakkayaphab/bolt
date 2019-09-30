@@ -311,7 +311,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
 
         if (n.getMark() == "")
         {
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+            if (n.LNGMATCH < 15)
             {
                 continue;
             }
@@ -421,17 +421,32 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-       
-
         if (n.getMark() == "SR")
         {
+            if (n.getSvLength() < 50)
+            {
+                continue;
+            }
+            // continue;
+            if (n.getFrequency() <= 2)
+            {
+                continue;
+            }
+
+            if (n.getMaxMapQ() < 40)
+            {
+                continue;
+            }
+
             cache.push_back(n);
             continue;
         }
 
+        // continue;
+
         if (n.getMark() == "")
         {
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+            if (n.LNGMATCH < 15)
             {
                 continue;
             }
@@ -479,10 +494,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextEndRD = rdf.getBlock(nextEnd);
         auto previousEndRD = rdf.getBlock(previousEnd);
 
-        // if (currentEndRD.depth==0) {
-        //     continue;
-        // }
-
         if (n.getSvLength() > 500)
         {
             if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
@@ -516,12 +527,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             continue;
         }
 
-        if (n.getSvLength() < 100)
+        if (n.getSvLength() < 50)
         {
             continue;
         }
 
-        if (n.getMaxMapQ() < 40)
+        if (n.getMaxMapQ() < 30)
         {
             continue;
         }
@@ -549,19 +560,18 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-         if (n.getSvLength() < 50)
+        if (n.getSvLength() < 50)
         {
             continue;
         }
 
-       
-
         if (n.getMark() == "SR")
         {
-            if (n.getFrequency()<=1) {
+            if (n.getFrequency() <= 1)
+            {
                 continue;
             }
-            
+
             // if (n.LNGMATCH < 15)
             // {
             //     continue;
@@ -575,7 +585,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         }
         else
         {
-            if (n.getFrequency()<=1) {
+            if (n.getFrequency() <= 1)
+            {
                 continue;
             }
             //  count++;
@@ -583,7 +594,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 1))
             if (n.LNGMATCH < 15)
             {
-                
+
                 continue;
             }
         }
@@ -600,7 +611,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-             if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+            if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
             {
                 continue;
             }
@@ -643,7 +654,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-         if (n.getMaxMapQ() < 40)
+        if (n.getMaxMapQ() < 40)
         {
             continue;
         }
