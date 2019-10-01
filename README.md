@@ -22,4 +22,6 @@ for [user guide][UserGuide]
 
 ## Third party software
 See [LICENSE-THIRD-PARTY][LICENSETHIRDPARTY] for details.
+
+
 [LICENSETHIRDPARTY]:LICENSE-THIRD-PARTY
