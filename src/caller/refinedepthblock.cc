@@ -423,7 +423,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
 
         if (n.getMark() == "SR")
         {
-            if (n.getSvLength() < 50)
+            // continue;
+            if (n.getSvLength() < 100)
             {
                 continue;
             }
@@ -565,6 +566,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
+        if (n.getSvLength() > 1000000)
+        {
+            continue;
+        }
+
         if (n.getMark() == "SR")
         {
             if (n.getFrequency() <= 1)
@@ -572,31 +578,32 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            // if (n.LNGMATCH < 15)
-            // {
-            //     continue;
-            // }
-            // if (n.getSvLength() < 100)
-            // {
-            //     continue;
-            // }
+            if (n.getMaxMapQ() < 40)
+            {
+                continue;
+            }
+
+            if (n.getSvLength() < 100)
+            {
+                if (n.getFrequency() <= 2)
+                {
+                    continue;
+                }
+            }
+
             cache.push_back(n);
             continue;
         }
         else
         {
-            if (n.getFrequency() <= 1)
-            {
-                continue;
-            }
-            //  count++;
-            // std::cout << count << " " << n.LNGMATCH  << "/" << getDivider(samplestat->getReadLength(), 10, 100, 1) << " , " << samplestat->getReadLength() << std::endl;
-            // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 1))
-            if (n.LNGMATCH < 15)
+
+            if (n.LNGMATCH < 20)
             {
 
                 continue;
             }
+
+            
         }
 
         if (n.getSvLength() > 2000)
@@ -654,9 +661,21 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-        if (n.getMaxMapQ() < 40)
+        if (n.getFrequency() <= 1)
         {
             continue;
+        }
+
+        if (n.getSvLength() < 100)
+        {
+            if (n.getMaxMapQ() < 60)
+            {
+                continue;
+            }
+
+            if (n.getMinMapQ()==0) {
+                continue;
+            }
         }
 
         cache.push_back(n);

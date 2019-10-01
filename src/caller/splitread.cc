@@ -285,8 +285,8 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-    // printDeletion();
-    // printDuplication();
+    printDeletion();
+    printDuplication();
     printInversion();
 }
 
@@ -345,14 +345,14 @@ void SplitRead::mergeEvidence(std::vector<Evidence> *vecTemp)
     *vecTemp = newEvidenceTempList;
 }
 
-void SplitRead::setAllCIEvidence(std::vector<Evidence> *elist)
+void SplitRead::setAllCIEvidence(std::vector<Evidence> *elist,int32_t rangePos)
 {
     for (int32_t i = 0; i < elist->size(); i++)
     {
-        elist->at(i).setCiPosLeft(-samplestate->getReadLength() * 2);
-        elist->at(i).setCiPosRight(samplestate->getReadLength() * 2);
-        elist->at(i).setCiEndLeft(-samplestate->getReadLength() * 2);
-        elist->at(i).setCiEndRight(samplestate->getReadLength() * 2);
+        elist->at(i).setCiPosLeft(-rangePos);
+        elist->at(i).setCiPosRight(rangePos);
+        elist->at(i).setCiEndLeft(-rangePos);
+        elist->at(i).setCiEndRight(rangePos);
     }
 }
 
@@ -450,7 +450,7 @@ void SplitRead::printDuplication()
 {
     auto vecTemp = convertMapToEvidenceList(&mapDUP, "DUP");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp,samplestate->getReadLength());
     filterEvidenceList(&vecTemp);
     filterLengthMinEvidenceList(&vecTemp, 100);
     filterLengthMaxEvidenceList(&vecTemp, samplestate->getReadLength() * 2);
@@ -465,7 +465,7 @@ void SplitRead::printInversion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapINV, "INV");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp,samplestate->getReadLength()*2);
     filterEvidenceList(&vecTemp);
     filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
@@ -482,10 +482,11 @@ void SplitRead::printDeletion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapDEL, "DEL");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp);
+    setAllCIEvidence(&vecTemp,samplestate->getReadLength()*2);
     filterEvidenceList(&vecTemp);
     filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
+    filterFrequencyLowerThan(1, &vecTemp);
 
     for (auto x : vecTemp)
     {

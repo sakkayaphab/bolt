@@ -134,7 +134,10 @@ bam_hdr_t *Caller::getBamHeader()
 
 void Caller::execute()
 {
-    
+    std::cout << std::endl;
+    std::cout << "------------------------------" << std::endl;
+    std::cout << "# Find evidence :" << std::endl;
+    std::cout << "------------------------------" << std::endl;
     // find evidence by using threads
 
     // tbb::task_scheduler_init init(35);
@@ -264,6 +267,11 @@ void Caller::mergeSplitRead()
 
 void Caller::refineDelpthBlock()
 {
+    std::cout << std::endl;
+    std::cout << "------------------------------" << std::endl;
+    std::cout << "# Filter Breakpoint with Depth block : " << std::endl;
+    std::cout << "------------------------------" << std::endl;
+
     RefineDepthBlock rdb;
     rdb.setFileManager(&filepath);
     rdb.setSampleStat(&samplestat);
@@ -276,7 +284,7 @@ void Caller::catEvidenceFile()
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
-    
+
     d = opendir(filepath.getTempEvidencePath().c_str());
     if (d)
     {
@@ -342,7 +350,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "INV")
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -418,8 +426,8 @@ void Caller::mergeReadDepthFile()
         {
 
             std::string svtype = n.substr(n.size() - 7, 3);
-            std::cout << svtype << std::endl;
-            if (svtype != "DUP")
+            // std::cout << svtype << std::endl;
+            if (svtype != "DEL")
             {
                 continue;
             }
@@ -457,6 +465,11 @@ void Caller::mergeReadDepthFile()
 
 void Caller::catfile()
 {
+    std::cout << std::endl;
+    std::cout << "------------------------------" << std::endl;
+    std::cout << "# Merge and filter evidence :" << std::endl;
+    std::cout << "------------------------------" << std::endl;
+
     // std::cout << ""
     catEvidenceFile();
 }
@@ -481,6 +494,11 @@ int Caller::writeFile(Evidence vr)
 
 int Caller::findBreakPoint()
 {
+    std::cout << std::endl;
+    std::cout << "------------------------------" << std::endl;
+    std::cout << "# Refine breakpoint : " << std::endl;
+    std::cout << "------------------------------" << std::endl;
+
     removeResult();
 
     //    ReadDepthHelper readdepthHelper;
@@ -597,7 +615,7 @@ int Caller::findBreakPoint()
         VariantResultFilter vrf;
         if (vrf.passFilterSV(&variantresult))
         {
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            std::cout << variantresult.getResultVcfFormatString() << std::endl;
 
             mxWriteFile.lock();
             // rda.analyzeByBreakPoint(variantresult);

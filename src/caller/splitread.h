@@ -39,7 +39,7 @@ public:
   void printInversion();
   std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype);
   void mergeEvidence(std::vector<Evidence> *elist);
-  void setAllCIEvidence(std::vector<Evidence> *elist);
+  void setAllCIEvidence(std::vector<Evidence> *elist,int32_t rangePos);
   void filterEvidenceList(std::vector<Evidence> *elist);
   void filterLengthMinEvidenceList(std::vector<Evidence> *elist,int32_t min);
   void filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t min);

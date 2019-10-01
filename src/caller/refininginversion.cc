@@ -494,8 +494,6 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
         }
     }
 
-    std::cout << bPos << " / " << bEnd << std::endl;
-
     Evidence result;
 
     if (evidence.getMark() == "SR")

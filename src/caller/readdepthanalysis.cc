@@ -81,7 +81,6 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
 
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
-
     }
     else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
     {
@@ -116,7 +115,7 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
         return false;
     }
 
-    if (e.getMaxMapQ() < 15)
+    if (e.getMaxMapQ() < 40)
     {
         return false;
     }
@@ -156,9 +155,13 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
 
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
-
-    if (e.getMaxMapQ() < 10)
+ 
+    if (e.getMaxMapQ() < 40)
     {
+        return false;
+    }
+
+    if (e.getFrequency()<=1) {
         return false;
     }
 
@@ -297,7 +300,6 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
 
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
-
     }
     else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
     {
@@ -313,8 +315,6 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
     {
         return false;
     }
-
-    
 
     // if (e.getMaxMapQ() < 15)
     // {
@@ -345,35 +345,14 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
 
-    // return true;
-    // if (e.getPos() != 18185538)
-    // {
-    //     return false;
-    // }
     setFocusReadDepth(e.getPosDiscordantRead() - configRound, e.getLastPosDiscordantRead() + configRound, &startFocusReadDepth);
     setFocusReadDepth(e.getEndDiscordantRead() - configRound, e.getLastEndDiscordantRead() + configRound, &endFocusReadDepth);
     collectNewData();
-    // std::cout << "--------" << std::endl;
-    // std::cout << "pos : "
-    // << e.getPos() + e.getCiPosLeft() - configRound
-    // << " end :"
-    // << e.getPos() + e.getCiPosRight() + configRound
-    // << std::endl;
-    // for (auto n : focusReadDepth)
-    // {
-    //     std::cout << n.pos << " rd:" << n.depth << std::endl;
-    // }
 
-    // return false;
-    //  return true;
     if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800)
     {
         return false;
     }
-
-    // if (avgReadDepthFocus>10000) {
-    //     return false;
-    // }
 
     if (e.getVariantType() == "DEL")
     {

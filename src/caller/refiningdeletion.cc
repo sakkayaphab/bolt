@@ -236,10 +236,10 @@ void RefiningDeletion::refineStartToEnd(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount < cigar.at(0).getLength())
-                // {
-                //     continue;
-                // }
+                if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
+                {
+                    continue;
+                }
             }
             else
             {
@@ -282,11 +282,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             {
                 continue;
             }
-
-            // if (mEnd <= mPos + 2)
-            // {
-            //     continue;
-            // }
+ 
 
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd<< std::endl;
@@ -306,29 +302,7 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             {
                 listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
             }
-
-            // for (int i = 0; i < rangeMapping; i++)
-            // {
-
-            //     int32_t tempPos = mPos + i;
-            //     int32_t tempEnd = mEnd + i;
-
-            //     if (i > 6)
-            //     {
-            //         break;
-            //     }
-            //     if (SCRead) {
-            //         listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
-            //     }
-            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping + i);
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-            //     // {
-            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-            //     // }
-            //     // break;
-            // }
+ 
         }
     }
 
@@ -476,10 +450,10 @@ void RefiningDeletion::refineEndToStart(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount < cigar.at(0).getLength())
-                // {
-                //     continue;
-                // }
+                if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
+                {
+                    continue;
+                }
             }
             else
             {
@@ -550,31 +524,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             {
                 listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
             }
-
-            // for (int i = 0; i < n.endseq; i++)
-            // {
-
-            //     int32_t tempPos = mPos - i;
-            //     int32_t tempEnd = mEnd - i;
-
-            //     if (i > 6)
-            //     {
-            //         break;
-            //     }
-
-            //     if (SCRead) {
-            //         listPosition[std::make_pair(tempPos, tempEnd)].alignWithSoftClipped = true;
-            //     }
-
-            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(n.endseq - i);
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-            //     // {
-            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-            //     // }
-            //     // break;
-            // }
+ 
         }
     }
 
@@ -616,48 +566,10 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         bFrequency = x.second.NumberOfMatchRead;
 
-        // if (evidence.getSvLength() < 500)
-        // {
-
-        //     if (bFrequency <= 1)
-        //     {
-        //         continue;
-        //     }
-        // }
-        // else
-        // {
-
-        //     if (bFrequency <= 1)
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        // if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second, x.first.second + 20))
-        // {
-        //     continue;
-        // }
-
-        // // confirm
-        // if (isMatchRef(evidence.getChr(), x.first.first - 1, x.first.first + 20 - 1, evidence.getEndChr(), x.first.second + 1, x.first.second + 20 + 1))
-        // {
-        //     continue;
-        // }
-
-        // if (isMatchRef(evidence.getChr(), x.first.first - 1 + 2, x.first.first + 20 - 1 + 2, evidence.getEndChr(), x.first.second + 2, x.first.second + 20 + 2))
-        // {
-        //     continue;
-        // }
-
-        // if (isMatchRef(evidence.getChr(), x.first.first + 1 - 20, x.first.first + 1, evidence.getEndChr(), x.first.second - 20, x.first.second))
-        // {
-        //     continue;
-        // }
-
-        // if (isMatchRef(evidence.getChr(), x.first.first + 2 - 20, x.first.first + 1 + 2, evidence.getEndChr(), x.first.second + 20 + 2, x.first.second + 2))
-        // {
-        //     continue;
-        // }
+        if (bFrequency <= 1)
+        {
+            continue;
+        }
 
         int number = x.second.NumberOfMatchRead;
 
@@ -677,7 +589,7 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     if (evidence.getMark() == "SR")
     {
         variantresult.setMark("SR");
-        if (evidence.getFrequency() >= 2 && (bPos==0 || bEnd==0))
+        if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
         {
             if (bPos == 0 || bEnd == 0)
             {
@@ -685,14 +597,15 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
                 bEnd = evidence.getEnd();
                 bHit = evidence.getFrequency();
                 variantresult.setMapQList(*evidence.getMapQVector());
-
             }
         }
-    }else {
+    }
+    else
+    {
         variantresult.setMapQList(bMapQList);
     }
 
-     variantresult.setPos(bPos);
+    variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
     variantresult.setMapQList(*evidence.getMapQVector());
@@ -719,7 +632,6 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     {
         return;
     }
- 
 
     variantresult.setQuailtyPass(true);
 }
