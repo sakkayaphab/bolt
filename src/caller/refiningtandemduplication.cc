@@ -20,11 +20,11 @@ void RefiningTandemDuplication::execute()
     {
         return;
     }
-    // second();
-    // if (variantresult.isQuailtyPass())
-    // {
-    //     return;
-    // }
+    second();
+    if (variantresult.isQuailtyPass())
+    {
+        return;
+    }
 }
 
 void RefiningTandemDuplication::first()
@@ -138,6 +138,13 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
         for (auto n : result)
         {
+           
+                if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
+                {
+                    continue;
+                }
+            
+
             if (n.matchCount <= 4)
             {
                 continue;
@@ -150,39 +157,12 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             {
                 continue;
             }
-
-            // std::cout << "Read Pos : " << readparser.getPos() << std::endl;
-            // std::cout << "mPos : " << mPos << std::endl;
-            // std::cout << "mtEnd : " << mEnd << std::endl;
-            // std::cout << "seq : " << readparser.getSequence().substr(0,n.endseq) << std::endl;
-
-            // std::cout << "pattern : " << n.matchSeqPattern << std::endl;
-            // std::cout << "mEnd : " << mEnd << std::endl;
-            // std::cout << "---------- MD TAG ----------" << std::endl;
-
+ 
             auto rangeMapping = n.endseq;
             listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
             listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
             listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
-
-            // for (int i = 0; i < rangeMapping; i++)
-            // {
-            //     int32_t tempPos = mPos - i;
-            //     int32_t tempEnd = mEnd - i;
-
-            //     if (i > 4)
-            //     {
-            //         break;
-            //     }
-
-            //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-            //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-            //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-            //     // {
-            //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-            //     // }
-            // }
+ 
         }
     }
 
@@ -198,7 +178,7 @@ void RefiningTandemDuplication::second()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    std::cout << range << " / " << samplestat->getReadLength() << std::endl;
+    // std::cout << range << " / " << samplestat->getReadLength() << std::endl;
     refineEndToStart(range);
 }
 
@@ -298,6 +278,11 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
             {
                 continue;
             }
+
+            if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
+                {
+                    continue;
+                }
 
             int32_t mPos = n.pos;
             int32_t mEnd = n.posseq + readparser.getPosOfSeq();

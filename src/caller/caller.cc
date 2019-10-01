@@ -350,7 +350,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }

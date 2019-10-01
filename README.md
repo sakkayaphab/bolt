@@ -21,4 +21,5 @@ for [user guide][UserGuide]
 [UserGuide]:docs/README.md
 
 ## Third party software
-See LICENSE-THIRD-PARTY for details.
+See [LICENSE-THIRD-PARTY][LICENSETHIRDPARTY] for details.
+[LICENSETHIRDPARTY]:LICENSE-THIRD-PARTY
