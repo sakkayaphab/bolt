@@ -316,14 +316,14 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
         return false;
     }
 
-    // if (e.getMaxMapQ() < 15)
-    // {
-    //     return false;
-    // }
+    if (e.getMaxMapQ() < 15)
+    {
+        return false;
+    }
 
-    // if (e.getFrequency()<=1) {
-    //     return false;
-    // }
+    if (e.getFrequency()<=1) {
+        return false;
+    }
 
     return true;
 }

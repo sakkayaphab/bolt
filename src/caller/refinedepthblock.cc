@@ -303,8 +303,18 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
     {
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
+        if (n.getSvLength() < 50)
+        {
+            continue;
+        }
+
         if (n.getMark() == "SR")
         {
+            if (n.getMaxMapQ() < 50)
+            {
+                continue;
+            }
+
             cache.push_back(n);
             continue;
         }
@@ -602,8 +612,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
 
                 continue;
             }
-
-            
         }
 
         if (n.getSvLength() > 2000)
@@ -673,7 +681,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getMinMapQ()==0) {
+            if (n.getMinMapQ() == 0)
+            {
                 continue;
             }
         }
