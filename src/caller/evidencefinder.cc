@@ -117,10 +117,10 @@ void EvidenceFinder::findEvidence()
         cigar = readparser.getCigar();
 
         seDeletion.updateRead();
-        seInsertion.updateRead();
-        seInversion.updateRead();
-        seTandemDuplication.updateRead();
-        seTranslocation.updateRead();
+        // seInsertion.updateRead();
+        // seInversion.updateRead();
+        // seTandemDuplication.updateRead();
+        // seTranslocation.updateRead();
 
         //Read depth
         getRound(&currentPos, &configRound, &roundedPos);

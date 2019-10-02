@@ -350,10 +350,10 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            // if (svtype != "INV")
-            // {
-            //     continue;
-            // }
+            if (svtype != "DEL")
+            {
+                continue;
+            }
 
             while (getline(myfile, line))
             {

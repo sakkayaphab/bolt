@@ -61,13 +61,17 @@ void SampleStat::findReadLength()
     read_length = lengthSeq;
 }
 
-int32_t SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist,int32_t insertsize_avg)
+int32_t SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist, int32_t insertsize_avg, int32_t limitsize)
 {
     int count = 0;
     int64_t UPPER = 0;
 
     for (auto n : *insertlist)
     {
+        if (n > limitsize)
+        {
+            continue;
+        }
         UPPER += pow((n - (insertsize_avg)), 2);
         count++;
     }
@@ -75,12 +79,16 @@ int32_t SampleStat::findSDSampleStat(std::vector<int32_t> *insertlist,int32_t in
     return (int32_t)sqrt(UPPER / (int64_t)(count));
 }
 
-int32_t SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist)
+int32_t SampleStat::findMedianSampleStat(std::vector<int32_t> *insertlist, int32_t limitsize)
 {
     int64_t sumINS = 0;
     int64_t count = 0;
     for (auto n : *insertlist)
     {
+        if (n > limitsize)
+        {
+            continue;
+        }
         sumINS += n;
         count++;
     }
@@ -94,8 +102,12 @@ void SampleStat::execute()
     findReadLength();
     auto insertsizelist = getInsertSizeList(countMax);
 
-    int32_t avginsert = findMedianSampleStat(&insertsizelist);
-    int32_t sdinsert = findSDSampleStat(&insertsizelist,avginsert);
+    int32_t avginsert = findMedianSampleStat(&insertsizelist, 100000);
+    int32_t sdinsert = findSDSampleStat(&insertsizelist, avginsert, 100000);
+
+    avginsert = findMedianSampleStat(&insertsizelist, avginsert + (sdinsert * 3));
+    sdinsert = findSDSampleStat(&insertsizelist, avginsert, avginsert + (sdinsert * 3));
+
     insertsize_avg = avginsert;
     insertsize_sd = sdinsert;
 }
@@ -121,6 +133,11 @@ std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
         if (count > countMax)
         {
             break;
+        }
+
+        if (!(aln->core.flag & BAM_FPROPER_PAIR))
+        {
+            continue;
         }
 
         if (aln->core.tid != aln->core.mtid)
@@ -156,7 +173,6 @@ std::vector<int32_t> SampleStat::getInsertSizeList(int64_t numberofread)
             continue;
         }
 
-    
         if ((matepos - pos) > 0 && (matepos - pos) < 100000)
         {
             insertsizeList.push_back(matepos - pos);
