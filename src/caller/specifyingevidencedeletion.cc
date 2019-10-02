@@ -312,57 +312,7 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     lastPos = evidence->getLastPosDiscordantRead();
     firstEnd = evidence->getEndDiscordantRead();
     lastEnd = evidence->getEndDiscordantRead();
-
-    // if (svlength < 500)
-    // {
-    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 1) - samplestat->getSDSampleStat();
-    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
-    //     firstEndDis = evidence->getEndDiscordantRead();
-    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
-    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 1) + samplestat->getSDSampleStat();
-
-    // // return
-    // }
-    // else if (svlength < 1000)
-    // {
-    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 2) - samplestat->getSDSampleStat();
-    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 3) + samplestat->getSDSampleStat();
-    //     firstEndDis = evidence->getEndDiscordantRead();
-    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 3) - samplestat->getSDSampleStat();
-    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 2) + samplestat->getSDSampleStat();
-    //     return;
-    // }
-    // else
-    // {
-    //     firstPos = evidence->getPosDiscordantRead() - (samplestat->getReadLength() * 4) - samplestat->getSDSampleStat();
-    //     lastPos = evidence->getLastPosDiscordantRead() + (samplestat->getReadLength() * 8) + samplestat->getSDSampleStat();
-    //     firstEndDis = evidence->getEndDiscordantRead();
-    //     firstEnd = firstEndDis - (samplestat->getReadLength() * 8);
-    //     lastEnd = evidence->getLastEndDiscordantRead() + (samplestat->getReadLength() * 4);
-    //      return;
-    // }
-
-    // if (lastPos > firstEnd)
-    // {
-    //     lastPos = firstEndDis;
-    // }
-
-    // if (firstEnd < lastPos)
-    // {
-    //     firstEnd = evidence->getLastPosDiscordantRead();
-    // }
-
-    // avgPos = (firstPos + lastPos) / 2;
-    // avgEnd = (firstEnd + lastEnd) / 2;
-    // evidence->setPos(avgPos);
-    // evidence->setCiPosLeft(firstPos - avgPos);
-    // evidence->setCiPosRight(lastPos - avgPos);
-    // evidence->setEnd(avgEnd);
-    // evidence->setCiEndLeft(firstEnd - avgEnd);
-    // evidence->setCiEndRight(lastEnd - avgEnd);
-
-    // avgPos = (firstPos + lastPos) / 2;
-    // avgEnd = (firstEnd + lastEnd) / 2;
+ 
     evidence->setPos(lastPos);
     evidence->setCiPosLeft(-notUsed);
     evidence->setCiPosRight(difflengthPos);

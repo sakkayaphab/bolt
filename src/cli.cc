@@ -149,12 +149,7 @@ int Cli::callSV()
 
 int Cli::debug()
 {
-    // EditDistance ed;
-    // std::string s1 = "AABBAABBAA";
-    // std::string s2 = "AABBXXBBAAA";
-    // std::cout << ed.Compare(&s1,&s2) << std::endl;
 
-    // for (int i=0;i<2;i++) {
     // std::string  sample = "/data/users/wichadak/kan/wgsim/survi.20x.bam";
     //    std::string  reference = "/data/users/wichadak/kan/reference/ucsc_hg19.fa";
     //    std::string sample = "/data/users/wichadak/kan/sample/NA12878_S1.bam";
@@ -166,7 +161,7 @@ int Cli::debug()
 
     // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
 
-    std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
+    std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174339/ERR174339.bam";
     // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/SRR1910366/SRR1910366.bam";
 
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
@@ -196,76 +191,10 @@ int Cli::debug()
     caller.showinfo();
     // caller.setParallel(40);
     // caller.execute();
-    caller.catfile();
-    caller.findBreakPoint();
+    // caller.catfile();
+    // caller.findBreakPoint();
     caller.refineDelpthBlock();
 
-
-    // caller.mergeSplitRead();
-   
-    // caller.mergeBreakpoint();
-
-    // caller.debugEvidenceProvider();
-
-    // const char *seq = "ATACGAAAAATTAACTGGGCATGGTGGCGGTTGCCTGTAATC";
-    // Bwt Bwt;
-    // Bwt.build(seq);
-    // Bwt.printBwtStore();
-    // Bwt.setStartPosition(0);
-
-    // std::string str = "TACGAXXXX";
-    // // auto result = Bwt.findEndToStart(&str, 1, 0, 1);
-    // auto result = Bwt.findStartToEnd(&str,1,0,2);
-
-    // std::cout << "########################" << std::endl;
-    // for (auto n : result)
-    // {
-    //     std::cout << "position : " << n.getPosition()
-    //               << ", hit : "
-    //               << n.getHit()
-    //               << ", position right :" << n.getPosition()+n.getHit()
-    //               << std::endl;
-    // }
-
-    // if (result.size() > 0)
-    // {
-    //     auto b = Bwt.getResultMaxHit(&result);
-    //     std::cout << "Max >> position : " << b.getPosition()
-    //               << ", hit : "
-    //               << b.getHit()
-    //               << std::endl;
-    // }
-
-    // EvidenceList eList;
-
-    // Evidence e1;
-    // e1.setPosDiscordantRead(1000);
-    // e1.setMatePos(2000);
-    // Evidence e2;
-    // e2.setPosDiscordantRead(3000);
-    // e2.setMatePos(4000);
-    //  Evidence e3;
-    // e3.setPosDiscordantRead(10000);
-    // e3.setMatePos(11000);
-    // eList.addEvidence(e1);
-    // eList.addEvidence(e3);
-    // eList.addEvidence(e2);
-    // // std::sort(eList, eList, ValueCmp);
-    // // std::sort(eList.begin(), eList.end(), compare);
-    // eList.printinfo();
-    // std::cout << "-------------" << std::endl;
-    // eList.sort();
-    // eList.printinfo();
-
-    // uint32_t a;
-    // std::cout << a << std::endl;
-
-    //     std::sort(eList.begin(),
-    //           objs.end(),
-    //           [](const MyClass& lhs, const MyClass& rhs)
-    // {
-    //     return lhs.value < rhs.value;
-    // });
 
     return 0;
 }
