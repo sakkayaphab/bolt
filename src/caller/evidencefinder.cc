@@ -128,12 +128,12 @@ void EvidenceFinder::findEvidence()
         {
             readdepthdetail.RD++;
 
-            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
+            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 8)
             {
                 readdepthdetail.SCF++;
             }
 
-            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
+            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 8)
             {
                 readdepthdetail.SCL++;
             }
@@ -569,7 +569,7 @@ bool EvidenceFinder::isDeletion()
     {
         insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
 
-        if (insertSizeFirstRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()*3))
         {
             return true;
         }
@@ -579,7 +579,7 @@ bool EvidenceFinder::isDeletion()
     {
         insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
 
-        if (insertSizeSecondRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
+        if (insertSizeSecondRead > samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()*3))
         {
             return true;
         }

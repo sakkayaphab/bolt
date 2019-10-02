@@ -161,7 +161,7 @@ int Cli::debug()
 
     // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
 
-    std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174339/ERR174339.bam";
+    std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
     // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/SRR1910366/SRR1910366.bam";
 
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";

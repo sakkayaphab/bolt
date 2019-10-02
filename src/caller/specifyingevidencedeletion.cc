@@ -15,10 +15,6 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    // if (readparser.isProperlyAligned()) {
-    //     return;
-    // }
-
     if (readparser.getPos() > readparser.getMatePos())
     {
         return;
@@ -44,7 +40,7 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    int32_t insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
+    int32_t insertSizeFirstRead = (readparser.getMatePos() + samplestat->getReadLength()) - readparser.getPos();
 
     if (readparser.isMateUnmapped())
     {
@@ -71,9 +67,6 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    // std::cout << "2 : " << (2*samplestat->getSDSampleStat()) << std::endl;
-    // std::cout << "1 : " << (samplestat->getSDSampleStat()) << std::endl;
-
     if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (2 * samplestat->getSDSampleStat()))
     {
         checkRange();
@@ -90,12 +83,10 @@ int32_t SpecifyingEvidenceDeletion::getSVLength()
 void SpecifyingEvidenceDeletion::checkRange()
 {
     bool added = false;
-    // int32_t diff = currentMPos-currentPos+samplestat->getReadLength()-samplestat->getAverageSampleStat()+(2*currentPos+samplestat->getReadLength())+(2* samplestat->getSDSampleStat());
 
-    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(2*samplestat->getSDSampleStat()) + (samplestat->getReadLength());
-     
+    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(2 * samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
-    
 
     checkProveEvidence();
 
@@ -229,13 +220,13 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     int32_t difflengthPos = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t difflengthEnd = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
     int32_t notUsed = (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
- 
+
     int32_t merge = 0;
     firstPos = evidence->getLastPosDiscordantRead();
     lastPos = evidence->getLastPosDiscordantRead();
     firstEnd = evidence->getEndDiscordantRead();
     lastEnd = evidence->getEndDiscordantRead();
- 
+
     evidence->setPos(lastPos);
     evidence->setCiPosLeft(-notUsed);
     evidence->setCiPosRight(difflengthPos);
@@ -258,20 +249,10 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
         return false;
     }
 
-    // if (svLength < 500)
-    // {
-    //     if (evidence->getFrequency() <= 1)
-    //     {
-    //         return false;
-    //     }
-    // }
-    // else if (svLength < 2000)
-    // {
-    //     // if (evidence->getFrequency() <= 1)
-    //     // {
-    //     //     return false;
-    //     // }
-    // }
+    if (evidence->getMaxMapQ() < 30)
+    {
+        return false;
+    }
 
     return true;
 }

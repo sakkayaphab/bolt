@@ -531,9 +531,27 @@ int Caller::findBreakPoint()
     // tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
+    // float progress = 0.0;
+    // float incrementevery = float(1)/float(sizeLoop);
+    // std::cout << incrementevery << std::endl;
 
     tbb::parallel_for(0, sizeLoop, [&](int i) {
+        
+
         mxRead.lock();
+        // int barWidth = 50;
+        // // std::cout << "[";
+        // // int pos = barWidth * progress;
+        // // for (int i = 0; i < barWidth; ++i) {
+        // //     if (i < pos) std::cout << "=";
+        // //     else if (i == pos) std::cout << ">";
+        // //     else std::cout << " ";
+        // // }
+        // // std::cout << "] " << int(progress * 100.0) << " %\r";
+        // std::cout << int(progress * 100.0) << " %\r";
+        // std::cout.flush();
+
+        // progress += incrementevery;
 
         if (ep.isEmpty())
         {
