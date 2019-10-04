@@ -211,6 +211,51 @@ uint8_t Evidence::getAvgMapQ()
     return countQual / mapqlist.size();
 }
 
+
+uint8_t Evidence::getMaxRPMapQ()
+{
+    uint8_t max = 0;
+    for (auto n : rpmapqlist)
+    {
+        if (n > max)
+        {
+            max = n;
+        }
+    }
+
+    return max;
+}
+
+uint8_t Evidence::getMinRPMapQ()
+{
+    uint8_t min = 255;
+    for (auto n : rpmapqlist)
+    {
+        if (n < min)
+        {
+            min = n;
+        }
+    }
+
+    if (min == 255)
+    {
+        return 0;
+    }
+
+    return min;
+}
+
+uint8_t Evidence::getAvgRPMapQ()
+{
+    uint8_t countQual = 0;
+    for (auto n : rpmapqlist)
+    {
+        countQual += n;
+    }
+
+    return countQual / rpmapqlist.size();
+}
+
 std::vector<std::string> split(const std::string &s, char delimiter)
 {
     std::vector<std::string> tokens;
@@ -404,6 +449,7 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
 
+               
                 // else if (getKeybyText(ainfo) == "DP")
                 // {
                 //     // FREQ = atoi(ainfo.c_str());

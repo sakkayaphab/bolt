@@ -236,10 +236,10 @@ void RefiningDeletion::refineStartToEnd(const char *range)
 
             if (SCRead)
             {
-                if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
-                {
-                    continue;
-                }
+                // if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
+                // {
+                //     continue;
+                // }
             }
             else
             {
@@ -450,10 +450,10 @@ void RefiningDeletion::refineEndToStart(const char *range)
 
             if (SCRead)
             {
-                if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
-                {
-                    continue;
-                }
+                // if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
+                // {
+                //     continue;
+                // }
             }
             else
             {
@@ -554,16 +554,11 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 25)
+        if (maxMatchSize < 15)
         {
             continue;
         }
-
-        if (maxQuality == 0)
-        {
-            continue;
-        }
-
+ 
         bFrequency = x.second.NumberOfMatchRead;
 
         if (bFrequency <= 1)
@@ -608,7 +603,6 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     variantresult.setPos(bPos);
     variantresult.setEnd(bEnd);
     variantresult.setFrequency(bHit);
-    variantresult.setMapQList(*evidence.getMapQVector());
     variantresult.setRPMapQ(*evidence.getMapQVector());
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -628,10 +622,14 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
         return;
     }
 
-    if (bEnd - bPos < 20)
+    if (bEnd - bPos < 50)
     {
         return;
     }
+
+    // if (variantresult.getMaxMapQ()<30) {
+    //     return;
+    // }
 
     variantresult.setQuailtyPass(true);
 }

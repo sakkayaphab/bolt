@@ -128,12 +128,12 @@ void EvidenceFinder::findEvidence()
         {
             readdepthdetail.RD++;
 
-            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 8)
+            if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
             {
                 readdepthdetail.SCF++;
             }
 
-            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 8)
+            if (cigar.at(cigar.size() - 1).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
             {
                 readdepthdetail.SCL++;
             }
@@ -721,7 +721,7 @@ bool EvidenceFinder::isInsertion()
             return false;
         }
 
-        if (insertSizeFirstRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        if (insertSizeFirstRead < samplestat->getAverageSampleStat() - (samplestat->getSDSampleStat()*2))
         {
             return true;
         }
@@ -735,7 +735,7 @@ bool EvidenceFinder::isInsertion()
             return false;
         }
 
-        if (insertSizeSecondRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
+        if (insertSizeSecondRead < samplestat->getAverageSampleStat() - (samplestat->getSDSampleStat()*2))
         {
             return true;
         }

@@ -17,7 +17,6 @@ private:
   //config
   int countMax=100000;
 
-
   void findReadLength();
   int32_t findMedianSampleStat(std::vector<int32_t> *insertlist,int32_t limitsize,int32_t minsize);
   int32_t findSDSampleStat(std::vector<int32_t> *insertlist,int32_t insertsize_avg,int32_t limitsize,int32_t minsize);

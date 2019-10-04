@@ -499,7 +499,7 @@ int Caller::findBreakPoint()
     std::cout << "# Refine breakpoint : " << std::endl;
     std::cout << "------------------------------" << std::endl;
 
-    removeResult();
+    // removeResult();
 
     //    ReadDepthHelper readdepthHelper;
     //    readdepthHelper.loadReadDepthFile()
@@ -525,14 +525,14 @@ int Caller::findBreakPoint()
     std::mutex mxWriteFile;
     EvidenceProvider ep(&filepath);
     int sizeLoop = ep.getEvidenceSize();
-    std::cout << "sizeLoop : " << sizeLoop << std::endl;
+    // std::cout << "sizeLoop : " << sizeLoop << std::endl;
 
     int countRunEvidence = 0;
     // tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
-    // float progress = 0.0;
-    // float incrementevery = float(1)/float(sizeLoop);
+    float progress = 0.0;
+    float incrementevery = float(1)/float(sizeLoop);
     // std::cout << incrementevery << std::endl;
 
     tbb::parallel_for(0, sizeLoop, [&](int i) {
@@ -540,15 +540,14 @@ int Caller::findBreakPoint()
 
         mxRead.lock();
         // int barWidth = 50;
-        // // std::cout << "[";
-        // // int pos = barWidth * progress;
-        // // for (int i = 0; i < barWidth; ++i) {
-        // //     if (i < pos) std::cout << "=";
-        // //     else if (i == pos) std::cout << ">";
-        // //     else std::cout << " ";
-        // // }
-        // // std::cout << "] " << int(progress * 100.0) << " %\r";
-        // std::cout << int(progress * 100.0) << " %\r";
+        // std::cout << "[";
+        // int pos = barWidth * progress;
+        // for (int i = 0; i < barWidth; ++i) {
+        //     if (i < pos) std::cout << "=";
+        //     else if (i == pos) std::cout << ">";
+        //     else std::cout << " ";
+        // }
+        // std::cout << "] " << int(progress * 100.0) << " %\r";
         // std::cout.flush();
 
         // progress += incrementevery;

@@ -56,8 +56,9 @@ void RefineDepthBlock::execute()
             // result = getRefineResultDeletion(&variantlist);
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
-            result = getResultRemoveOverlapped(&variantlist, &variantlist);
-            result = getRefineResultDeletion(&result);
+            result = getRefineResultDeletion(&variantlist);
+            result = getResultRemoveOverlapped(&result, &result);
+
             // } else if (variantlist.at(0).getSVType()=="DUP") {
             //     // result = getRefineResultDuplication(&result);
         }
@@ -560,7 +561,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
     int count = 0;
     for (auto n : *master)
     {
-
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
         auto currentPos = roundNumber(n.getPos(), roundConfig);
@@ -583,22 +583,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
 
         if (n.getMark() == "SR")
         {
+            // continue;
             if (n.getFrequency() <= 1)
             {
                 continue;
-            }
-
-            if (n.getMaxMapQ() < 40)
-            {
-                continue;
-            }
-
-            if (n.getSvLength() < 100)
-            {
-                if (n.getFrequency() <= 2)
-                {
-                    continue;
-                }
             }
 
             cache.push_back(n);
@@ -606,13 +594,13 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         }
         else
         {
-
             if (n.LNGMATCH < 20)
             {
-
                 continue;
             }
         }
+
+        // continue;
 
         if (n.getSvLength() > 2000)
         {
@@ -659,7 +647,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
-        if (n.getMaxMapQ() < 40)
+        if (n.getMaxMapQ() < 20)
         {
             continue;
         }
@@ -672,19 +660,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         if (n.getFrequency() <= 1)
         {
             continue;
-        }
-
-        if (n.getSvLength() < 100)
-        {
-            if (n.getMaxMapQ() < 60)
-            {
-                continue;
-            }
-
-            if (n.getMinMapQ() == 0)
-            {
-                continue;
-            }
         }
 
         cache.push_back(n);
@@ -780,26 +755,26 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
             if (e.getPos() != 0)
             {
 
-                if (e.getMark() == "SR")
-                {
-                    cache.push_back(e);
-                }
-                else
-                {
-                    if (e.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
-                    {
-                        continue;
-                    }
+                // if (e.getMark() == "SR")
+                // {
+                //     cache.push_back(e);
+                // }
+                // else
+                // {
+                //     if (e.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 4, 1))
+                //     {
+                //         continue;
+                //     }
 
-                    if (e.getFrequency() <= 1)
-                    {
-                        continue;
-                    }
+                //     if (e.getFrequency() <= 1)
+                //     {
+                //         continue;
+                //     }
 
-                    cache.push_back(e);
-                    // cache.push_back(n);
-                    // continue;
-                }
+                cache.push_back(e);
+                // cache.push_back(n);
+                // continue;
+                // }
 
                 // if (e.getSvLength()<500 && e.getAvgMapQ()<6) {
 
@@ -819,7 +794,7 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
             //     << std::endl;
         }
         myfile.close();
-        std::cout << "End + load evidence :" << filepaht << std::endl;
+        // std::cout << "End + load evidence :" << filepaht << std::endl;
     }
 
     return cache;
