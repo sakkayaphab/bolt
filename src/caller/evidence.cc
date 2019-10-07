@@ -547,8 +547,22 @@ std::string Evidence::getInfoString()
     }
     if (getCiEndLeft()!=0 || getCiEndRight()!=0) {
            result.append("CIEND=" + std::to_string(getCiEndLeft()) + "," + std::to_string(getCiEndRight()) + ";");
-
     }
+
+    if (getPosDiscordantRead()!=0||getLastPosDiscordantRead()!=0)
+    {
+        result.append("BOLT_POS_DR=" + std::to_string(getPosDiscordantRead()) + "," + std::to_string(getLastPosDiscordantRead()) + ";");
+    }
+
+     if (getEndDiscordantRead()!=0||getLastEndDiscordantRead()!=0)
+    {
+       result.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
+    }
+
+     
+    
+
+    
 
     
 

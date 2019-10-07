@@ -561,15 +561,23 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
     int count = 0;
     for (auto n : *master)
     {
-        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
-        auto nextPos = nextNumber(n.getPos(), roundConfig);
-        auto previousPos = previousNumber(n.getPos(), roundConfig);
+        // auto currentPos = roundNumber(n.getPos(), roundConfig);
+        // auto nextPos = nextNumber(n.getPos(), roundConfig);
+        // auto previousPos = previousNumber(n.getPos(), roundConfig);
 
-        auto currentRD = rdf.getBlock(currentPos);
-        auto nextRD = rdf.getBlock(nextPos);
-        auto previousRD = rdf.getBlock(previousPos);
+        // auto currentRD = rdf.getBlock(currentPos);
+        // auto nextRD = rdf.getBlock(nextPos);
+        // auto previousRD = rdf.getBlock(previousPos);
+
+        // auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        // auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        // auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+
+        // auto currentEndRD = rdf.getBlock(currentEnd);
+        // auto nextEndRD = rdf.getBlock(nextEnd);
+        // auto previousEndRD = rdf.getBlock(previousEnd);
 
         if (n.getSvLength() < 50)
         {
@@ -589,6 +597,57 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
+            if (n.getMaxRPMapQ() < 60)
+            {
+                continue;
+            }
+
+            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 20, 1))
+            {
+                continue;
+            }
+
+            // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) && n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
+            // {
+            //     continue;
+            // }
+
+        //     if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2 && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2)
+        // {
+        //     continue;
+        // }
+
+            cache.push_back(n);
+            continue;
+        }
+        else if (n.getMark() == "SDEL")
+        {
+            // continue;
+            if (n.getFrequency() <= 1)
+            {
+                continue;
+            }
+
+            if (n.getMaxMapQ() < 60)
+            {
+                continue;
+            }
+
+            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 10, 1))
+            {
+                continue;
+            }
+
+            // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) && n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
+            // {
+            //     continue;
+            // }
+
+        //     if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2 && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2)
+        // {
+        //     continue;
+        // }
+
             cache.push_back(n);
             continue;
         }
@@ -600,52 +659,63 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
+        if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 5, 1))
+        {
+            continue;
+        }
+
         // continue;
 
-        if (n.getSvLength() > 2000)
-        {
-            if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
-            {
-                continue;
-            }
+        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2 && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr())*2)
+        // {
+        //     continue;
+        // }
 
-            if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
-            {
-                continue;
-            }
+        // if (n.getSvLength() > 2000)
+        // {
+        //     if (currentRD.INS1 + currentRD.INS2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
-            {
-                continue;
-            }
-        }
+        //     if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-        auto currentEnd = roundNumber(n.getEnd(), roundConfig);
-        auto nextEnd = nextNumber(n.getEnd(), roundConfig);
-        auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+        //     if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-        auto currentEndRD = rdf.getBlock(currentEnd);
-        auto nextEndRD = rdf.getBlock(nextEnd);
-        auto previousEndRD = rdf.getBlock(previousEnd);
+        //     if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
+        // }
 
-        bool endpass = true;
-        if (n.getSvLength() > 2000)
-        {
-            if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
-            {
-                continue;
-            }
+        // if (n.getSvLength() > 2000)
+        // {
+        //     if (currentEndRD.INS1 + currentEndRD.INS2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentEndRD.TRA1 + currentEndRD.TRA2 >= n.getFrequency())
-            {
-                continue;
-            }
+        //     if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
-            {
-                continue;
-            }
-        }
+        //     if (currentEndRD.TRA1 + currentEndRD.TRA2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
+
+        //     if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
+        // }
 
         if (n.getMaxMapQ() < 20)
         {

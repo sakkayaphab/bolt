@@ -347,6 +347,11 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         return true;
     }
 
+    if (e.getMark() == "SDEL")
+    {
+        return true;
+    }
+
     if (cachechr != e.getChr())
     {
         loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt");

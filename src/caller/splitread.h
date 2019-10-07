@@ -18,6 +18,7 @@ private:
 
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDUP;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
+   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallDEL;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
 
   std::vector<Evidence> vecINV;
@@ -29,15 +30,17 @@ public:
   void updateRead();
   void findTandemDuplication();
   void findDeletion();
+  void findDeletionInRead();
   void findInversion();
   void printResult();
   void removeDuplicateResult(std::vector<Evidence> *vec);
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   int writeFile(Evidence vr);
   void printDeletion();
+  void printSmallDeletion();
   void printDuplication();
   void printInversion();
-  std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype);
+  std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype,std::string mark);
   void mergeEvidence(std::vector<Evidence> *elist);
   void setAllCIEvidence(std::vector<Evidence> *elist,int32_t rangePos);
   void filterEvidenceList(std::vector<Evidence> *elist);
@@ -45,6 +48,8 @@ public:
   void filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t min);
     void filterMapQLowerThan(uint8_t mapq,std::vector<Evidence> *elist);
      void filterFrequencyLowerThan(int number,std::vector<Evidence> *elist);
+
+     bool haveSmallDeletion();
 
 
   

@@ -72,7 +72,6 @@ void SpecifyingEvidenceDeletion::updateRead()
         checkRange();
         return;
     }
-
 }
 
 int32_t SpecifyingEvidenceDeletion::getSVLength()
@@ -217,22 +216,40 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     int32_t lastEnd = 0;
     int32_t avgEnd = 0;
 
-    int32_t difflengthPos = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t notUsed = (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-
     int32_t merge = 0;
-    firstPos = evidence->getLastPosDiscordantRead();
     lastPos = evidence->getLastPosDiscordantRead();
     firstEnd = evidence->getEndDiscordantRead();
-    lastEnd = evidence->getEndDiscordantRead();
+
+    int32_t insertsize_max = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 3);
+
+    int32_t difflengthPos = (evidence->getPosDiscordantRead() + insertsize_max) - evidence->getLastPosDiscordantRead();
+    int32_t difflengthEnd = insertsize_max - (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead());
 
     evidence->setPos(lastPos);
-    evidence->setCiPosLeft(-notUsed);
+    int32_t setCiPosLeft = (evidence->getLastPosDiscordantRead() - evidence->getPosDiscordantRead());
+    if (setCiPosLeft > samplestat->getReadLength())
+    {
+        evidence->setCiPosLeft(-(setCiPosLeft));
+    }
+    else
+    {
+        evidence->setCiPosLeft(-(samplestat->getReadLength()));
+    }
+
     evidence->setCiPosRight(difflengthPos);
     evidence->setEnd(firstEnd);
-    evidence->setCiEndLeft(-difflengthEnd);
-    evidence->setCiEndRight(notUsed);
+
+    int32_t setCiEndRight = (evidence->getLastEndDiscordantRead() - evidence->getEndDiscordantRead());
+    if (setCiEndRight > samplestat->getReadLength())
+    {
+        evidence->setCiEndRight((setCiEndRight));
+    }
+    else
+    {
+        evidence->setCiEndRight((samplestat->getReadLength()));
+    }
+
+    evidence->setCiEndLeft(-(difflengthEnd));
 }
 
 bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
@@ -249,10 +266,10 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
         return false;
     }
 
-    if (evidence->getMaxMapQ() < 30)
-    {
-        return false;
-    }
+    // if (evidence->getMaxMapQ() < 30)
+    // {
+    //     return false;
+    // }
 
     return true;
 }

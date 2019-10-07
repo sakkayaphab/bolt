@@ -21,7 +21,11 @@ void RefiningDeletion::execute()
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
 
-    // std::cout << "evidence : " << evidence.getPos() << " - " << evidence.getEnd() << std::endl;
+    if (evidence.getMark()=="SDEL") {
+        variantresult = evidence;
+        variantresult.setQuailtyPass(true);
+        return;
+    }
 
     prepareBamReader();
     first();
@@ -159,11 +163,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         {
             continue;
 
-            // if (haveIndel(cigar)) {
+            if (haveIndel(cigar)) {
 
-            // }else {
-            //     continue;
-            // }
+            }else {
+                continue;
+            }
 
             SCsize = 0;
             // if (evidence.getSvLength()<250) {
@@ -566,6 +570,8 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
             continue;
         }
 
+        // std::cout << x.first.first << " = " << x.first.second << std::endl;
+
         int number = x.second.NumberOfMatchRead;
 
         int score = (number) * (2 * maxMatchSize);
@@ -607,6 +613,11 @@ void RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int3
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     variantresult.LNGMATCH = bMaxMatchSize;
+    
+    variantresult.setPosDiscordantRead(evidence.getPosDiscordantRead());
+    variantresult.setLastPosDiscordantRead(evidence.getLastPosDiscordantRead());
+    variantresult.setEndDiscordantRead(evidence.getEndDiscordantRead());
+    variantresult.setLastEndDiscordantRead(evidence.getLastEndDiscordantRead());
 
     if (bPos == 0)
     {
