@@ -579,7 +579,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         // auto nextEndRD = rdf.getBlock(nextEnd);
         // auto previousEndRD = rdf.getBlock(previousEnd);
 
-        if (n.getSvLength() < 50)
+        if (n.getSvLength() < 30)
         {
             continue;
         }
@@ -602,10 +602,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 20, 1))
-            {
-                continue;
-            }
+            // if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 20, 1))
+            // {
+            //     continue;
+            // }
 
             // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) && n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
             // {
@@ -633,10 +633,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 10, 1))
-            {
-                continue;
-            }
+            // if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 1, 10, 1))
+            // {
+            //     continue;
+            // }
 
             // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) && n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()))
             // {

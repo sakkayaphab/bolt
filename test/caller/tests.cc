@@ -9,17 +9,31 @@
 #include "caller/stringsearch.h"
 #include "caller/stringsearchalignment.h"
 
-//TEST(FilePathTest, getFilePathName)
-//{
-//    std::string samplepath = "file.bam";
+TEST(FilePathTest, getFilePathName)
+{
+   std::string samplepath = "file.bam";
+   std::string refpath = "file.fasta";
+   std::string output = "tempout";
+   FileManager fp(samplepath, refpath, output);
+
+   ASSERT_EQ("file.bam", fp.getSamplePath());
+   ASSERT_EQ("file.fasta", fp.getReferencePath());
+   ASSERT_EQ("tempout", fp.getOutputPath());
+}
+
+// TEST(TestSplitRead, testIndelInReads)
+// {
+//    std::string samplepath = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.chr1_231869234-231869675.bam";
 //    std::string refpath = "file.fasta";
 //    std::string output = "tempout";
 //    FileManager fp(samplepath, refpath, output);
-//
+
 //    ASSERT_EQ("file.bam", fp.getSamplePath());
 //    ASSERT_EQ("file.fasta", fp.getReferencePath());
 //    ASSERT_EQ("tempout", fp.getOutputPath());
-//}
+// }
+
+
 //
 //TEST(FilePathTest, getFilePathNameGen)
 //{
@@ -114,26 +128,26 @@
 //     // }
 // }
 
-TEST(Aligment, alignDeletionTargetAtStart)
-{
-    std::string ref = "AGGGTGCTAGGTCCTGGGGATACAGCAGTGAGGTCCTTGGTCTCCCAGGGCTTGCTCGGGAACCAGGTGTCCCTCCCATGGGATTCTCGTGTGCTCCCTGGTTATAGCAAGTGCTGTGCTGTGTTTTCGTGATCTGGCTACATGTCTGTTCTCCCCACTAGACCAAGGAGCTTCTCAAGGAGAGAGTCTGAGTCTTCCATTTCTGTATCCCATAACACCTAGTGTTGGGTATATGGAAGGTTCTTTAGAACTGAATAAATGAACTAAAGGGGAGAACAGACCCAGGCCTGCTGATCCCAGGATCAATATGAAATGGGGCAAAGGAGTATTGAGGCAGCTTTTCAGATTCAAAAGCCAAGCTAGCAACAAGTCCCTGGTACAGGGTCTGTGGCTACTGTCAAGGACTGGGCTGTGTGGCCTGGGGACCAACTCACTCCTCTTTTCCTGCCAGTGTGTAGGAGCGGATCCAGGGGTTGGGCACAGACAGCCTGGGGGCCAGG";
-    std::string seq = "CTGGACTACACCTAAAACCAAAACCACTGAGTAAGATTTTTTCATTTTGTGAAAGTTCTGCCAATTTTGCTTAAGTAGAACTGAATAAATGAACTAAAGG";
+// TEST(Aligment, alignDeletionTargetAtStart)
+// {
+//     std::string ref = "AGGGTGCTAGGTCCTGGGGATACAGCAGTGAGGTCCTTGGTCTCCCAGGGCTTGCTCGGGAACCAGGTGTCCCTCCCATGGGATTCTCGTGTGCTCCCTGGTTATAGCAAGTGCTGTGCTGTGTTTTCGTGATCTGGCTACATGTCTGTTCTCCCCACTAGACCAAGGAGCTTCTCAAGGAGAGAGTCTGAGTCTTCCATTTCTGTATCCCATAACACCTAGTGTTGGGTATATGGAAGGTTCTTTAGAACTGAATAAATGAACTAAAGGGGAGAACAGACCCAGGCCTGCTGATCCCAGGATCAATATGAAATGGGGCAAAGGAGTATTGAGGCAGCTTTTCAGATTCAAAAGCCAAGCTAGCAACAAGTCCCTGGTACAGGGTCTGTGGCTACTGTCAAGGACTGGGCTGTGTGGCCTGGGGACCAACTCACTCCTCTTTTCCTGCCAGTGTGTAGGAGCGGATCCAGGGGTTGGGCACAGACAGCCTGGGGGCCAGG";
+//     std::string seq = "CTGGACTACACCTAAAACCAAAACCACTGAGTAAGATTTTTTCATTTTGTGAAAGTTCTGCCAATTTTGCTTAAGTAGAACTGAATAAATGAACTAAAGG";
 
-    StringSearchAlignment ssa;
-    ssa.setReference(ref);
-    ssa.setSVType("DELEND");
-    ssa.setPosReference(66537691);
-    ssa.buildReference();
-    StringSearchConfig ssc;
-    std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtStart(&seq,&ssc);
-    for (auto n : result)
-    {
-        int32_t mPos = n.posseq + 66530331;
-        int32_t mEnd = n.pos;
+//     StringSearchAlignment ssa;
+//     ssa.setReference(ref);
+//     ssa.setSVType("DELEND");
+//     ssa.setPosReference(66537691);
+//     ssa.buildReference();
+//     StringSearchConfig ssc;
+//     std::vector<StringSearch::Score> result = ssa.alignDeletionTargetAtStart(&seq,&ssc);
+//     for (auto n : result)
+//     {
+//         int32_t mPos = n.posseq + 66530331;
+//         int32_t mEnd = n.pos;
 
-        std::cout << mPos << " = " << mEnd << std::endl;
-    }
-}
+//         std::cout << mPos << " = " << mEnd << std::endl;
+//     }
+// }
 
 // TEST(Aligment, alignDeletionTargetAtEnd)
 // {

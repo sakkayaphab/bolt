@@ -3,6 +3,8 @@
 
 #include "configuration.h"
 #include <stdint.h>
+#include <string>
+
 class Configuration
 {
 private:
@@ -10,18 +12,10 @@ private:
 
 public:
     Configuration();
+    std::string mode;
 
-public:
-    struct PE_DELETION
-    {
-        int32_t MININUM_READ_SMALL = 0;
-        int32_t MININUM_READ_MEDIUM = 0;
-        int32_t MININUM_READ_LARGE = 0;
-        int8_t MININUM_MAPQ_SMALL = 0;
-        int8_t MININUM_MAPQ_MEDIUM = 0;
-        int8_t MININUM_MAPQ_LARGE = 0;
-    };
-    
+    void setMode(std::string mode);
+    void getMode(std::string mode);
 };
 
 #endif

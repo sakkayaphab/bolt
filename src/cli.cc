@@ -147,9 +147,9 @@ int Cli::callSV()
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     // caller.setParallel(40);
-    // caller.execute();
-    // caller.catfile();
-    // caller.findBreakPoint();
+    caller.execute();
+    caller.catfile();
+    caller.findBreakPoint();
     caller.refineDelpthBlock();
 
     return 0;
@@ -169,9 +169,14 @@ int Cli::debug()
 
     // std::string sample = "/home/sakkayaphab/kan/sample/Sim-A_30x_bwa.bam";
 
+   
     // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/ERR174338/ERR174338.bam";
     // std::string sample =  "/home/sakkayaphab/kan/sample/com/sample/SRR1910366/SRR1910366.bam";
-    std::string sample = "/data/users/duangdao/kan/sample/SRR1910366/SRR1910366_rg.bam";
+    // std::string sample = "/data/users/duangdao/kan/sample/SRR1910366/SRR1910366_rg.bam";
+    // std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.chr1_231869234-231869675.bam";
+    // std::string sample = "/data/users/duangdao/kan/sample/SRR1910366/SRR1910366_chr1.231869234-231869675.bam";
+    //  std::string sample =  "/data/users/duangdao/kan/sample/ERR174338/ERR174338_chr1.244746140-244746291.bam";
+std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
 
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
     // std::string sample = "/home/sakkayaphab/kan/sra/sratoolkit.2.9.6-centos_linux64/bin/SRR390728.bam";
@@ -181,14 +186,15 @@ int Cli::debug()
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly19.fasta";
     //  std::string reference = "/home/sakkayaphab/kan/reference/ucsc_hg19.fa";
     // std::string reference = "/home/sakkayaphab/kan/reference/hs37d5.fa";
-    std::string reference = "/data/users/duangdao/kan/reference/hs37d5.fa";
+    // std::string reference = "/data/users/duangdao/kan/reference/hs37d5.fa";
+    std::string reference = "/data/users/duangdao/kan/reference/GRCh38_full_plus_hs38d1_analysis_set_minus_alts/GRCh38_full_plus_hs38d1_analysis_set_minus_alts.fa";
 
     //   std::string reference = "/home/sakkayaphab/kan/reference/GRCh38_full_plus_hs38d1_analysis_set_minus_alts/GRCh38_full_plus_hs38d1_analysis_set_minus_alts.fa";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens/NCBI/GRCh38Decoy/Sequence/WholeGenomeFasta/genome.fa";
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly18.fasta";
     // std::string reference = "/data/users/wichadak/kan/reference/ucsc_hg19.fa";
     // std::string output = "na12878";
-    std::string output = "/data/users/duangdao/kan/bolt/temp";
+    std::string output = "/data/users/duangdao/kan/bolt/temp1";
     // std::string output = "/data/users/wichadak/kan/bolt/temp";
     // std::string output = "/data/users/wichadak/kan/bolt/temp";
     // std::string output = "temp100";
@@ -200,8 +206,8 @@ int Cli::debug()
     Caller caller(sample, reference, output);
     caller.showinfo();
     // caller.setParallel(40);
-    caller.execute();
-    caller.catfile();
+    // caller.execute();
+    // caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 

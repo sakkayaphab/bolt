@@ -305,7 +305,6 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
 
 void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
 {
-
     //checkNormalRead
     checkNormalRead(rdd);
 

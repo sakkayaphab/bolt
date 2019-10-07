@@ -17,7 +17,7 @@ void SplitRead::updateRead()
     {
         return;
     }
-    
+
     findInversion();
     findDeletion();
     findTandemDuplication();
@@ -117,68 +117,40 @@ void SplitRead::findInversion()
 void SplitRead::findDeletionInRead()
 {
     std::vector<ReadParser::Cigar> cigar = readparser->getCigar();
-    // if (cigar.size() > 3)
-    // {
-    //     return;
-    // }
 
     if (cigar.size() <= 2)
     {
         return;
     }
 
-    int increment = 0;
-    // if (cigar.at(0).getOperatorName() == 'S')
-    // {
-    //     increment = 1;
-    // }
+    // CIGAR = 20S71M6D43M54D117M = 20 + 71(M) + 43(M) + 117(M)
+    int32_t incrementPos = 0;
 
-
-    if (cigar.at(0+increment).getOperatorName() == 'M' && cigar.at(1+increment).getOperatorName() == 'D' && cigar.at(2+increment).getOperatorName() == 'M')
+    for (int i = 0; i < cigar.size(); i++)
     {
+        if (cigar.at(i).getOperatorName() == 'M')
+        {
+            incrementPos += cigar.at(i).getLength();
+        }
 
-    }else {
-        return;
-    }
+        if (cigar.at(i).getOperatorName() == 'D')
+        {
 
-    if (cigar.at(1).getLength()<50) {
-        return;
-    }
+            if (cigar.at(i).getLength() > 10)
+            {
 
-    
+                mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead++;
+                mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
+                mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
 
-    int32_t posDel = 0;
-    int32_t indelpos = 0;
-    int32_t indelend = 0;
-    int32_t sizevariant = 0;
+                // std::cout << "D" << cigar.at(i).getLength() << " " 
+                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength() 
+                // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
+                // << std::endl;
+            }
 
-    indelpos = readparser->getPos() + cigar.at(0).getLength();
-    indelend = readparser->getPos() + cigar.at(0).getLength()+ cigar.at(1).getLength();
-    sizevariant = cigar.at(1).getLength();
-    if (sizevariant<50) {
-        return;
-    }
-
-    if (sizevariant>1000000) {
-        return;
-    }
-    std::cout << "----- " << readparser->getChromosomeNameString() <<  " ------" << std::endl;
-
-    for (auto n:cigar) {
-        std::cout << n.getOperatorName() << n.getLength();
-    }
-
-    std::cout << std::endl;
-
-    std::cout << indelpos << std::endl;
-    std::cout << indelend << std::endl;
-    std::cout << "-----------" << std::endl;
-
-    if (indelpos != 0 && indelend != 0)
-    {
-        mapSmallDEL[std::make_pair(indelpos, indelend)].NumberOfMatchRead++;
-        mapSmallDEL[std::make_pair(indelpos, indelend)].MatchLists.push_back(sizevariant);
-        mapSmallDEL[std::make_pair(indelpos, indelend)].MapQLists.push_back(readparser->getMapQuality());
+            incrementPos += cigar.at(i).getLength();
+        }
     }
 }
 
@@ -239,16 +211,8 @@ void SplitRead::findDeletion()
             continue;
         }
 
-        // if (sa.mapQ<30) {
-        //     continue;
-        // }
-
         if (readparser->getPos() < sa.pos)
         {
-            // if (sa.pos - readparser->getPos() > (samplestate->getReadLength()*1.5))
-            // {
-            //     continue;
-            // }
 
             if (readparser->isReverse() && sa.strand == "-")
             {
@@ -271,6 +235,8 @@ void SplitRead::findDeletion()
 
             if (sa.cigar.at(0).getOperatorName() == 'S' && sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'M')
             {
+
+                // std::cout << readparser->getEnd() << " = " << sa.pos << std::endl;
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(sa.cigar.at(sa.cigar.size() - 1).getLength());
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
@@ -437,12 +403,13 @@ void SplitRead::mergeEvidence(std::vector<Evidence> *vecTemp)
         bool incremented = false;
         for (int32_t i = 0; i < newEvidenceTempList.size(); i++)
         {
-            if (checkBetween(m.getPos(), newEvidenceTempList.at(i).getPos(), samplestate->getReadLength()) && checkBetween(m.getEnd(), newEvidenceTempList.at(i).getEnd(), samplestate->getReadLength()))
+            if (checkBetween(m.getPos(), newEvidenceTempList.at(i).getPos(), 2) && checkBetween(m.getEnd(), newEvidenceTempList.at(i).getEnd(), 2))
             {
                 incremented = true;
                 for (auto x : *m.getMapQVector())
                 {
                     newEvidenceTempList.at(i).addMapQ(x);
+                    newEvidenceTempList.at(i).incrementFrequency();
                 }
                 break;
             }
@@ -564,7 +531,7 @@ void SplitRead::printDuplication()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp, samplestate->getReadLength());
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp, 100);
+    // filterLengthMinEvidenceList(&vecTemp, 100);
     filterLengthMaxEvidenceList(&vecTemp, samplestate->getReadLength() * 2);
 
     for (auto x : vecTemp)
@@ -579,7 +546,7 @@ void SplitRead::printInversion()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp, samplestate->getReadLength() * 2);
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp, 50);
+    // filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
     filterFrequencyLowerThan(1, &vecTemp);
     // filterMapQLowerThan(60, &vecTemp);
@@ -593,7 +560,7 @@ void SplitRead::printInversion()
 void SplitRead::printSmallDeletion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapSmallDEL, "DEL", "SDEL");
-    mergeEvidence(&vecTemp);
+    // mergeEvidence(&vecTemp);
     filterFrequencyLowerThan(1, &vecTemp);
 
     for (auto x : vecTemp)
@@ -608,12 +575,14 @@ void SplitRead::printDeletion()
     mergeEvidence(&vecTemp);
     setAllCIEvidence(&vecTemp, samplestate->getReadLength() * 2);
     filterEvidenceList(&vecTemp);
-    filterLengthMinEvidenceList(&vecTemp, 50);
+    // filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
     filterFrequencyLowerThan(1, &vecTemp);
 
     for (auto x : vecTemp)
     {
+                std::cout << x.getResultVcfFormatString() << std::endl;
+
         writeFile(x);
     }
 }
