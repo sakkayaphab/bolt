@@ -67,7 +67,9 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (2 * samplestat->getSDSampleStat()))
+    // std::cout << samplestat->getAverageSampleStat() + int32_t(1.282 * double(samplestat->getSDSampleStat())) << std::endl;
+
+    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + int32_t(1.282 * double(samplestat->getSDSampleStat())))
     {
         checkRange();
         return;

@@ -146,7 +146,7 @@ int Cli::callSV()
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
-    // caller.setParallel(40);
+    caller.setParallel(40);
     // caller.execute();
     // caller.catfile();
     // caller.findBreakPoint();

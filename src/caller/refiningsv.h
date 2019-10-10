@@ -84,6 +84,8 @@ public:
   void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
 
   bool haveIndel(std::vector<ReadParser::Cigar> cigar);
+
+  Evidence getBestResult(Evidence r1, Evidence r2);
 };
 
 #endif

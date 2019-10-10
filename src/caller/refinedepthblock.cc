@@ -584,6 +584,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
+        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 3 && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 3)
+        {
+            continue;
+        }
+
         if (n.getMark() == "SR")
         {
 
@@ -598,12 +603,21 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
             {
                 continue;
             }
 
-  
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            {
+                continue;
+            }
+
+            if (n.getSvLength() < 20)
+            {
+                continue;
+            }
+
             cache.push_back(n);
             continue;
         }
@@ -620,7 +634,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
             {
                 continue;
             }
@@ -629,7 +643,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             {
                 continue;
             }
- 
 
             cache.push_back(n);
             continue;
@@ -651,10 +664,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
 
         // continue;
 
-        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2 && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
-        // {
-        //     continue;
-        // }
+        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) && currentEndRD.depth > readDepthStat.getReadDepthByChr(n.getChr()))
+        {
+            continue;
+        }
 
         if (n.getSvLength() > 2000)
         {
@@ -702,11 +715,17 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             }
         }
 
-        if (n.getMaxMapQ() < 20)
+        if (n.getMaxMapQ() < 30)
         {
             continue;
         }
+ 
 
+        if (n.getMaxRPMapQ() < 30)
+        {
+            continue;
+        }
+ 
         if (n.getSvLength() > 1000000)
         {
             continue;
@@ -717,12 +736,20 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-        if (n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
         {
             continue;
         }
 
-        if (n.getSvLength() < 50)
+        if (n.getSvLength() < 500)
+        {
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 15, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 15, 100, 1))
+            {
+                continue;
+            }
+        }
+
+        if (n.getSvLength() < 20)
         {
             continue;
         }
@@ -784,13 +811,15 @@ std::vector<Evidence> RefineDepthBlock::getResultRemoveOverlapped(std::vector<Ev
         bool found = false;
         for (auto m : cache)
         {
-            if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
-            {
-                continue;
-            }
+            // if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
+            // {
+            //     found = true;
+            //     continue;
+            // }
 
-            if (m.getPos() - 100 <= n.getPos() && n.getPos() <= m.getPos() + 100)
+            if (checkBetween(n.getPos(), m.getPos(), 10) && checkBetween(n.getEnd(), m.getEnd(), 10))
             {
+                std::cout << n.getChr() << " " << n.getPos() << " " << m.getEnd() << std::endl;
                 found = true;
                 break;
             }
@@ -803,6 +832,21 @@ std::vector<Evidence> RefineDepthBlock::getResultRemoveOverlapped(std::vector<Ev
     }
 
     return cache;
+}
+
+bool RefineDepthBlock::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
+{
+    if (targetPos - overlapped > pos)
+    {
+        return false;
+    }
+
+    if (targetPos + overlapped < pos)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepaht)

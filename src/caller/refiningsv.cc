@@ -4,6 +4,33 @@ RefiningSV::RefiningSV()
 {
 }
 
+Evidence RefiningSV::getBestResult(Evidence r1, Evidence r2)
+{
+
+    if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
+    {
+        Evidence result;
+        return result;
+    }
+
+    if (r1.isQuailtyPass() && r2.isQuailtyPass())
+    {
+        if (r1.LNGMATCH > r2.LNGMATCH)
+        {
+            return r1;
+        }
+
+        return r2;
+    }
+
+    if (r1.isQuailtyPass())
+    {
+        return r1;
+    }
+
+    return r2;
+}
+
 RefiningSV::~RefiningSV()
 {
 

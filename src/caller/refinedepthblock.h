@@ -37,6 +37,8 @@ public:
   int32_t nextNumber(int32_t number,int32_t round);
   int32_t previousNumber(int32_t number,int32_t round);
   int getDivider(int value,int top,int down,int minimum);
+
+  bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
 };
 
 #endif

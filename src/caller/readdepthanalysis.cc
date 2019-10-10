@@ -156,10 +156,10 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
 
-    if (e.getMaxMapQ() < 20)
-    {
-        return false;
-    }
+    // if (e.getMaxMapQ() < 20)
+    // {
+    //     return false;
+    // }
 
     if (e.getFrequency() <= 1)
     {
@@ -170,20 +170,20 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     {
 
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 50, 1))
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 5, 100, 1))
     {
         return false;
     }
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    {
-        return false;
-    }
+    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    // {
+    //     return false;
+    // }
 
-    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    {
-        return false;
-    }
+    // if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    // {
+    //     return false;
+    // }
 
     if (sumStartSCL <= 1 && sumStartSCF <= 1)
     {

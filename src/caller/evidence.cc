@@ -245,6 +245,11 @@ uint8_t Evidence::getMinRPMapQ()
     return min;
 }
 
+int  Evidence::getNumberOfRP()
+{
+    return rpmapqlist.size();
+}
+
 uint8_t Evidence::getAvgRPMapQ()
 {
     uint8_t countQual = 0;

@@ -24,7 +24,7 @@ public:
   RefiningInversion();
   void execute();
   Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
-  Evidence getBestResult(Evidence r1, Evidence r2);
+  
 };
 
 #endif

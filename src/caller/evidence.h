@@ -218,6 +218,7 @@ public:
   uint8_t getMaxRPMapQ();
   uint8_t getMinRPMapQ();
   uint8_t getAvgRPMapQ();
+  int getNumberOfRP();
 
   int32_t getSvLength();
   std::string getSVType();

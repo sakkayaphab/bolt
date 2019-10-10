@@ -62,7 +62,7 @@ void SpecifyingEvidenceInsertion::updateRead()
             return;
         }
 
-        if (diff < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat())
+        if (diff < samplestat->getAverageSampleStat() - (2*samplestat->getSDSampleStat()))
         {
             checkRange();
         }
