@@ -163,7 +163,7 @@ int Cli::debug()
     //    std::string sample = "/data/users/wichadak/kan/sample/NA12878_S1.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/G2223.remdup.uniqMap.TS.bam";
     // std::string sample = "/home/sakkayaphab/kan/wgsim/hx1f4s4full_3rdfixedv2.bam";
-    // std::string sample = "/home/sakkayaphab/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
+    std::string sample = "/home/sakkayaphab/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878_S1.bam";
     // std::string sample = "/home/sakkayaphab/kan/sample/G5091.bam";
 
@@ -176,7 +176,7 @@ int Cli::debug()
     // std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.chr1_231869234-231869675.bam";
     // std::string sample = "/data/users/duangdao/kan/sample/SRR1910366/SRR1910366_chr1.231869234-231869675.bam";
     //  std::string sample =  "/data/users/duangdao/kan/sample/ERR174338/ERR174338_chr1.244746140-244746291.bam";
-std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
+// std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs38d1_analysis_set_minus_alts.300x.bam";
 
     // std::string sample = "/home/sakkayaphab/kan/sample/NA12878.hiseq.wgs.bwa.raw.bam";
     // std::string sample = "/home/sakkayaphab/kan/sra/sratoolkit.2.9.6-centos_linux64/bin/SRR390728.bam";
@@ -194,20 +194,20 @@ std::string sample = "/data/users/duangdao/kan/sample/HG001.GRCh38_full_plus_hs3
     // std::string reference = "/home/sakkayaphab/kan/reference/Homo_sapiens_assembly18.fasta";
     // std::string reference = "/data/users/wichadak/kan/reference/ucsc_hg19.fa";
     // std::string output = "na12878";
-    std::string output = "/data/users/duangdao/kan/bolt/temp1";
+    // std::string output = "/data/users/duangdao/kan/bolt/temp1";
     // std::string output = "/data/users/wichadak/kan/bolt/temp";
     // std::string output = "/data/users/wichadak/kan/bolt/temp";
     // std::string output = "temp100";
-    // std::string output = "temp50";
+    std::string output = "temp";
     // std::string name = "hello";
     // std::cout << name.substr(0,name.size()) << std::endl;
     // return 0;
 
     Caller caller(sample, reference, output);
     caller.showinfo();
-    // caller.setParallel(40);
-    // caller.execute();
-    // caller.catfile();
+    caller.setParallel(40);
+    caller.execute();
+    caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 

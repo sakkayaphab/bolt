@@ -33,6 +33,12 @@ protected:
   Evidence evidence;
 
 public:
+  struct AlternativeSA
+  {
+    std::string chr;
+    int32_t pos=0;
+  };
+
   struct MatchRead
   {
     std::string poschr;
@@ -45,6 +51,7 @@ public:
     int32_t maxSC = 0;
     int32_t maxAlterSC = 0;
     bool alignWithSoftClipped = false;
+    std::vector<AlternativeSA> AltSA;
   };
 
 public:
@@ -84,8 +91,7 @@ public:
   void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
 
   bool haveIndel(std::vector<ReadParser::Cigar> cigar);
-
-  Evidence getBestResult(Evidence r1, Evidence r2);
+  int32_t getDivider(int value, int top, int down, int minimum);
 };
 
 #endif

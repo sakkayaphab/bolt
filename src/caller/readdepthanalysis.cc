@@ -156,11 +156,7 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
 
-    // if (e.getMaxMapQ() < 20)
-    // {
-    //     return false;
-    // }
-
+   
     if (e.getFrequency() <= 1)
     {
         return false;
@@ -170,25 +166,15 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
     {
 
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 5, 100, 1))
+    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 100, 1))
     {
         return false;
     }
 
-    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    // {
-    //     return false;
-    // }
-
-    // if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    // {
-    //     return false;
-    // }
-
-    if (sumStartSCL <= 1 && sumStartSCF <= 1)
-    {
+    if (sumStartSCL<=1 && sumEndSCF<=1) {
         return false;
     }
+ 
 
     return true;
 }
@@ -309,10 +295,16 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
         return false;
     }
 
+     if (e.getFrequency() <= 1)
+    {
+        return false;
+    }
+
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
+
     }
-    else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 1, 20, 1))
+    else if (e.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 100, 1))
     {
         return false;
     }
@@ -322,20 +314,12 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
         return false;
     }
 
-    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 8))
     {
         return false;
     }
 
-    if (e.getMaxMapQ() < 15)
-    {
-        return false;
-    }
-
-    if (e.getFrequency() <= 1)
-    {
-        return false;
-    }
+   
 
     return true;
 }
@@ -366,14 +350,13 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     setFocusReadDepth(e.getEndDiscordantRead() - configRound, e.getLastEndDiscordantRead() + configRound, &endFocusReadDepth);
     collectNewData();
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800)
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800 && getReadDepthAverageFocusArea(&endFocusReadDepth)>800)
     {
         return false;
     }
 
     if (e.getVariantType() == "DEL")
     {
-
         return filterDeletion(e);
     }
 

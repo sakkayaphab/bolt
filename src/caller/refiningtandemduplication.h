@@ -15,10 +15,14 @@ private:
   void refineStartToEnd(const char *range);
   void refineEndToStart(const char *range);
 
+  Evidence resultFirst;
+  Evidence resultSecond;
+
 public:
   RefiningTandemDuplication();
   void execute();
-  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence getBestResult(Evidence r1, Evidence r2);
 };
 
 #endif

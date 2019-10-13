@@ -16,45 +16,45 @@ RefiningDeletion::~RefiningDeletion()
 
 void RefiningDeletion::execute()
 {
+    // std::cout << evidence.getResultVcfFormatString() << std::endl;
+
     ReadDepthAnalysis rda(filepath);
 
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
 
-    if (evidence.getMark()=="SDEL") {
+    if (evidence.getMark() == "SDEL")
+    {
         variantresult = evidence;
         variantresult.setQuailtyPass(true);
         return;
     }
 
     prepareBamReader();
-    // first();
-    // resultFromStart = true;
-    // if (variantresult.isQuailtyPass())
-    // {
-    //     return;
-    // }
-    // resultFromStart = false;
-    // second();
-    // if (variantresult.isQuailtyPass())
-    // {
-    //     return;
-    // }
 
     first();
-    // if (variantresult.isQuailtyPass())
-    // {
-    //     return;
-    // }
     second();
 
     variantresult = getBestResult(resultFirst, resultSecond);
-
-    // if (!variantresult.isQuailtyPass()) {
-    //     approximate();
-    // }
+    // std::cout << variantresult.getResultVcfFormatString() << std::endl;
 }
 
+Evidence RefiningDeletion::getBestResult(Evidence r1, Evidence r2)
+{
+
+    if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
+    {
+        Evidence result;
+        return result;
+    }
+
+    if (r1.getFrequency() > r2.getFrequency())
+    {
+        return r1;
+    }
+
+    return r2;
+}
 
 void RefiningDeletion::approximate()
 {
@@ -173,9 +173,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         {
             continue;
 
-            if (haveIndel(cigar)) {
-
-            }else {
+            if (haveIndel(cigar))
+            {
+            }
+            else
+            {
                 continue;
             }
 
@@ -250,10 +252,10 @@ void RefiningDeletion::refineStartToEnd(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
-                // {
-                //     continue;
-                // }
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                {
+                    continue;
+                }
             }
             else
             {
@@ -296,10 +298,19 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             {
                 continue;
             }
- 
+
+            std::vector<ReadParser::SATag> satag = readparser.getSATag();
+            for (ReadParser::SATag sa : satag)
+            {
+                AlternativeSA tempAltSA;
+                tempAltSA.chr = readparser.getChromosomeNameString();
+                tempAltSA.pos = sa.pos;
+                listPosition[std::make_pair(mPos, mEnd)].AltSA.push_back(tempAltSA);
+            }
 
             // std::cout << "mPos : " << mPos << std::endl;
             // std::cout << "mtEnd : " << mEnd<< std::endl;
+            // std::cout << mPos << " " << mEnd << " = " << SCsize << " > " << readparser.getEnd() << std::endl;
             //  std::cout << "pattern : " << n. << std::endl;
             // std::cout << "mEnd : " << mEnd << std::endl;
             // std::cout << "---------- MD TAG ----------" << std::endl;
@@ -316,11 +327,11 @@ void RefiningDeletion::refineStartToEnd(const char *range)
             {
                 listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
             }
- 
         }
     }
 
     resultFirst = RefiningDeletion::calculateFinalBreakpoint(&listPosition);
+    resultFirst.setEvidenceFrom(resultFirst.getPos());
 
     hts_itr_destroy(iter);
     return;
@@ -366,6 +377,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
     bool SCRead = false;
     int32_t SCsize = 0;
     int32_t AlterSCsize = 0;
+    
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -464,10 +476,10 @@ void RefiningDeletion::refineEndToStart(const char *range)
 
             if (SCRead)
             {
-                // if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
-                // {
-                //     continue;
-                // }
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
+                {
+                    continue;
+                }
             }
             else
             {
@@ -517,15 +529,18 @@ void RefiningDeletion::refineEndToStart(const char *range)
                 continue;
             }
 
-            // if (mPos >= mEnd + 2)
-            // {
-            //     continue;
-            // }
-            //  std::cout << "> n.pos : " << mPos << " n.end : " << mEnd << " n.matchCount" << n.matchCount << std::endl;
-            //  std::cout << "mPos : " << mPos << std::endl;
-            //  std::cout << "mEnd : " << mEnd << std::endl;
-            //      std::cout << "pattern : " << n.pattern << std::endl;
-            // std::cout << "---------- MD TAG ----------" << std::endl;
+            // std::cout << mPos << " " << mEnd << " = " << SCsize << std::endl;
+            
+            
+            std::vector<ReadParser::SATag> satag = readparser.getSATag();
+            for (ReadParser::SATag sa : satag)
+            {
+                AlternativeSA tempAltSA;
+                tempAltSA.chr = readparser.getChromosomeNameString();
+                tempAltSA.pos = sa.pos;
+                listPosition[std::make_pair(mPos, mEnd)].AltSA.push_back(tempAltSA);
+            }
+
             listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
             listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(n.endseq);
             listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
@@ -538,11 +553,11 @@ void RefiningDeletion::refineEndToStart(const char *range)
             {
                 listPosition[std::make_pair(mPos, mEnd)].maxAlterSC = AlterSCsize;
             }
- 
         }
     }
 
     resultSecond = RefiningDeletion::calculateFinalBreakpoint(&listPosition);
+    resultSecond.setEvidenceFrom(resultSecond.getEnd());
     hts_itr_destroy(iter);
     return;
 }
@@ -559,6 +574,7 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
     std::vector<uint8_t> bMapQList;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
+    std::vector<AlternativeSA> BAltSA;
 
     int lastscore = 0;
 
@@ -572,10 +588,15 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
         {
             continue;
         }
- 
+
         bFrequency = x.second.NumberOfMatchRead;
 
         if (bFrequency <= 1)
+        {
+            continue;
+        }
+
+        if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
         {
             continue;
         }
@@ -594,6 +615,7 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
             bHit = number;
             bMaxMatchSize = maxMatchSize;
             bMapQList = x.second.MapQLists;
+            BAltSA = x.second.AltSA;
         }
     }
 
@@ -628,6 +650,11 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
     result.setEndChr(evidence.getEndChr());
     result.LNGMATCH = bMaxMatchSize;
     result.setVariantType("DEL");
+    // result.AltSA = BAltSA;
+    for (auto n:BAltSA) 
+    {
+        result.addAlterSA(n.chr,n.pos);
+    }
 
     if (bHit <= 1)
     {
@@ -652,6 +679,7 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
 
     return result;
 }
+
 int RefiningDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist, uint8_t start, uint8_t end)
 {
     int count = 0;

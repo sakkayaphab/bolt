@@ -25,8 +25,8 @@ private:
   int32_t lastpos = 0;
   int32_t lastend = 0;
 
-  int32_t ciPosLeft=0;
-  int32_t ciPosRight=0;
+  int32_t ciPosLeft = 0;
+  int32_t ciPosRight = 0;
 
   bool foundEvidenceAtStart = false;
   bool foundEvidenceAtEnd = false;
@@ -35,9 +35,10 @@ private:
 
   std::string mark;
   std::vector<uint8_t> rpmapqlist;
+
 public:
-void setRPMapQ(std::vector<uint8_t> rpmapq);
-std::vector<uint8_t> *getRPMapQ();
+  void setRPMapQ(std::vector<uint8_t> rpmapq);
+  std::vector<uint8_t> *getRPMapQ();
 
   // void setMark(std::string mark);
   // std::string getMark();
@@ -60,9 +61,10 @@ public:
   //
   //    void setFoundEvidenceAtEnd(bool foundEvidenceAtEnd);
   std::string convertMapQlistToCommaString(std::vector<uint8_t> *mapqs);
+
 private:
-  int32_t ciEndLeft=0;
-  int32_t ciEndRight=0;
+  int32_t ciEndLeft = 0;
+  int32_t ciEndRight = 0;
 
   int frequency = 0;
   bool forwardDirection;
@@ -77,7 +79,6 @@ private:
 
   std::vector<associateRead> associateReadLists;
 
-  
   //    int32_t calculateSDEndAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists);
   //    int calculateNumberOfAbnormalSDAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists,int32_t basediff);
 
@@ -89,7 +90,7 @@ private:
   std::string ref;
   std::string alt;
   std::string info;
-  uint8_t qual=0;
+  uint8_t qual = 0;
   std::string filter;
   std::vector<uint8_t> mapqlist;
   std::string comment;
@@ -226,7 +227,21 @@ public:
   bool haveSomeMapQMoreThan(uint8_t qual);
   bool haveSomeMapQLessThan(uint8_t qual);
 
-  
+  struct AlternativeSA
+  {
+    std::string chr;
+    int32_t pos = 0;
+  };
+  std::vector<AlternativeSA> AltSA;
+
+  void addAlterSA(std::string chr,int32_t pos);
+  int getAltSASize();
+  int32_t evidencefrom = 0;
+  int32_t getEvidencePos();
+  void setEvidenceFrom(int32_t pos);
+  int countEvidencePosNear(int32_t pos,int32_t overlapped);
+  int countDiffEvidencePos(int32_t overlapped);
+  bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
 
   //    std::string getIsFoundEvidenceAtStartString();
   //    std::string getIsFoundEvidenceAtEndString();

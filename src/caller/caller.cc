@@ -350,7 +350,7 @@ void Caller::catEvidenceFile()
         {
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "DEL")
+            if (svtype != "DUP")
             {
                 continue;
             }
@@ -525,14 +525,14 @@ int Caller::findBreakPoint()
     std::mutex mxWriteFile;
     EvidenceProvider ep(&filepath);
     int sizeLoop = ep.getEvidenceSize();
-    // std::cout << "sizeLoop : " << sizeLoop << std::endl;
+    std::cout << "sizeLoop : " << sizeLoop << std::endl;
 
     int countRunEvidence = 0;
     // tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
-    float progress = 0.0;
-    float incrementevery = float(1)/float(sizeLoop);
+    // float progress = 0.0;
+    // float incrementevery = float(1)/float(sizeLoop);
     // std::cout << incrementevery << std::endl;
 
     tbb::parallel_for(0, sizeLoop, [&](int i) {

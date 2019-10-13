@@ -16,15 +16,26 @@ void RefiningTandemDuplication::execute()
     ReadDepthAnalysis rda(filepath);
 
     first();
-    if (variantresult.isQuailtyPass())
-    {
-        return;
-    }
     second();
-    if (variantresult.isQuailtyPass())
+
+    variantresult = getBestResult(resultFirst, resultSecond);
+}
+
+Evidence RefiningTandemDuplication::getBestResult(Evidence r1, Evidence r2)
+{
+
+    if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
     {
-        return;
+        Evidence result;
+        return result;
     }
+
+    if (r1.getFrequency() > r2.getFrequency())
+    {
+        return r1;
+    }
+
+    return r2;
 }
 
 void RefiningTandemDuplication::first()
@@ -138,12 +149,11 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         std::vector<StringSearch::Score> result = ssa.alignDuplicationTargetAtStart(&fullRead, &ssc);
         for (auto n : result)
         {
-           
-                if (n.matchCount+n.missmatchCount < cigar.at(0).getLength())
-                {
-                    continue;
-                }
-            
+
+            if (n.matchCount + n.missmatchCount +5 < cigar.at(0).getLength())
+            {
+                continue;
+            }
 
             if (n.matchCount <= 4)
             {
@@ -157,16 +167,25 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
             {
                 continue;
             }
- 
+
+            std::vector<ReadParser::SATag> satag = readparser.getSATag();
+            for (ReadParser::SATag sa : satag)
+            {
+                AlternativeSA tempAltSA;
+                tempAltSA.chr = readparser.getChromosomeNameString();
+                tempAltSA.pos = sa.pos;
+                listPosition[std::make_pair(mPos, mEnd)].AltSA.push_back(tempAltSA);
+            }
+
             auto rangeMapping = n.endseq;
             listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
             listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
             listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
- 
         }
     }
 
-    RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultFirst = RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultFirst.setEvidenceFrom(resultFirst.getPos());
 
     hts_itr_destroy(iter);
     return;
@@ -279,10 +298,10 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
                 continue;
             }
 
-            if (n.matchCount+n.missmatchCount < cigar.at(cigar.size() - 1).getLength())
-                {
-                    continue;
-                }
+            if (n.matchCount + n.missmatchCount + 5 < cigar.at(cigar.size() - 1).getLength())
+            {
+                continue;
+            }
 
             int32_t mPos = n.pos;
             int32_t mEnd = n.posseq + readparser.getPosOfSeq();
@@ -290,6 +309,15 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
             if (mPos >= mEnd + 2)
             {
                 continue;
+            }
+
+            std::vector<ReadParser::SATag> satag = readparser.getSATag();
+            for (ReadParser::SATag sa : satag)
+            {
+                AlternativeSA tempAltSA;
+                tempAltSA.chr = readparser.getChromosomeNameString();
+                tempAltSA.pos = sa.pos;
+                listPosition[std::make_pair(mPos, mEnd)].AltSA.push_back(tempAltSA);
             }
 
             // std::cout << "mPos : " << mPos << std::endl;
@@ -324,13 +352,14 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         }
     }
 
-    RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultSecond = RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultSecond.setEvidenceFrom(resultSecond.getEnd());
     // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
 
-void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+Evidence RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
 {
     int32_t bPos = 0;
     int32_t bEnd = 0;
@@ -339,6 +368,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
     int bMaxMatchSize = 0;
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
+     std::vector<AlternativeSA> BAltSA;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
     int lastscore = 0;
@@ -349,20 +379,15 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
 
-        if (maxMatchSize < 15)
+        if (maxMatchSize < 20)
         {
             continue;
         }
 
-        // if (maxMatchSize > 80)
-        // {
-        //     continue;
-        // }
-
-        // if (maxQuality == 0)
-        // {
-        //     continue;
-        // }
+        if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 6, 1))
+        {
+            continue;
+        }
 
         int number = x.second.NumberOfMatchRead;
 
@@ -376,6 +401,7 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
             bHit = number;
             bMaxMatchSize = maxMatchSize;
             bMapQList = x.second.MapQLists;
+            BAltSA = x.second.AltSA;
         }
     }
 
@@ -398,33 +424,62 @@ void RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int3
         variantresult.setMapQList(bMapQList);
     }
 
-     variantresult.setPos(bPos);
-    variantresult.setEnd(bEnd);
-    variantresult.setFrequency(bHit);
-    variantresult.setMapQList(*evidence.getMapQVector());
-    variantresult.setRPMapQ(*evidence.getMapQVector());
-    variantresult.setChr(evidence.getChr());
-    variantresult.setEndChr(evidence.getEndChr());
-    variantresult.LNGMATCH = bMaxMatchSize;
+    Evidence result;
+
+    if (evidence.getMark() == "SR")
+    {
+        result.setMark("SR");
+        result.setMapQList(bMapQList);
+
+        if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
+        {
+            if (bPos == 0 || bEnd == 0)
+            {
+                bPos = evidence.getPos();
+                bEnd = evidence.getEnd();
+                bHit = evidence.getFrequency();
+                result.setMapQList(*evidence.getMapQVector());
+            }
+        }
+    }
+    else
+    {
+        result.setMapQList(bMapQList);
+    }
+
+    result.setPos(bPos);
+    result.setEnd(bEnd);
+    result.setFrequency(bHit);
+    result.setRPMapQ(*evidence.getMapQVector());
+    result.setChr(evidence.getChr());
+    result.setEndChr(evidence.getEndChr());
+    result.LNGMATCH = bMaxMatchSize;
+    result.setVariantType("DUP");
+    for (auto n : BAltSA)
+    {
+        result.addAlterSA(n.chr, n.pos);
+    }
+
+    if (bHit <= 1)
+    {
+        return result;
+    }
 
     if (bPos == 0)
     {
-        return;
+        return result;
     }
     if (bEnd == 0)
     {
-        return;
+        return result;
     }
 
     if (bEnd - bPos > 1000000)
     {
-        return;
+        return result;
     }
 
-    if (bEnd - bPos < 20)
-    {
-        return;
-    }
+    result.setQuailtyPass(true);
 
-    variantresult.setQuailtyPass(true);
+    return result;
 }

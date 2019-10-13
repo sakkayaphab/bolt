@@ -29,6 +29,24 @@ void RefiningInversion::execute()
     // }
 }
 
+Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
+{
+
+    if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
+    {
+        Evidence result;
+        return result;
+    }
+
+    if (r1.getFrequency() > r2.getFrequency())
+    {
+        return r1;
+    }
+
+    return r2;
+ 
+}
+
 
 
 void RefiningInversion::first()

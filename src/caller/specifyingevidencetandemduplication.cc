@@ -116,7 +116,7 @@ void SpecifyingEvidenceTandemDuplication::checkRange()
 
     if (!added)
     {
-        if (readparser.getPosOfSeq()  < readparser.getMatePos())
+        if (readparser.getPosOfSeq() < readparser.getMatePos())
         {
             Evidence evidence;
             evidence.setVariantType(svtype);
@@ -160,7 +160,7 @@ void SpecifyingEvidenceTandemDuplication::proveEvidence(int index)
 
 void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
 {
-    
+
     int32_t firstPos = 0;
     int32_t lastPos = 0;
     int32_t avgPos = 0;
@@ -263,12 +263,20 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     // {
     //     return false;
     // }
-    
+
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
-    if (svLength>1000000) {
+    if (svLength > 1000000)
+    {
         return false;
     }
+
+    if (evidence->getFrequency() <= 1)
+    {
+        return false;
+    }
+
+    // if
 
     // if (svLength < 500)
     // {

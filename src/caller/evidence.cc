@@ -211,7 +211,6 @@ uint8_t Evidence::getAvgMapQ()
     return countQual / mapqlist.size();
 }
 
-
 uint8_t Evidence::getMaxRPMapQ()
 {
     uint8_t max = 0;
@@ -245,7 +244,7 @@ uint8_t Evidence::getMinRPMapQ()
     return min;
 }
 
-int  Evidence::getNumberOfRP()
+int Evidence::getNumberOfRP()
 {
     return rpmapqlist.size();
 }
@@ -454,7 +453,26 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
 
-               
+                else if (getKeybyText(ainfo) == "BOLT_SA")
+                {
+                    std::vector<std::string> nineSection = split(getValuebyText(ainfo), ',');
+                    for (auto m : nineSection)
+                    {
+                        std::vector<std::string> n = split(m, ':');
+                        // for (auto n : BAltSA)
+                        // {
+                        addAlterSA(n.at(0), std::stol(n.at(1), nullptr, 0));
+                        // }
+                    }
+                    continue;
+                }
+
+                else if (getKeybyText(ainfo) == "BOLT_EPOS")
+                {
+                    evidencefrom = std::stol(getValuebyText(ainfo), nullptr, 0);
+                    continue;
+                }
+
                 // else if (getKeybyText(ainfo) == "DP")
                 // {
                 //     // FREQ = atoi(ainfo.c_str());
@@ -546,32 +564,127 @@ std::string Evidence::getInfoString()
         result.append("BOLT_RPMQL=" + convertMapQlistToCommaString(getRPMapQ()) + ";");
     }
 
-    if (getCiPosLeft()!=0 || getCiPosRight()!=0) {
-            result.append("CIPOS=" + std::to_string(getCiPosLeft()) + "," + std::to_string(getCiPosRight()) + ";");
-
+    if (getCiPosLeft() != 0 || getCiPosRight() != 0)
+    {
+        result.append("CIPOS=" + std::to_string(getCiPosLeft()) + "," + std::to_string(getCiPosRight()) + ";");
     }
-    if (getCiEndLeft()!=0 || getCiEndRight()!=0) {
-           result.append("CIEND=" + std::to_string(getCiEndLeft()) + "," + std::to_string(getCiEndRight()) + ";");
+    if (getCiEndLeft() != 0 || getCiEndRight() != 0)
+    {
+        result.append("CIEND=" + std::to_string(getCiEndLeft()) + "," + std::to_string(getCiEndRight()) + ";");
     }
 
-    if (getPosDiscordantRead()!=0||getLastPosDiscordantRead()!=0)
+    if (getPosDiscordantRead() != 0 || getLastPosDiscordantRead() != 0)
     {
         result.append("BOLT_POS_DR=" + std::to_string(getPosDiscordantRead()) + "," + std::to_string(getLastPosDiscordantRead()) + ";");
     }
 
-     if (getEndDiscordantRead()!=0||getLastEndDiscordantRead()!=0)
+    if (getEndDiscordantRead() != 0 || getLastEndDiscordantRead() != 0)
     {
-       result.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
+        result.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
     }
 
-     
-    
+    if (AltSA.size() != 0)
+    {
+        result.append("BOLT_SA=");
+        bool first = true;
+        for (auto n : AltSA)
+        {
+            if (first)
+            {
+                first = false;
+                result.append(n.chr + ":" + std::to_string(n.pos));
+            }
+            result.append("," + n.chr + ":" + std::to_string(n.pos));
+        }
+        result.append(";");
+    }
 
-    
-
-    
+    if (evidencefrom != 0)
+    {
+        result.append("BOLT_EPOS=" + std::to_string(evidencefrom) + ";");
+    }
 
     return result;
+}
+
+void Evidence::addAlterSA(std::string chr, int32_t pos)
+{
+    AlternativeSA tempALT;
+    tempALT.chr = chr;
+    tempALT.pos = pos;
+    AltSA.push_back(tempALT);
+}
+void Evidence::setEvidenceFrom(int32_t pos)
+{
+    evidencefrom = pos;
+}
+
+int32_t Evidence::getEvidencePos()
+{
+    return evidencefrom;
+}
+
+int Evidence::countEvidencePosNear(int32_t pos, int32_t overlapped)
+{
+    int count = 0;
+    for (auto n : AltSA)
+    {
+        if (checkBetween(n.pos, pos, overlapped))
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+int Evidence::countDiffEvidencePos(int32_t overlapped)
+{
+    std::vector<AlternativeSA> tempAltSA;
+    for (auto n : AltSA)
+    {
+        bool found = false;
+        for (auto m : tempAltSA)
+        {
+            if (m.chr != n.chr)
+            {
+                continue;
+            }
+
+            if (checkBetween(n.pos, m.pos, overlapped))
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) 
+        {
+            tempAltSA.push_back(n);
+        }
+    }
+
+    return tempAltSA.size();
+}
+
+int Evidence::getAltSASize()
+{
+    return AltSA.size();
+}
+
+bool Evidence::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
+{
+    if (targetPos - overlapped > pos)
+    {
+        return false;
+    }
+
+    if (targetPos + overlapped < pos)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void Evidence::setMark(std::string mark)
@@ -692,49 +805,6 @@ std::string Evidence::getValuebyText(std::string n)
     return "";
 }
 
-//int32_t Evidence::calculateSDEndAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists)
-//{
-//    int64_t sum = 0;
-//
-//    for (int i = 0; i < m_associateReadLists->size(); ++i)
-//    {
-//        int diff = (m_associateReadLists->at(i).mateposDiscordantRead - m_associateReadLists->at(i).posDiscordantRead);
-//        sum += diff;
-//    }
-//
-//    auto insertsize_median = sum / 10;
-//    int64_t UPPER = 0;
-//    for (int i = 0; i < m_associateReadLists->size(); ++i)
-//    {
-//        int diff = (m_associateReadLists->at(i).mateposDiscordantRead - m_associateReadLists->at(i).posDiscordantRead);
-//        UPPER += pow((diff - (insertsize_median)), 2);
-//    }
-//    // std::cout
-//    //     << "mean : " << insertsize_median
-//    //     << " sd : " << (int) sqrt(UPPER / m_associateReadLists->size())
-//    //     << std::endl;
-//    return (int)sqrt(UPPER / m_associateReadLists->size());
-//}
-
-//int Evidence::calculateNumberOfAbnormalSDAssociateReadListsRead(std::vector<associateRead> *m_associateReadLists, int32_t basediff)
-//{
-//    int count = 0;
-//    for (int i = 0; i < m_associateReadLists->size(); ++i)
-//    {
-//        int diff = (m_associateReadLists->at(i).mateposDiscordantRead - m_associateReadLists->at(i).posDiscordantRead);
-//        if (diff - 2000 > basediff)
-//        {
-//            count++;
-//        }
-//        else if (diff + 2000 < basediff)
-//        {
-//            count++;
-//        }
-//    }
-//
-//    return count;
-//}
-
 std::string Evidence::convertToVcfString()
 {
     std::string buf;
@@ -775,12 +845,6 @@ std::string Evidence::convertToVcfString()
         buf.append("BOLT_RPMQL=" + convertMapQlistToCommaString(&rpmapqlist) + ";");
     }
 
-    //    buf.append("BOLT_COUNTERROR=" + std::to_string(errorAssociateReadLists.size()) + ";");
-    //    buf.append("BOLT_END_DR_LISTS=" + convertEndAssociateReadListsToCommaString() + ";");
-    //    buf.append("BOLT_END_DR_SD=" + std::to_string(calculateSDEndAssociateReadListsRead(&associateReadLists)) + ";");
-    //    buf.append("BOLT_END_NUMBEROF_ABNORMAL_SD=" + std::to_string(calculateNumberOfAbnormalSDAssociateReadListsRead(&associateReadLists, pv_end - pv_pos)) + ";");
-    //    buf.append("BOLT_FOUNDEVIDENCEATSTART=" + getIsFoundEvidenceAtStartString() + ";");
-    //    buf.append("BOLT_FOUNDEVIDENCEATEND=" + getIsFoundEvidenceAtEndString() + ";");
     return buf;
 }
 
@@ -803,52 +867,6 @@ std::string Evidence::getSVType()
 {
     return variantType;
 }
-
-//std::string Evidence::getIsFoundEvidenceAtStartString()
-//{
-//    if (isFoundEvidenceAtStart())
-//    {
-//        return  "true";
-//    }
-//
-//    return "false";
-//}
-//
-//std::string Evidence::getIsFoundEvidenceAtEndString()
-//{
-//    if (isFoundEvidenceAtEnd())
-//    {
-//        return  "true";
-//    }
-//
-//    return "false";
-//}
-
-//std::string Evidence::convertEndAssociateReadListsToCommaString()
-//{
-//    std::string mapqString;
-//
-//    bool first = false;
-//    for (auto n : associateReadLists)
-//    {
-//        if (!first)
-//        {
-//            mapqString.append(std::to_string(n.mateposDiscordantRead));
-//            first = true;
-//        }
-//        else
-//        {
-//            mapqString.append("," + std::to_string(n.mateposDiscordantRead));
-//        }
-//    }
-//
-//    return mapqString;
-//}
-
-//int Evidence::getSizeErrorAssociateReadLists()
-//{
-//    return errorAssociateReadLists.size();
-//}
 
 int32_t Evidence::getPos()
 {
@@ -980,19 +998,3 @@ bool Evidence::haveSomeMapQLessThan(uint8_t qual)
 
     return false;
 }
-
-//bool Evidence::isFoundEvidenceAtStart() const {
-//    return foundEvidenceAtStart;
-//}
-//
-//void Evidence::setFoundEvidenceAtStart(bool foundEvidenceAtStart) {
-//    Evidence::foundEvidenceAtStart = foundEvidenceAtStart;
-//}
-//
-//bool Evidence::isFoundEvidenceAtEnd() const {
-//    return foundEvidenceAtEnd;
-//}
-//
-//void Evidence::setFoundEvidenceAtEnd(bool foundEvidenceAtEnd) {
-//    Evidence::foundEvidenceAtEnd = foundEvidenceAtEnd;
-//}
