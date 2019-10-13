@@ -312,10 +312,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
             continue;
         }
 
-        if (n.countDiffEvidencePos(samplestat->getReadLength() * 2) >= 3)
-        {
-            continue;
-        }
+        // if (n.countDiffEvidencePos(samplestat->getReadLength() * 2) >= 3)
+        // {
+        //     continue;
+        // }
 
         // if (n.getPos() == n.getEvidencePos())
         // {

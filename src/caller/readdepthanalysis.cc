@@ -290,6 +290,11 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
 
 bool ReadDepthAnalysis::filterDuplication(Evidence e)
 {
+    if (e.getMark() == "SR")
+    {
+        return true;
+    }
+ 
     if (sumStartSCL <= 1 && sumStartSCF <= 1)
     {
         return false;
@@ -300,11 +305,15 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
         return false;
     }
 
-    if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
-    {
-
+    if (e.getMaxMapQ()<20) {
+        return false;
     }
-    else if (e.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 100, 1))
+
+    // if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
+    // {
+
+    // }
+    if (e.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 5, 100, 1))
     {
         return false;
     }
@@ -318,8 +327,6 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
     {
         return false;
     }
-
-   
 
     return true;
 }

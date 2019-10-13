@@ -135,8 +135,10 @@ void RefiningInversion::refineStartToEnd(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S')
+        if (cigar.at(0).getOperatorName() == 'S'&& cigar.at(0).getLength()>=3)
         {
+             
+
             if (cigar.at(0).getLength() < 4)
             {
                 continue;
@@ -151,6 +153,10 @@ void RefiningInversion::refineStartToEnd(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
+                {
+                    continue;
+                }
                 if (n.matchCount <= 4)
                 {
                     continue;
@@ -189,7 +195,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
             }
         }
         // else if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
         {
             if (cigar.at(cigar.size() - 1).getLength() < 4)
             {
@@ -209,6 +215,11 @@ void RefiningInversion::refineStartToEnd(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead, &ssc);
             for (auto n : result)
             {
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                {
+                    continue;
+                }
+
                 if (n.matchCount <= 4)
                 {
                     continue;
@@ -328,8 +339,9 @@ void RefiningInversion::refineEndToStart(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S')
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength()>=3)
         {
+            
             // continue;
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
@@ -337,6 +349,11 @@ void RefiningInversion::refineEndToStart(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
+                {
+                    continue;
+                }
+
                 if (n.matchCount <= 4)
                 {
                     continue;
@@ -376,9 +393,12 @@ void RefiningInversion::refineEndToStart(const char *range)
             }
         }
 
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
         // if (true)
         {
+
+           
+
             // continue;
             // if (cigar.at(cigar.size() - 1).getLength() < 10)
             // {
@@ -395,6 +415,11 @@ void RefiningInversion::refineEndToStart(const char *range)
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                {
+                    continue;
+                }
+
                 if (n.matchCount <= 4)
                 {
                     continue;
@@ -466,8 +491,19 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
         int maxMatchSize = getMaxIntFromVector(x.second.MatchLists);
 
         uint8_t maxQuality = getMaxUInt8FromVector(x.second.MapQLists);
+        bFrequency = x.second.NumberOfMatchRead;
 
         if (maxMatchSize < 15)
+        {
+            continue;
+        }
+
+         if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
+        {
+            continue;
+        }
+
+        if (bFrequency <= 1)
         {
             continue;
         }
