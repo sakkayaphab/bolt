@@ -7,6 +7,7 @@
 #include <vector>
 #include "refiningsv.h"
 #include "insertionpositiondetail.h"
+#include "editdistance.h"
 
 class RefiningInsertion : public RefiningSV
 {
@@ -38,18 +39,30 @@ private:
   };
 
   std::vector<BreakpointPosition> vectorBP;
+
+  struct CountRefineSeq
+  {
+    std::string seq;
+    int count=0;
+  };
+  
   
   
   void convertMapSC();
   void clearMapSC();
-  void convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> *mapSC,std::vector<InsertionPositionDetail> *vectorSC);
+  std::vector<InsertionPositionDetail> convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> mapSC);
   void findBreakpoint();
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   void filterBreakpoint();
 
+  std::vector<CountRefineSeq> mergeString(std::vector<std::string> fragmentlist,bool fromstart);
+  bool compareEditDistance(std::string s1,std::string s2,bool fromstart);
+  void substringSeq(std::string *s1,std::string *s2,bool fromstart);
+
 public:
   RefiningInsertion();
   void execute();
+  
 };
 
 #endif

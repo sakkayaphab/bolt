@@ -423,27 +423,16 @@ void Evidence::setEvidenceByString(std::string line)
                     setLastEndDiscordantRead(std::stol(nineSection.at(1), nullptr, 0));
                     continue;
                 }
-
-                else if (getKeybyText(ainfo) == "COMMENT")
-                {
-                    setComment(getValuebyText(ainfo));
-                    continue;
-                }
-
+ 
                 else if (getKeybyText(ainfo) == "LNGMATCH")
                 {
                     LNGMATCH = atoi(getValuebyText(ainfo).c_str());
-                    // std::cout << LNGMATCH << std::endl;
-                    // (getValuebyText(ainfo));
                     continue;
                 }
 
-                else if (getKeybyText(ainfo) == "FREQ")
+                else if (getKeybyText(ainfo) == "BOLT_FREQ")
                 {
-                    // FREQ = atoi(ainfo.c_str());
                     setFrequency(atoi(getValuebyText(ainfo).c_str()));
-                    // std::cout << FREQ << std::endl;
-                    // (getValuebyText(ainfo));
                     continue;
                 }
 
@@ -473,18 +462,9 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
 
-                // else if (getKeybyText(ainfo) == "DP")
-                // {
-                //     // FREQ = atoi(ainfo.c_str());
-                //     // setRead
-                //     setDep(atoi(getValuebyText(ainfo).c_str()));
-                //     // std::cout << FREQ << std::endl;
-                //     // (getValuebyText(ainfo));
-                //     continue;
-                // }
             }
-            // setFrequency(mapqlist.size());
         }
+
         i++;
     }
 }
@@ -532,10 +512,6 @@ std::string Evidence::getInfoString()
     result.append("END=" + std::to_string(getEnd()) + ";");
     result.append("SVTYPE=" + getVariantType() + ";");
 
-    if (getFrequency() != -1)
-    {
-        result.append("DP=" + std::to_string(getFrequency()) + ";");
-    }
     if (getVariantType() != "BND")
     {
         result.append("SVLEN=" + std::to_string(getEnd() - getPos()) + ";");
@@ -545,13 +521,13 @@ std::string Evidence::getInfoString()
         result.append("CHR2=" + getEndChr() + ";");
     }
 
-    if (getComment() != "")
-    {
-        result.append("COMMENT=" + getComment() + ";");
-    }
+    // if (getComment() != "")
+    // {
+    //     result.append("COMMENT=" + getComment() + ";");
+    // }
     if (getFrequency() != 0)
     {
-        result.append("FREQ=" + std::to_string(getFrequency()) + ";");
+        result.append("BOLT_FREQ=" + std::to_string(getFrequency()) + ";");
     }
     result.append("LNGMATCH=" + std::to_string(LNGMATCH) + ";");
     result.append("BOLT_MQL=" + convertMapQlistToCommaString(getMapQVector()) + ";");
@@ -697,15 +673,15 @@ std::string Evidence::getMark()
     return mark;
 }
 
-std::string Evidence::getComment()
-{
-    return comment;
-}
+// std::string Evidence::getComment()
+// {
+//     return comment;
+// }
 
-void Evidence::setComment(std::string comment)
-{
-    Evidence::comment = comment;
-}
+// void Evidence::setComment(std::string comment)
+// {
+//     Evidence::comment = comment;
+// }
 
 void Evidence::setMapQList(std::vector<uint8_t> mapqs)
 {
@@ -832,13 +808,13 @@ std::string Evidence::convertToVcfString()
     buf.append("BOLT_MQL=" + convertMapQlistToCommaString(getMapQVector()) + ";");
     buf.append("BOLT_POS_DR=" + std::to_string(getPosDiscordantRead()) + "," + std::to_string(getLastPosDiscordantRead()) + ";");
     buf.append("BOLT_END_DR=" + std::to_string(getEndDiscordantRead()) + "," + std::to_string(getLastEndDiscordantRead()) + ";");
-    if (getComment() != "")
+    if (getMark() != "")
     {
-        buf.append("COMMENT=" + getComment() + ";");
+        buf.append("BOLT_MARK=" + getMark() + ";");
     }
     if (getFrequency() != 0)
     {
-        buf.append("FREQ=" + std::to_string(getFrequency()) + ";");
+        buf.append("BOLT_FREQ=" + std::to_string(getFrequency()) + ";");
     }
     if (rpmapqlist.size() != 0)
     {

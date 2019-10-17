@@ -126,8 +126,8 @@ public:
   std::string getFilter();
 
   std::string getInfoString();
-  std::string getComment();
-  void setComment(std::string comment);
+  // std::string getComment();
+  // void setComment(std::string comment);
 
 public:
   Evidence();

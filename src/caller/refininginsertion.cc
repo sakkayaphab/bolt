@@ -1,4 +1,5 @@
 #include "refininginsertion.h"
+#include <stdlib.h>
 
 RefiningInsertion::RefiningInsertion()
 {
@@ -17,8 +18,6 @@ void RefiningInsertion::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(),
                                                  evidence.getPos() + evidence.getCiPosRight());
-
-    std::cout << findRange << std::endl;
 
     const char *range = findRange.c_str();
     refineStartToEnd(range);
@@ -69,14 +68,15 @@ void RefiningInsertion::refineStartToEnd(const char *range)
             mapSCEnd[readparser.getEnd()].addMapQ(readparser.getMapQuality());
             mapSCEnd[readparser.getEnd()].addLongMapping(cigar.at(cigar.size() - 1).getLength());
             mapSCEnd[readparser.getEnd()].setPosition(readparser.getEnd());
+            mapSCEnd[readparser.getEnd()].addSeqList(readparser.getEdgeSeqFromEndSeq(cigar.at(cigar.size() - 1).getLength()));
         }
 
         if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 4)
         {
-            // std::cout << readparser.getPos() << std::endl;
             mapSCStart[readparser.getPos()].addMapQ(readparser.getMapQuality());
             mapSCStart[readparser.getPos()].addLongMapping(cigar.at(0).getLength());
             mapSCStart[readparser.getPos()].setPosition(readparser.getPos());
+            mapSCStart[readparser.getPos()].addSeqList(readparser.getEdgeSeqFromStartSeq(cigar.at(0).getLength()));
         }
     }
 
@@ -92,10 +92,15 @@ void RefiningInsertion::refineStartToEnd(const char *range)
 
 void RefiningInsertion::filterBreakpoint()
 {
+    // std::cout << "# filterBreakpoint : " << vectorBP.size() << std::endl;
     std::sort(vectorBP.begin(), vectorBP.end());
+
+    int maxFreq = 0;
 
     for (BreakpointPosition n : vectorBP)
     {
+        // std::cout << "# filterBreakpoint : " << vectorBP.size() << std::endl;
+
         int32_t averagePos = 0;
         if (n.pos > n.end)
         {
@@ -106,26 +111,32 @@ void RefiningInsertion::filterBreakpoint()
             averagePos = (n.end + n.pos) / 2;
         }
 
-        // std::cout << n.pos << " = " << n.end << std::endl;
+        if (maxFreq >= n.frequency)
+        {
+            continue;
+        }
+
+        maxFreq = n.frequency;
 
         variantresult.setPos(averagePos);
         variantresult.setEnd(averagePos);
-        variantresult.setFrequency(n.mappingqualitylist.size());
+        variantresult.setFrequency(n.frequency);
         variantresult.setRPMapQ(*evidence.getMapQVector());
 
         variantresult.setMapQList(n.mappingqualitylist);
         variantresult.setChr(evidence.getChr());
         variantresult.setEndChr(evidence.getEndChr());
         variantresult.setQuailtyPass(true);
-        break;
+        variantresult.setMark(evidence.getMark());
     }
 }
 
 void RefiningInsertion::findBreakpoint()
 {
+
     for (InsertionPositionDetail n : vectorSCStart)
     {
-        if (n.getLongMapping() < 4)
+        if (n.getLongMapping() < 10)
         {
             continue;
         }
@@ -137,9 +148,18 @@ void RefiningInsertion::findBreakpoint()
 
         bool added;
 
+        // std::cout << n.getSeqList().size() << std::endl;
+        // std::cout << "text :" ;
+        // for (auto text:n.getSeqList())
+        // {
+        //     std::cout << text << std::endl;
+        // }
+
+        std::vector<CountRefineSeq> mergeStart = mergeString(n.getSeqList(), false);
+
         for (InsertionPositionDetail m : vectorSCEnd)
         {
-            if (m.getLongMapping() < 4)
+            if (m.getLongMapping() < 10)
             {
                 continue;
             }
@@ -149,15 +169,19 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
+            std::vector<CountRefineSeq> mergeEnd = mergeString(m.getSeqList(), true);
+
             if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();
                 tempBP.end = m.getPosition();
                 tempBP.frequency = n.getFrequency() + m.getFrequency();
+
                 tempBP.score = n.getFrequency() + m.getFrequency();
                 tempBP.longmapstart = n.getLongMapping();
                 tempBP.longmapend = m.getLongMapping();
+
                 for (auto x : n.getMapQList())
                 {
                     tempBP.mappingqualitylist.push_back(x);
@@ -167,31 +191,14 @@ void RefiningInsertion::findBreakpoint()
                     tempBP.mappingqualitylist.push_back(x);
                 }
 
-                if (tempBP.frequency <= 3)
+                if (tempBP.frequency <= 2)
                 {
                     continue;
                 }
+
                 added = true;
                 vectorBP.push_back(tempBP);
             }
-        }
-
-        if (!added && n.getFrequency() >= 4)
-        {
-            BreakpointPosition tempBP;
-            tempBP.pos = n.getPosition();
-            tempBP.end = n.getPosition();
-            tempBP.frequency = n.getFrequency();
-            tempBP.score = n.getFrequency();
-            tempBP.longmapstart = n.getLongMapping();
-            tempBP.longmapend = n.getLongMapping();
-            for (auto x : n.getMapQList())
-            {
-                tempBP.mappingqualitylist.push_back(x);
-            } 
- 
-            added = true;
-            vectorBP.push_back(tempBP);
         }
     }
 }
@@ -213,23 +220,152 @@ bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t ove
 
 void RefiningInsertion::convertMapSC()
 {
-    convertMapSCToVector(&mapSCStart, &vectorSCStart);
+    vectorSCStart = convertMapSCToVector(mapSCStart);
     std::sort(vectorSCStart.begin(), vectorSCStart.end());
+    // std::cout << "vectorSC : " <<
+    // vectorSCStart.at(0).getSeqList()[0] << std::endl;
 
-    convertMapSCToVector(&mapSCEnd, &vectorSCEnd);
+    vectorSCEnd = convertMapSCToVector(mapSCEnd);
     std::sort(vectorSCEnd.begin(), vectorSCEnd.end());
 }
 
-void RefiningInsertion::convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> *mapSC, std::vector<InsertionPositionDetail> *vectorSC)
+std::vector<InsertionPositionDetail> RefiningInsertion::convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> mapSC)
 {
-    for (auto const &x : *mapSC)
+
+    std::vector<InsertionPositionDetail> vectorSC;
+    int count = 0;
+    for (auto x : mapSC)
     {
-        vectorSC->push_back(x.second);
+        vectorSC.push_back(x.second);
+        // vectorSC->at(count).setSeqList(x.second.getSeqList());
+        // std::cout << x.second.getSeqList()[0] << std::endl;
+        // std::cout <<  vectorSC.at(count).getSeqList()[0] << std::endl;
+
+        count++;
     }
+
+    return vectorSC;
 }
 
 void RefiningInsertion::clearMapSC()
 {
     mapSCStart.clear();
     mapSCEnd.clear();
+}
+
+std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(std::vector<std::string> fragmentlist, bool fromstart)
+{
+            // compareEditDistance("ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCA", "ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGTACCT", false);
+
+        // compareEditDistance("AATCACTGCTTATTGACTGAATCAGCAATGGGGT", "GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
+        // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", "AATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
+        // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACT", "GCCACACACAGAGCAGACGC", true);
+        // compareEditDistance("GCCACACACAGAGCAGACGC", "GCCACACACAGAGCAGACGCTGAATCACT", true);
+        
+
+    std::vector<CountRefineSeq> tempSeq;
+
+    // return tempSeq;
+
+    for (std::string n : fragmentlist)
+    {
+
+        // std::cout << n << std::endl;
+        
+        bool added = false;
+        for (int i = 0; i < tempSeq.size(); i++)
+        {
+            if (compareEditDistance(n, tempSeq.at(i).seq, fromstart))
+            {
+                if (n.size() > tempSeq.at(i).seq.size())
+                {
+                    tempSeq.at(i).seq = n;
+                    tempSeq.at(i).count++;
+                }
+                added = true;
+                // break;
+            } 
+        }
+
+        if (!added)
+        {
+            CountRefineSeq tempCRS;
+            tempCRS.seq = n;
+            tempCRS.count++;
+            tempSeq.push_back(tempCRS);
+        }
+ 
+    }
+
+    std::cout << "------" << std::endl;
+    for (CountRefineSeq n : tempSeq)
+    {
+        std::cout << n.seq << " = " << n.count << std::endl;
+    }
+    std::cout << "^^^^^" << std::endl;
+
+    return tempSeq;
+}
+
+bool RefiningInsertion::compareEditDistance(std::string s1, std::string s2, bool fromstart)
+{
+    std::string temps1 = s1;
+    std::string temps2 = s2;
+    substringSeq(&temps1, &temps2, fromstart);
+
+    // std::cout << "s1 : " << s1<< std::endl;
+    // std::cout << "s2 : " << s2<< std::endl;
+    // std::cout << "temps1 : " << temps1<< std::endl;
+    // std::cout << "temps2 : " << temps2<< std::endl;
+
+    EditDistance editdistance;
+    int editpoint = editdistance.Compare(&temps1, &temps2);
+
+    // std::cout << "### editpoint" << std::endl;
+    // std::cout << editpoint << std::endl;
+    // std::cout << temps1 << std::endl;
+    // std::cout << temps2 << std::endl;
+
+    if (editpoint<4)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool fromstart)
+{
+    std::string temps1;
+    std::string temps2;
+    int diffsize = s1->size() - s2->size();
+    if (s1->size() > s2->size())
+    {
+        if (!fromstart)
+        {
+            temps1 = s1->substr(s1->length() - abs(s2->size()));
+            temps2 = *s2;
+        }
+        else
+        {
+            temps1 = s1->substr(0, s2->size());
+            temps2 = *s2;
+        }
+    }
+    else
+    {
+        if (!fromstart)
+        {
+            temps2 = s2->substr(s2->length() - abs(s1->size()));
+            temps1 = *s1;
+        }
+        else
+        {
+            temps2 = s2->substr(0, s1->size());
+            temps1 = *s1;
+        }
+    }
+
+    *s1 = temps1;
+    *s2 = temps2;
 }

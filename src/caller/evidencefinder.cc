@@ -228,7 +228,7 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
 {
     if (readparser.isFirstRead())
     {
-        if (readparser.isMateUnmapped())
+        if (readparser.isMateUnmapped() && !readparser.isReverse())
         {
             rdd->R1_MUN++;
             return;
@@ -266,7 +266,7 @@ void EvidenceFinder::checkNormalRead(ReadDepthDetail *rdd)
     }
     else
     {
-        if (readparser.isMateUnmapped())
+        if (readparser.isMateUnmapped() && readparser.isReverse())
         {
             rdd->R2_MUN++;
             return;
@@ -364,116 +364,6 @@ void EvidenceFinder::updateReadDepthSV(ReadDepthDetail *rdd)
         }
     }
 
-    // if (readparser.isSecondRead())
-    // {
-    //     insertSizeSecondRead = (readparser.getPos() + readparser.getLengthSequence()) - readparser.getMatePos();
-
-    //     if (readparser.isMateUnmapped() && readparser.isReverse())
-    //     {
-    //         rdd->INS2++;
-    //         return;
-    //     }
-
-    //     if (!readparser.isPairOnSameChromosome())
-    //     {
-    //         rdd->TRA2++;
-    //         return;
-    //     }
-
-    //     if (readparser.isReverse() && readparser.isMateReverse())
-    //     {
-    //         rdd->INV2++;
-    //         return;
-    //     }
-
-    //     if (!readparser.isReverse() && !readparser.isMateReverse())
-    //     {
-    //         rdd->INV2++;
-    //         return;
-    //     }
-
-    //     if (readparser.isReverse() && !readparser.isMateReverse())
-    //     {
-    //         if (readparser.getPos() < readparser.getMatePos())
-    //         {
-    //             rdd->DUP2++;
-    //             return;
-    //         }
-
-    //         if (insertSizeSecondRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
-    //         {
-    //             rdd->DEL2++;
-    //             return;
-    //         }
-
-    //         if (insertSizeSecondRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
-    //         {
-    //             rdd->INS2++;
-    //             return;
-    //         }
-    //         return;
-    //     }
-
-    //     return;
-    // }
-
-    // if (readparser.isFirstRead())
-    // {
-    //     insertSizeFirstRead = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
-    //     if (readparser.isMateUnmapped() && !readparser.isReverse())
-    //     {
-    //         rdd->INS1++;
-    //         return;
-    //     }
-
-    //     if (!readparser.isPairOnSameChromosome())
-    //     {
-    //         rdd->TRA1++;
-    //         return;
-    //     }
-
-    //     if (!readparser.isReverse() && readparser.isMateReverse())
-    //     {
-    //         if (readparser.getPos() > readparser.getMatePos())
-    //         {
-    //             rdd->DUP1++;
-    //             return;
-    //         }
-
-    //         if (insertSizeFirstRead > samplestat->getAverageSampleStat() + samplestat->getSDSampleStat() + samplestat->getReadLength() + 200)
-    //         {
-    //             rdd->DEL1++;
-    //             return;
-    //         }
-
-    //         if (insertSizeFirstRead < 0)
-    //         {
-    //             return;
-    //         }
-
-    //         if (insertSizeFirstRead < samplestat->getAverageSampleStat() - samplestat->getSDSampleStat() - samplestat->getReadLength() - 200)
-    //         {
-    //             rdd->INS1++;
-    //             return;
-    //         }
-
-    //         return;
-    //     }
-
-    //     if (readparser.isReverse() && readparser.isMateReverse())
-    //     {
-    //         rdd->INV1++;
-    //         return;
-    //     }
-
-    //     if (!readparser.isReverse() && !readparser.isMateReverse())
-    //     {
-    //         rdd->INV1++;
-    //         return;
-    //     }
-
-    //     return;
-    // }
 }
 
 void EvidenceFinder::execute()

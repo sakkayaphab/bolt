@@ -43,6 +43,23 @@ int InsertionPositionDetail::getFrequency()
     return mappingqualitylist.size();
 }
 
+void InsertionPositionDetail::addSeqList(std::string seq)
+{
+    seqlist.push_back(seq);    
+}
+
+std::vector<std::string> InsertionPositionDetail::getSeqList()
+{
+    // std::cout << "seqlist : " << seqlist.size() << std::endl;
+    // std::cout << "seq : " << seqlist[0] << std::endl;
+    return seqlist;
+}
+
+void InsertionPositionDetail::setSeqList(std::vector<std::string> seqlist)
+{
+    InsertionPositionDetail::seqlist = seqlist;
+}
+
 uint8_t InsertionPositionDetail::getMaxMapQ()
 {
     uint8_t max = 0;

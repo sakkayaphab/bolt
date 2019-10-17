@@ -37,7 +37,8 @@ private:
     int sumStartINS = 0;
     int sumStartSCF = 0;
     int sumStartSCL = 0;
-
+     int sumStartR1_MUN = 0;
+    int sumStartR2_MUN = 0;
 
      int sumEndDEL = 0;
     int sumEndDUP = 0;
@@ -46,6 +47,9 @@ private:
     int sumEndINS = 0;
     int sumEndSCF = 0;
     int sumEndSCL = 0;
+
+    int sumEndR1_MUN = 0;
+    int sumEndR2_MUN = 0;
 
 
 public:

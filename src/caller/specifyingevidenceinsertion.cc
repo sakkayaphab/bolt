@@ -18,11 +18,9 @@ void SpecifyingEvidenceInsertion::updateRead()
 
     if (readparser.isFirstRead() && !readparser.isReverse())
     {
-
         if (readparser.isMateUnmapped())
         {
             // std::cout << currentPos << " = " << currentMPos << std::endl;
-
             checkRange();
             return;
         }
@@ -33,8 +31,7 @@ void SpecifyingEvidenceInsertion::updateRead()
         if (readparser.isMateUnmapped())
         {
             // std::cout << currentPos << " = " << currentMPos << std::endl;
-
-            // checkRange();
+            checkRange();
             return;
         }
     }
@@ -57,12 +54,18 @@ void SpecifyingEvidenceInsertion::updateRead()
         }
 
         int diff = (readparser.getMatePos() + readparser.getLengthSequence()) - readparser.getPos();
-        if (diff < 50)
+        if (diff < 0)
         {
             return;
         }
 
-        if (diff < samplestat->getAverageSampleStat() - (2*samplestat->getSDSampleStat()))
+        if (!(read->core.flag & BAM_FPROPER_PAIR))
+        {
+            return;
+        }
+
+        // if (diff < samplestat->getAverageSampleStat() - int32_t(1.654 * double(samplestat->getSDSampleStat())))
+        if (diff < samplestat->getAverageSampleStat() - (2 * samplestat->getSDSampleStat()))
         {
             checkRange();
         }
@@ -76,30 +79,77 @@ bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
 
-        if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos))
+        if (readparser.isMateUnmapped())
         {
-            if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+            if (readparser.isFirstRead())
             {
-                preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
-            }
-
-            if (currentMPos != 0)
-            {
-                if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
+                if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos))
                 {
-                    preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
-                }
+                    if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+                    {
+                        preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
+                    }
 
-                if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
-                {
-                    preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
+                    preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+
+                    preCollectSV.at(positionOverlapped).incrementFrequency();
+                    added = true;
                 }
             }
+            else
+            {
+                if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead() + samplestat->getAverageSampleStat() + (3 * samplestat->getSDSampleStat()), overlappedpos))
+                {
+                    if (preCollectSV.at(positionOverlapped).getEnd() == 0)
+                    {
+                        preCollectSV.at(positionOverlapped).setEnd(currentPos);
+                        preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentPos);
+                    }
 
-            preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+                    if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentPos)
+                    {
+                        preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentPos);
+                    }
 
-            preCollectSV.at(positionOverlapped).incrementFrequency();
-            added = true;
+                    preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+
+                    preCollectSV.at(positionOverlapped).incrementFrequency();
+                    added = true;
+                }
+            }
+        }
+        else
+        {
+            if (readparser.isSecondRead())
+            {
+                continue;
+            }
+
+            if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos))
+            {
+                if (preCollectSV.at(positionOverlapped).getLastPosDiscordantRead() < currentPos)
+                {
+                    preCollectSV.at(positionOverlapped).setLastPosDiscordantRead(currentPos);
+                }
+
+                if (currentMPos != 0)
+                {
+                    if (preCollectSV.at(positionOverlapped).getEndDiscordantRead() > currentMPos)
+                    {
+                        preCollectSV.at(positionOverlapped).setEndDiscordantRead(currentMPos);
+                    }
+
+                    if (preCollectSV.at(positionOverlapped).getLastEndDiscordantRead() < currentMPos)
+                    {
+                        preCollectSV.at(positionOverlapped).setLastEndDiscordantRead(currentMPos);
+                    }
+                }
+
+                preCollectSV.at(positionOverlapped).addMapQ(readparser.getMapQuality());
+
+                preCollectSV.at(positionOverlapped).incrementFrequency();
+                added = true;
+            }
         }
     }
 
@@ -109,13 +159,22 @@ bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t
 void SpecifyingEvidenceInsertion::checkRange()
 {
     bool added = false;
-    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
+    int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat() * 3);
+    // if (readparser.isMateUnmapped()) && readparser.isSecondRead())
+    // {
+    //     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat() * 3);
+    // }
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     checkProveEvidence();
 
     if (!added)
     {
+        if (readparser.isSecondRead())
+        {
+            return;
+        }
+
         Evidence evidence;
         evidence.setVariantType(svtype);
         evidence.setChr(readparser.getChromosomeNameString());
@@ -123,30 +182,16 @@ void SpecifyingEvidenceInsertion::checkRange()
 
         if (readparser.isMateUnmapped())
         {
-            evidence.setComment("MATEUNMAPPED");
-
+            evidence.setMark("MATEUNMAPPED");
             evidence.setPosDiscordantRead(readparser.getPos());
             evidence.setLastPosDiscordantRead(readparser.getPos());
-
-            evidence.setEndDiscordantRead(readparser.getPos());
-            evidence.setLastEndDiscordantRead(readparser.getPos());
         }
         else
         {
-            if (readparser.isFirstRead())
-            {
-                evidence.setPosDiscordantRead(readparser.getPos());
-                evidence.setLastPosDiscordantRead(readparser.getPos());
-                evidence.setEndDiscordantRead(readparser.getMatePos());
-                evidence.setLastEndDiscordantRead(readparser.getMatePos());
-            }
-            else
-            {
-                evidence.setPosDiscordantRead(readparser.getMatePos());
-                evidence.setLastPosDiscordantRead(readparser.getMatePos());
-                evidence.setEndDiscordantRead(readparser.getPos());
-                evidence.setLastEndDiscordantRead(readparser.getPos());
-            }
+            evidence.setPosDiscordantRead(readparser.getPos());
+            evidence.setLastPosDiscordantRead(readparser.getPos());
+            evidence.setEndDiscordantRead(readparser.getMatePos());
+            evidence.setLastEndDiscordantRead(readparser.getMatePos());
         }
 
         evidence.addMapQ(readparser.getMapQuality());
@@ -185,17 +230,16 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
     int32_t end = evidence->getEndDiscordantRead();
     int32_t lastend = evidence->getLastEndDiscordantRead();
 
-    if (evidence->getComment() == "MATEUNMAPPED")
+    if (evidence->getMark() == "MATEUNMAPPED")
     {
-
         end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getAverageSampleStat());
-        evidence->setCiPosRight((end - pos)+ samplestat->getAverageSampleStat());
+        evidence->setCiPosLeft(-samplestat->getReadLength());
+        evidence->setCiPosRight((end - pos) + samplestat->getAverageSampleStat() + (3 * samplestat->getSDSampleStat()));
 
-        evidence->setCiEndLeft(pos-end);
+        evidence->setCiEndLeft(pos - end);
         evidence->setCiEndRight(samplestat->getReadLength());
     }
     else
@@ -204,20 +248,33 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-samplestat->getReadLength()-samplestat->getAverageSampleStat());
-        evidence->setCiPosRight((end - pos)+ samplestat->getAverageSampleStat());
+        evidence->setCiPosLeft(-samplestat->getReadLength() - samplestat->getAverageSampleStat());
+        evidence->setCiPosRight((end - pos) + samplestat->getAverageSampleStat());
 
-        evidence->setCiEndLeft(pos-end);
+        evidence->setCiEndLeft(pos - end);
         evidence->setCiEndRight(samplestat->getReadLength());
     }
 }
 
 bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 {
- 
+
     if (evidence->getFrequency() <= 3)
     {
         return false;
+    }
+
+    if (evidence->getMaxMapQ()<30)
+    {
+        return false;
+    }
+
+    if (evidence->getMark() == "MATEUNMAPPED")
+    {
+        if (evidence->getEnd() == 0)
+        {
+            return false;
+        }
     }
 
     return true;
@@ -233,7 +290,6 @@ void SpecifyingEvidenceInsertion::checkProveEvidence()
 
 void SpecifyingEvidenceInsertion::done()
 {
-
     std::vector<Evidence> temp;
     for (auto n : finalEvidence)
     {

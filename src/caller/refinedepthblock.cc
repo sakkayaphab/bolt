@@ -86,15 +86,18 @@ void RefineDepthBlock::execute()
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
             result = getResultRemoveOverlapped(&variantlist, &variantlist);
-            result = getRefineResultTranslocation(&variantlist);
+            result = getResultRemoveOverlapped(&result, &result);
+
+            // result = getRefineResultTranslocation(&variantlist);
             // result = variantlist;
         }
         else if (variantlist.at(0).getSVType() == "INS")
         {
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
-            result = getResultRemoveOverlapped(&variantlist, &variantlist);
             result = getRefineResultInsertion(&variantlist);
+            result = getResultRemoveOverlapped(&result, &result);
+
             // result = variantlist;
         }
         else
@@ -236,63 +239,73 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 4)
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // auto currentEnd = roundNumber(n.getEnd(), roundConfig);
-        // auto nextEnd = nextNumber(n.getEnd(), roundConfig);
-        // auto previousEnd = previousNumber(n.getEnd(), roundConfig);
-
-        // auto currentEndRD = rdf.getBlock(currentEnd);
-        // auto nextEndRD = rdf.getBlock(nextEnd);
-        // auto previousEndRD = rdf.getBlock(previousEnd);
-
-        // if (currentEndRD.INV1 + currentEndRD.INV2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        if (n.getFrequency() <= 2)
+        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
         {
             continue;
         }
 
-        if (n.getMaxMapQ() < 40)
+        if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
         {
             continue;
         }
 
-        // if (n.getMinMapQ() == 0)
+        if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+        if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
+        {
+            continue;
+        }
+
+
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 3))
+        {
+            continue;
+        }
+
+        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+        {
+            continue;
+        }
+
+        // if (n.getFrequency() <= 3)
         // {
         //     continue;
         // }
+
+        if (n.getMaxMapQ() < 30)
+        {
+            continue;
+        }
+
+        if (n.getMaxRPMapQ() < 20)
+        {
+            continue;
+        }
+
+        if ((n.getMark() == "MATEUNMAPPED"))
+        {
+            // continue;
+        }
+        else
+        {
+            continue;
+             
+        }
+
+        // continue;
 
         cache.push_back(n);
     }
@@ -473,8 +486,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         auto nextRD = rdf.getBlock(nextPos);
         auto previousRD = rdf.getBlock(previousPos);
 
-        
-
         if (n.getMark() == "SR")
         {
             // continue;
@@ -493,7 +504,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             //     continue;
             // }
 
-            if (n.getMaxRPMapQ() ==0)
+            if (n.getMaxRPMapQ() == 0)
             {
                 continue;
             }
@@ -597,7 +608,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             continue;
         }
 
-        if (n.getMaxMapQ()==0)
+        if (n.getMaxMapQ() == 0)
         {
             continue;
         }
