@@ -49,6 +49,8 @@ class SmithWaterman
     void setReference(std::string *reference);
     std::vector<ScoreAlignment> removeRedundant(std::vector<ScoreAlignment> *scorelist);
 
+    int findMaxMatchInsertion(std::string *query);
+
   private:
     std::string reference;
     int32_t RefPos;

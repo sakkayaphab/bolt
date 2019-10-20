@@ -26,6 +26,13 @@ public:
         int32_t deleteCount = 0;
     };
 
+    struct KeepPos
+    {
+        int32_t pos = 0;
+        int32_t end = 0;
+        int32_t count = 0;
+    };
+
     StringSearch();
     void setReference(const char *reference);
     void buildHashTable();
@@ -40,6 +47,7 @@ public:
     void removeMissMatchEndPattern(Score *score);
     void removeMissMatchStartPattern(Score *score);
     bool conditionSaveResult(Score *score);
+    StringSearch::Score getBestMatchFragment(std::string *seq);
 };
 
 #endif

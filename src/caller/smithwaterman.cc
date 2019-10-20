@@ -42,6 +42,30 @@ void SmithWaterman::setRefPos(int32_t RefPos)
     SmithWaterman::RefPos = RefPos;
 }
 
+int SmithWaterman::findMaxMatchInsertion(std::string *seq)
+{
+    std::vector<std::vector<int>> cell;
+    makeScoreMatrix(&cell, seq);
+
+    std::cout << cell.size() << std::endl;
+    int maxMatch=0;
+    for (std::vector<int> n : cell)
+    {
+        for (int m : n)
+        {
+            if (m>maxMatch)
+            {
+                maxMatch = m;
+            }
+            
+        }
+    }
+
+    std::cout << maxMatch << std::endl;
+
+    return maxMatch;
+}
+
 std::vector<SmithWaterman::ScoreAlignment> SmithWaterman::findEndToStart(std::string seq)
 {
     std::vector<std::vector<int>> cell;
@@ -53,7 +77,7 @@ std::vector<SmithWaterman::ScoreAlignment> SmithWaterman::findEndToStart(std::st
         int score = cell.at(seq.length()).at(i);
         if (score >= 4)
         {
-            ScoreAlignment aResult = getNextPath(&cell, &seq, seq.size(), i,false);
+            ScoreAlignment aResult = getNextPath(&cell, &seq, seq.size(), i, false);
             // countScorePattern(&aResult);
             // if (aResult.countpatternmatch >= 2)
             // {
@@ -88,7 +112,7 @@ std::vector<SmithWaterman::ScoreAlignment> SmithWaterman::findStartToEnd(std::st
         int score = cell.at(seq.length()).at(i);
         if (score >= 4)
         {
-            ScoreAlignment aResult = getNextPath(&cell, &seq, seq.size(), i,true);
+            ScoreAlignment aResult = getNextPath(&cell, &seq, seq.size(), i, true);
             // countScorePattern(&aResult);
             // if (aResult.countpatternmatch >= 3)
             // {
@@ -242,10 +266,10 @@ void SmithWaterman::goToLeft(int *i, int *j)
     *i = *i - 1;
 }
 
-SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector<int>> *cell, std::string *seq, int i, int j,bool findStartToEnd)
+SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector<int>> *cell, std::string *seq, int i, int j, bool findStartToEnd)
 {
     std::string pattern;
-     int32_t start = j;
+    int32_t start = j;
 
     int currentpos = cell->at(i).at(j);
     if (seq->at(i - 1) == reference.at(j - 1))
@@ -264,7 +288,7 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
     //     ScoreAlignment score;
     //     return score;
     // }
-   
+
     // std::cout << "i : " << i << " j : " << j << std::endl;
     int stateMissmatch = 0;
     int missmatch = 0;
@@ -273,7 +297,7 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
     {
         // std::cout << "----start --- " << std::endl;
 
-        if (i==1 ||j==1)
+        if (i == 1 || j == 1)
         {
             break;
         }
@@ -283,7 +307,8 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
             break;
         }
 
-        if (missmatch==2) {
+        if (missmatch == 2)
+        {
             break;
         }
 
@@ -293,7 +318,6 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
         // std::cout << "current seq : " << seq->at(i - 1) << " ref : " << reference.at(j - 1) << std::endl;
         // std::cout << "current pattern : " << pattern << std::endl;
 
-
         int upper = getScoreUpper(cell, i, j);
         int upperleft = getScoreUpperleft(cell, i, j);
         int left = getScoreLeft(cell, i, j);
@@ -302,26 +326,25 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
         // std::cout << " > upperleft : " << upperleft << std::endl;
         // std::cout << " > left : " << left << std::endl;
 
-        if (upper==0 && upperleft ==0 && left ==0) {
+        if (upper == 0 && upperleft == 0 && left == 0)
+        {
             break;
         }
-
-        
 
         if (upperleft != 0)
         {
             // if (upperleft == currentpos - 1)
             // {
-                // std::cout << "upperleft" << std::endl;
-                if (seq->at(i - 1) == reference.at(j - 1))
-                {
-                    pattern += "M";
-                    stateMissmatch = 0;
-                    
-                    goToUpperleft(&i, &j);
-                    // std::cout << " > goto : goToUpperleft M" << std::endl;
-                    continue;
-                }
+            // std::cout << "upperleft" << std::endl;
+            if (seq->at(i - 1) == reference.at(j - 1))
+            {
+                pattern += "M";
+                stateMissmatch = 0;
+
+                goToUpperleft(&i, &j);
+                // std::cout << " > goto : goToUpperleft M" << std::endl;
+                continue;
+            }
             // }
 
             if (upperleft > upper && upperleft > left)
@@ -354,11 +377,13 @@ SmithWaterman::ScoreAlignment SmithWaterman::getNextPath(std::vector<std::vector
         continue;
     }
 
-
-    if (findStartToEnd) {
-        return calculatePositionfindEndToStart(start,pattern);
-    }else {
-        return calculatePositionfindStartToEnd(start,pattern);
+    if (findStartToEnd)
+    {
+        return calculatePositionfindEndToStart(start, pattern);
+    }
+    else
+    {
+        return calculatePositionfindStartToEnd(start, pattern);
     }
 }
 
@@ -408,7 +433,7 @@ SmithWaterman::ScoreAlignment SmithWaterman::calculatePositionfindStartToEnd(int
     }
 
     score.endseq = seqRun;
-    score.pos = pos-refRun;
+    score.pos = pos - refRun;
     score.end = score.pos + refRun;
     score.pattern = pattern;
 
@@ -416,7 +441,6 @@ SmithWaterman::ScoreAlignment SmithWaterman::calculatePositionfindStartToEnd(int
 
     return score;
 }
-
 
 SmithWaterman::ScoreAlignment SmithWaterman::calculatePositionfindEndToStart(int pos, std::string pattern)
 {

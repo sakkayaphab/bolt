@@ -17,7 +17,6 @@ if(APPLE)
         caller
         vcf
         fasta
-        ${SSWLIB_LIBRARIES}
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
         ${LIBLZMA_LIBRARIES}
@@ -29,7 +28,6 @@ elseif(UNIX AND NOT APPLE)
         caller
         vcf
         fasta
-        ${SSWLIB_LIBRARIES}
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
         ${LIBLZMA_LIBRARIES}

@@ -424,7 +424,7 @@ void Evidence::setEvidenceByString(std::string line)
                     continue;
                 }
  
-                else if (getKeybyText(ainfo) == "LNGMATCH")
+                else if (getKeybyText(ainfo) == "BOLT_LNGMATCH")
                 {
                     LNGMATCH = atoi(getValuebyText(ainfo).c_str());
                     continue;
@@ -529,7 +529,7 @@ std::string Evidence::getInfoString()
     {
         result.append("BOLT_FREQ=" + std::to_string(getFrequency()) + ";");
     }
-    result.append("LNGMATCH=" + std::to_string(LNGMATCH) + ";");
+    result.append("BOLT_LNGMATCH=" + std::to_string(LNGMATCH) + ";");
     result.append("BOLT_MQL=" + convertMapQlistToCommaString(getMapQVector()) + ";");
     if (getMark() != "")
     {

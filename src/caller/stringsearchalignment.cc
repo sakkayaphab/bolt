@@ -27,7 +27,6 @@ int32_t StringSearchAlignment::getPosReference()
 
 void StringSearchAlignment::buildReference()
 {
-    
     ss.setReference(reference.c_str());
     ss.buildHashTable();
 }
