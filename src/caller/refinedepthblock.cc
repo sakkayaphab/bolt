@@ -249,25 +249,25 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             continue;
         }
 
-        if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
-        {
-            continue;
-        }
+        // if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
-        {
-            continue;
-        }
+        // if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
-        {
-            continue;
-        }
+        // if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
-        {
-            continue;
-        }
+        // if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
+        // {
+        //     continue;
+        // }
 
 
         if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 3))
@@ -275,7 +275,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             continue;
         }
 
-        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 7, 100, 3))
         {
             continue;
         }
@@ -285,7 +285,24 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         //     continue;
         // }
 
-        if (n.getMaxMapQ() < 30)
+        // if (n.getNumberOfZeroRPMapQ()>=2)
+        // {
+        //     continue;
+        // }
+
+        // if (n.getMaxMapQ() < 30)
+        // {
+        //     continue;
+        // }
+
+        // if (n.getMaxRPMapQ() < 20)
+        // {
+        //     continue;
+        // }
+
+        if ((n.getMark() == "MATEUNMAPPED"))
+        {
+            if (n.getMaxMapQ() < 30)
         {
             continue;
         }
@@ -294,14 +311,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         {
             continue;
         }
-
-        if ((n.getMark() == "MATEUNMAPPED"))
-        {
             // continue;
         }
         else
         {
-            continue;
+            // continue;
              
         }
 
@@ -910,11 +924,11 @@ std::vector<Evidence> RefineDepthBlock::getResultRemoveOverlapped(std::vector<Ev
         bool found = false;
         for (auto m : cache)
         {
-            // if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
-            // {
-            //     found = true;
-            //     continue;
-            // }
+            if (n.getPos() == m.getPos() && n.getEnd() == m.getEnd())
+            {
+                found = true;
+                break;
+            }
 
             if (checkBetween(n.getPos(), m.getPos(), 10) && checkBetween(n.getEnd(), m.getEnd(), 10))
             {

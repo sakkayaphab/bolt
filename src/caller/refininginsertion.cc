@@ -1,5 +1,7 @@
 #include "refininginsertion.h"
 #include <stdlib.h>
+#include "smithwaterman.h"
+#include <ssw_cpp.h>
 
 RefiningInsertion::RefiningInsertion()
 {
@@ -18,6 +20,11 @@ void RefiningInsertion::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(),
                                                  evidence.getPos() + evidence.getCiPosRight());
+
+    if (evidence.getPos() + evidence.getCiPosRight()-evidence.getPos() + evidence.getCiPosLeft()<200)
+    {
+        return;
+    }
 
     const char *range = findRange.c_str();
     refineStartToEnd(range);
@@ -141,7 +148,7 @@ void RefiningInsertion::findBreakpoint()
             continue;
         }
 
-        if (n.getFrequency() < 1)
+        if (n.getFrequency() <= 1)
         {
             continue;
         }
@@ -154,42 +161,65 @@ void RefiningInsertion::findBreakpoint()
         // {
         //     std::cout << text << std::endl;
         // }
+        std::vector<CountRefineSeq> mergeStart;
+        if ((evidence.getMark() != "MATEUNMAPPED"))
+        {
+            mergeStart = mergeString(n, false);
+        }
 
-        std::vector<CountRefineSeq> mergeStart = mergeString(n.getSeqList(), false);
+        int frequency = 0;
+        std::vector<uint8_t> mapq;
 
         for (InsertionPositionDetail m : vectorSCEnd)
         {
+            mapq.clear();
             if (m.getLongMapping() < 10)
             {
                 continue;
             }
 
-            if (m.getFrequency() < 1)
+            if (m.getFrequency() <= 1)
             {
                 continue;
             }
+            if ((evidence.getMark() != "MATEUNMAPPED"))
+            {
+                std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
+                std::vector<uint8_t> tempmapq;
 
-            std::vector<CountRefineSeq> mergeEnd = mergeString(m.getSeqList(), true);
+                bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &tempmapq);
+                mapq = tempmapq;
+
+                if (!passoverlapped)
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                frequency = n.getFrequency() + m.getFrequency();
+            }
 
             if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();
                 tempBP.end = m.getPosition();
-                tempBP.frequency = n.getFrequency() + m.getFrequency();
+                tempBP.frequency = frequency;
 
                 tempBP.score = n.getFrequency() + m.getFrequency();
                 tempBP.longmapstart = n.getLongMapping();
                 tempBP.longmapend = m.getLongMapping();
+                tempBP.mappingqualitylist = mapq;
 
-                for (auto x : n.getMapQList())
-                {
-                    tempBP.mappingqualitylist.push_back(x);
-                }
-                for (auto x : m.getMapQList())
-                {
-                    tempBP.mappingqualitylist.push_back(x);
-                }
+                // for (auto x : n.getMapQList())
+                // {
+                //     tempBP.mappingqualitylist.push_back(x);
+                // }
+                // for (auto x : m.getMapQList())
+                // {
+                //     tempBP.mappingqualitylist.push_back(x);
+                // }
 
                 if (tempBP.frequency <= 2)
                 {
@@ -253,25 +283,24 @@ void RefiningInsertion::clearMapSC()
     mapSCEnd.clear();
 }
 
-std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(std::vector<std::string> fragmentlist, bool fromstart)
+std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(InsertionPositionDetail fragmentlist, bool fromstart)
 {
-            // compareEditDistance("ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCA", "ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGTACCT", false);
+    // compareEditDistance("ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCA", "ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGTACCT", false);
 
-        // compareEditDistance("AATCACTGCTTATTGACTGAATCAGCAATGGGGT", "GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
-        // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", "AATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
-        // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACT", "GCCACACACAGAGCAGACGC", true);
-        // compareEditDistance("GCCACACACAGAGCAGACGC", "GCCACACACAGAGCAGACGCTGAATCACT", true);
-        
+    // compareEditDistance("AATCACTGCTTATTGACTGAATCAGCAATGGGGT", "GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
+    // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT", "AATCACTGCTTATTGACTGAATCAGCAATGGGGT", false);
+    // compareEditDistance("GCCACACACAGAGCAGACGCTGAATCACT", "GCCACACACAGAGCAGACGC", true);
+    // compareEditDistance("GCCACACACAGAGCAGACGC", "GCCACACACAGAGCAGACGCTGAATCACT", true);
 
     std::vector<CountRefineSeq> tempSeq;
 
     // return tempSeq;
 
-    for (std::string n : fragmentlist)
+    int count = 0;
+    for (std::string n : fragmentlist.getSeqList())
+    //  for (int in=0;in < fragmentlist.)
     {
 
-        // std::cout << n << std::endl;
-        
         bool added = false;
         for (int i = 0; i < tempSeq.size(); i++)
         {
@@ -281,10 +310,11 @@ std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(st
                 {
                     tempSeq.at(i).seq = n;
                     tempSeq.at(i).count++;
+                    tempSeq.at(i).mapqlist.push_back(fragmentlist.getMapQList().at(count));
                 }
                 added = true;
                 // break;
-            } 
+            }
         }
 
         if (!added)
@@ -292,17 +322,11 @@ std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(st
             CountRefineSeq tempCRS;
             tempCRS.seq = n;
             tempCRS.count++;
+            tempCRS.mapqlist.push_back(fragmentlist.getMapQList().at(count));
             tempSeq.push_back(tempCRS);
         }
- 
+        count++;
     }
-
-    std::cout << "------" << std::endl;
-    for (CountRefineSeq n : tempSeq)
-    {
-        std::cout << n.seq << " = " << n.count << std::endl;
-    }
-    std::cout << "^^^^^" << std::endl;
 
     return tempSeq;
 }
@@ -326,7 +350,7 @@ bool RefiningInsertion::compareEditDistance(std::string s1, std::string s2, bool
     // std::cout << temps1 << std::endl;
     // std::cout << temps2 << std::endl;
 
-    if (editpoint<4)
+    if (editpoint < 4)
     {
         return true;
     }
@@ -368,4 +392,161 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
 
     *s1 = temps1;
     *s2 = temps2;
+}
+
+bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, std::vector<uint8_t> *mapq)
+{
+    // std::cout << "START SEQ" << std::endl;
+    // for (CountRefineSeq n : startSeq)
+    // {
+    //     std::cout << n.seq << " = " << n.count << std::endl;
+    // }
+    // std::cout << "^^^^^" << std::endl;
+
+    // std::cout << "END SEQ" << std::endl;
+    // for (CountRefineSeq n : endSeq)
+    // {
+    //     std::cout << n.seq << " = " << n.count << std::endl;
+    // }
+    // std::cout << "^^^^^" << std::endl;
+
+    for (CountRefineSeq n : startSeq)
+    {
+        if (n.seq.size() < 20)
+        {
+            continue;
+        }
+        // std::cout << n.seq << " = " << n.count << " > " << n.seq.size() << std::endl;
+
+        for (CountRefineSeq m : endSeq)
+        {
+            if (m.seq.size() < 20)
+            {
+                continue;
+            }
+
+            // std::cout << m.seq << " = " << m.count << " > " << m.seq.size() << std::endl;
+
+            std::string ref;
+            std::string query;
+            if (n.seq.size() >= m.seq.size())
+            {
+                ref = n.seq;
+                query = m.seq;
+            }
+            else
+            {
+                ref = m.seq;
+                query = n.seq;
+            }
+
+            if (ref.size() < 20)
+            {
+                continue;
+            }
+
+            if (query.size() < 20)
+            {
+                continue;
+            }
+
+            std::cout << evidence.getPos() << std::endl;
+            std::cout << ref.size() << " ref = " << ref << std::endl;
+            std::cout <<  query.size() << "query = " << query << std::endl;
+
+            int32_t maskLen = strlen(query.c_str()) / 4;
+            maskLen = maskLen < 15 ? 15 : maskLen;
+            // int32_t maskLen = 8;
+            //const string ref   = "CCGTTTATCGCA";
+            //const string query = "CCTTTTATCGCA";
+
+            StripedSmithWaterman::Aligner aligner;
+            // Declares a default filter
+            StripedSmithWaterman::Filter filter;
+            // Declares an alignment that stores the result
+            StripedSmithWaterman::Alignment alignment;
+            // Aligns the query to the ref
+            // aligner.CleanReferenceSequence();
+            aligner.Align(query.c_str(), ref.c_str(), ref.size(), filter, &alignment, maskLen);
+
+            // std::cout << "===== SSW result =====" << std::endl;
+            // std::cout << "Best Smith-Waterman score:\t" << alignment.sw_score << std::endl
+            //           << "Next-best Smith-Waterman score:\t" << alignment.sw_score_next_best << std::endl
+            //           << "Reference start:\t" << alignment.ref_begin << std::endl
+            //           << "Reference end:\t" << alignment.ref_end << std::endl
+            //           << "Query start:\t" << alignment.query_begin << std::endl
+            //           << "Query end:\t" << alignment.query_end << std::endl
+            //           << "Next-best reference end:\t" << alignment.ref_end_next_best << std::endl
+            //           << "Number of mismatches:\t" << alignment.mismatches << std::endl
+            //           << "Cigar: " << alignment.cigar_string << std::endl;
+            // std::cout << "======================" << std::endl;
+
+            // if (alignment.sw_score > 20 && alignment.mismatches<=0)
+            // {
+            //     return true;
+            // }
+
+            // if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
+            // {
+            //     continue;
+            // }
+
+            // *frequency = n.count + m.count;
+            // std::vector<uint8_t> tempmapq;
+            // tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
+            // tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
+            // *mapq = tempmapq;
+
+
+            // if (alignment.sw_score > 20 && alignment.mismatches <= 0)
+            // {
+            //     return true;
+            // }
+
+            // if (alignment.sw_score > 30 && alignment.mismatches <= 1)
+            // {
+            //     return true;
+            // }
+
+            // if (alignment.sw_score > 40 && alignment.mismatches <= 2)
+            // {
+            //     return true;
+            // }
+
+            // if (alignment.sw_score > 50)
+            // {
+            //     return true;
+            // }
+        }
+    }
+
+    return false;
+
+    //     const std::string ref = "ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGTACCT";
+    //     const std::string query = "CCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGT";
+    //     int32_t maskLen = strlen(query.c_str()) / 2;
+    //     maskLen = maskLen < 15 ? 15 : maskLen;
+    //     //const string ref   = "CCGTTTATCGCA";
+    //     //const string query = "CCTTTTATCGCA";
+
+    //     StripedSmithWaterman::Aligner aligner;
+    //     // Declares a default filter
+    //     StripedSmithWaterman::Filter filter;
+    //     // Declares an alignment that stores the result
+    //     StripedSmithWaterman::Alignment alignment;
+    //     // Aligns the query to the ref
+    //     // aligner.CleanReferenceSequence();
+    //     aligner.Align(query.c_str(), ref.c_str(), ref.size(), filter, &alignment, maskLen);
+
+    //     std::cout << "===== SSW result =====" << std::endl;
+    //     std::cout << "Best Smith-Waterman score:\t" << alignment.sw_score << std::endl
+    //               << "Next-best Smith-Waterman score:\t" << alignment.sw_score_next_best << std::endl
+    //               << "Reference start:\t" << alignment.ref_begin << std::endl
+    //               << "Reference end:\t" << alignment.ref_end << std::endl
+    //               << "Query start:\t" << alignment.query_begin << std::endl
+    //               << "Query end:\t" << alignment.query_end << std::endl
+    //               << "Next-best reference end:\t" << alignment.ref_end_next_best << std::endl
+    //               << "Number of mismatches:\t" << alignment.mismatches << std::endl
+    //               << "Cigar: " << alignment.cigar_string << std::endl;
+    //     std::cout << "======================" << std::endl;
 }

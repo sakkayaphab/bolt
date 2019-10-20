@@ -51,6 +51,7 @@ public:
   void setMultipleEndChromosome(const std::vector<std::string> &multipleEndChromosome);
   void setMapQList(std::vector<uint8_t> mapqs);
   int getNumberOfZeroMapQ();
+   int getNumberOfZeroRPMapQ();
 
 public:
   //    bool isFoundEvidenceAtStart() const;

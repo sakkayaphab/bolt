@@ -150,7 +150,7 @@ int Cli::callSV()
     // caller.execute();
     // caller.catfile();
     caller.findBreakPoint();
-    // caller.refineDelpthBlock();
+    caller.refineDelpthBlock();
 
     return 0;
 }

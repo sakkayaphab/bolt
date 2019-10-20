@@ -182,12 +182,12 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 bool ReadDepthAnalysis::filterInsertion(Evidence e)
 {
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 3))
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
     {
         return false;
     }
 
-    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 3))
+    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
     {
         return false;
     }

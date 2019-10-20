@@ -17,15 +17,18 @@ include(ExternalProject)
 
 # Build external library
 include(cmake/FindHTSlib.cmake)
-#include(cmake/FindZLIBlib.cmake)
-#include(cmake/FindLZMAlib.cmake)
-#include(cmake/FindBZip2.cmake)
+include(cmake/FindZLIBlib.cmake)
+include(cmake/FindLZMAlib.cmake)
+include(cmake/FindBZip2.cmake)
 include(cmake/FindTBB.cmake)
+include(cmake/FindSSWlib.cmake)
 
 enable_testing()
 
 #include header
 include_directories(${HTSLIB_INCLUDE_DIRS})
+include_directories(${SSWLIB_INCLUDE_DIRS})
+
 
 # build bolt
 add_subdirectory(src)

@@ -264,7 +264,7 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
         return false;
     }
 
-    if (evidence->getMaxMapQ()<30)
+    if (evidence->getMaxMapQ()==0)
     {
         return false;
     }
@@ -293,7 +293,6 @@ void SpecifyingEvidenceInsertion::done()
     std::vector<Evidence> temp;
     for (auto n : finalEvidence)
     {
-
         if (readdepthHelper->isRangeDisorderByMorethanRD(n.getPosDiscordantRead(), n.getEndDiscordantRead(), readdepthHelper->getAvgReadDepth() + 30))
         {
             continue;

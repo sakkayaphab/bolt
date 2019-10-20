@@ -159,7 +159,7 @@ void Caller::execute()
     // std::cout << "start executing" << std::endl;
     // find evidence by using multiple process
     // int max_active = numberofparallel;
-    int max_active = 35;
+    int max_active = numberofparallel;
     int number_active = 0;
     bool done = false;
     int32_t tasks = bam_header.n_targets;
@@ -525,10 +525,10 @@ int Caller::findBreakPoint()
     std::mutex mxWriteFile;
     EvidenceProvider ep(&filepath);
     int sizeLoop = ep.getEvidenceSize();
-    std::cout << "sizeLoop : " << sizeLoop << std::endl;
+    // std::cout << "sizeLoop : " << sizeLoop << std::endl;
 
     int countRunEvidence = 0;
-    // tbb::task_scheduler_init init(1);
+    tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
     // float progress = 0.0;

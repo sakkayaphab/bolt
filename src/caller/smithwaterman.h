@@ -62,8 +62,6 @@ class SmithWaterman
     int getMaxInteger(std::vector<int> *score);
     ScoreAlignment getNextPath(std::vector<std::vector<int>> *cell,std::string *seq,int i,int j,bool findStartToEnd);
 
-
-
     int getScoreUpper(std::vector<std::vector<int>> *cell,int i,int j);
     int getScoreUpperleft(std::vector<std::vector<int>> *cell,int i,int j);
     int getScoreLeft(std::vector<std::vector<int>> *cell,int i,int j);

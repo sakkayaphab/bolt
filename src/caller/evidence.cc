@@ -949,6 +949,21 @@ int Evidence::getNumberOfZeroMapQ()
     return count;
 }
 
+
+int Evidence::getNumberOfZeroRPMapQ()
+{
+    int count = 0;
+    for (auto n : rpmapqlist)
+    {
+        if (n == 0)
+        {
+            count++;
+        }
+    }
+
+    return count;
+}
+
 bool Evidence::haveSomeMapQMoreThan(uint8_t qual)
 {
     for (auto n : mapqlist)

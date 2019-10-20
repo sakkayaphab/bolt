@@ -44,6 +44,7 @@ private:
   {
     std::string seq;
     int count=0;
+    std::vector<uint8_t> mapqlist;
   };
   
   
@@ -55,9 +56,10 @@ private:
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   void filterBreakpoint();
 
-  std::vector<CountRefineSeq> mergeString(std::vector<std::string> fragmentlist,bool fromstart);
+  std::vector<CountRefineSeq> mergeString(InsertionPositionDetail fragmentlist,bool fromstart);
   bool compareEditDistance(std::string s1,std::string s2,bool fromstart);
   void substringSeq(std::string *s1,std::string *s2,bool fromstart);
+  bool getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,std::vector<uint8_t> *mapq);
 
 public:
   RefiningInsertion();
