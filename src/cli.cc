@@ -148,7 +148,7 @@ int Cli::callSV()
     caller.showinfo();
     caller.setParallel(40);
     // caller.execute();
-    // caller.catfile();
+    caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 

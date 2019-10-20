@@ -274,7 +274,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     setFocusReadDepth(e.getEndDiscordantRead() - configRound, e.getLastEndDiscordantRead() + configRound, &endFocusReadDepth);
     collectNewData();
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800 && getReadDepthAverageFocusArea(&endFocusReadDepth)>800)
+    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500 && getReadDepthAverageFocusArea(&endFocusReadDepth)>500)
     {
         return false;
     }

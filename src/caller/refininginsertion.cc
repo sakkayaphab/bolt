@@ -166,12 +166,12 @@ void RefiningInsertion::findBreakpoint()
             mergeStart = mergeString(n, false);
         }
 
-        int frequency = 0;
-        std::vector<uint8_t> mapq;
+        
 
         for (InsertionPositionDetail m : vectorSCEnd)
         {
-            mapq.clear();
+            
+        
             if (m.getLongMapping() < 10)
             {
                 continue;
@@ -181,12 +181,17 @@ void RefiningInsertion::findBreakpoint()
             {
                 continue;
             }
+
+            
+            int frequency = 0;
+            std::vector<uint8_t> mapq;
+            int32_t longmatch = 0;
             if ((evidence.getMark() != "MATEUNMAPPED"))
             {
                 std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
                 std::vector<uint8_t> tempmapq;
 
-                bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &tempmapq);
+                bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency,&longmatch, &tempmapq);
                 mapq = tempmapq;
 
                 if (!passoverlapped)
@@ -205,6 +210,7 @@ void RefiningInsertion::findBreakpoint()
                 tempBP.pos = n.getPosition();
                 tempBP.end = m.getPosition();
                 tempBP.frequency = frequency;
+                tempBP.longmatch = longmatch;
 
                 tempBP.score = n.getFrequency() + m.getFrequency();
                 tempBP.longmapstart = n.getLongMapping();
@@ -393,7 +399,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     *s2 = temps2;
 }
 
-bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, std::vector<uint8_t> *mapq)
+bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,int *longmatch,std::vector<uint8_t> *mapq)
 {
     // std::cout << "START SEQ" << std::endl;
     // for (CountRefineSeq n : startSeq)
@@ -465,6 +471,7 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
             tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
             tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
             *mapq = tempmapq;
+            *longmatch = maxmatch;
 
             // if (samplestat->get)
 

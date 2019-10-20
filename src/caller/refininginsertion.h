@@ -30,6 +30,7 @@ private:
     int longmapstart =0;
     int longmapend = 0;
     int score = 0;
+    int32_t longmatch=0;
     std::vector<uint8_t> mappingqualitylist;
 
     bool operator<(const BreakpointPosition &rhs) const
@@ -59,7 +60,7 @@ private:
   std::vector<CountRefineSeq> mergeString(InsertionPositionDetail fragmentlist,bool fromstart);
   bool compareEditDistance(std::string s1,std::string s2,bool fromstart);
   void substringSeq(std::string *s1,std::string *s2,bool fromstart);
-  bool getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,std::vector<uint8_t> *mapq);
+  bool getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,int *longmatch,std::vector<uint8_t> *mapq);
 
 public:
   RefiningInsertion();

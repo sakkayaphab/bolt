@@ -249,74 +249,32 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             continue;
         }
 
-        // if (currentRD.INV1 + currentRD.INV2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-        // if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
-        // {
-        //     continue;
-        // }
-
-
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 3))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 7, 100, 3))
         {
             continue;
         }
 
-        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 7, 100, 3))
+        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
         {
             continue;
         }
-
-        // if (n.getFrequency() <= 3)
-        // {
-        //     continue;
-        // }
-
-        // if (n.getNumberOfZeroRPMapQ()>=2)
-        // {
-        //     continue;
-        // }
-
-        // if (n.getMaxMapQ() < 30)
-        // {
-        //     continue;
-        // }
-
-        // if (n.getMaxRPMapQ() < 20)
-        // {
-        //     continue;
-        // }
 
         if ((n.getMark() == "MATEUNMAPPED"))
         {
             if (n.getMaxMapQ() < 30)
-        {
-            continue;
-        }
+            {
+                continue;
+            }
 
-        if (n.getMaxRPMapQ() < 20)
-        {
+            if (n.getMaxRPMapQ() < 20)
+            {
+                continue;
+            }
             continue;
-        }
-            // continue;
         }
         else
         {
             // continue;
-             
         }
 
         // continue;

@@ -47,7 +47,7 @@ int SmithWaterman::findMaxMatchInsertion(std::string *seq)
     std::vector<std::vector<int>> cell;
     makeScoreMatrix(&cell, seq);
 
-    std::cout << cell.size() << std::endl;
+    // std::cout << cell.size() << std::endl;
     int maxMatch=0;
     for (std::vector<int> n : cell)
     {
@@ -61,7 +61,7 @@ int SmithWaterman::findMaxMatchInsertion(std::string *seq)
         }
     }
 
-    std::cout << maxMatch << std::endl;
+    // std::cout << maxMatch << std::endl;
 
     return maxMatch;
 }
