@@ -270,10 +270,14 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             {
                 continue;
             }
-            continue;
+            // continue;
         }
         else
         {
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 1))
+            {
+                continue;
+            }
             // continue;
         }
 

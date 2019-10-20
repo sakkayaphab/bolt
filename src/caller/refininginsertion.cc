@@ -128,6 +128,7 @@ void RefiningInsertion::filterBreakpoint()
         variantresult.setEnd(averagePos);
         variantresult.setFrequency(n.frequency);
         variantresult.setRPMapQ(*evidence.getMapQVector());
+        variantresult.LNGMATCH = n.longmatch;
 
         variantresult.setMapQList(n.mappingqualitylist);
         variantresult.setChr(evidence.getChr());
@@ -161,17 +162,14 @@ void RefiningInsertion::findBreakpoint()
         //     std::cout << text << std::endl;
         // }
         std::vector<CountRefineSeq> mergeStart;
-        if ((evidence.getMark() != "MATEUNMAPPED"))
-        {
-            mergeStart = mergeString(n, false);
-        }
-
-        
+        // if ((evidence.getMark() != "MATEUNMAPPED"))
+        // {
+        mergeStart = mergeString(n, false);
+        // }
 
         for (InsertionPositionDetail m : vectorSCEnd)
         {
-            
-        
+
             if (m.getLongMapping() < 10)
             {
                 continue;
@@ -182,27 +180,26 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            
             int frequency = 0;
             std::vector<uint8_t> mapq;
             int32_t longmatch = 0;
-            if ((evidence.getMark() != "MATEUNMAPPED"))
-            {
-                std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
-                std::vector<uint8_t> tempmapq;
+            // if ((evidence.getMark() != "MATEUNMAPPED"))
+            // {
+            std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
+            std::vector<uint8_t> tempmapq;
 
-                bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency,&longmatch, &tempmapq);
-                mapq = tempmapq;
+            bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &longmatch, &tempmapq);
+            mapq = tempmapq;
 
-                if (!passoverlapped)
-                {
-                    continue;
-                }
-            }
-            else
+            if (!passoverlapped)
             {
-                frequency = n.getFrequency() + m.getFrequency();
+                continue;
             }
+            // }
+            // else
+            // {
+            //     frequency = n.getFrequency() + m.getFrequency();
+            // }
 
             if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
             {
@@ -399,7 +396,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     *s2 = temps2;
 }
 
-bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,int *longmatch,std::vector<uint8_t> *mapq)
+bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, int *longmatch, std::vector<uint8_t> *mapq)
 {
     // std::cout << "START SEQ" << std::endl;
     // for (CountRefineSeq n : startSeq)
@@ -431,6 +428,8 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq,st
     // ssa.setPosReference(positionStartReference);
     // ssa.buildReference();
 
+
+
     for (CountRefineSeq n : startSeq)
     {
         if (n.seq.size() < 20)
@@ -448,39 +447,51 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq,st
                 continue;
             }
 
-            if (n.count + m.count<=2)
+            if (n.count + m.count <= 2)
             {
                 continue;
             }
 
-            // if (n.seq.size() < 40 || m.seq.size() < 40)
-            // {
-
-            // }
-            // else
-            // {
-            //     continue;
-            // }
-
-            SmithWaterman swm(&n.seq, 0, false);
-            int maxmatch = swm.findMaxMatchInsertion(&m.seq);
-            // std::cout << maxmatch << std::endl;
-
-            *frequency = n.count + m.count;
-            std::vector<uint8_t> tempmapq;
-            tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
-            tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
-            *mapq = tempmapq;
-            *longmatch = maxmatch;
-
-            // if (samplestat->get)
-
-            if (maxmatch > 15)
+            if ((evidence.getMark() != "MATEUNMAPPED"))
             {
-                return true;
+                SmithWaterman swm(&n.seq, 0, false);
+                int maxmatch = swm.findMaxMatchInsertion(&m.seq);
+                // std::cout << maxmatch << std::endl;
+
+                *frequency = n.count + m.count;
+                std::vector<uint8_t> tempmapq;
+                tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
+                tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
+                *mapq = tempmapq;
+                *longmatch = maxmatch;
+
+                // if (samplestat->get)
+
+                if (maxmatch > 15)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                *frequency = n.count + m.count;
+                std::vector<uint8_t> tempmapq;
+                tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
+                tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
+                *mapq = tempmapq;
+                if (m.seq.size()>=n.seq.size()) {
+                    *longmatch = m.seq.size();
+                }else
+                {
+                    *longmatch = n.seq.size();
+                }
+
+                return true;  
             }
         }
     }
+
+    
 
     return false;
 }

@@ -57,6 +57,8 @@ void ReadDepthAnalysis::setFocusReadDepth(int32_t pos, int32_t end, std::vector<
         datamodel.SCF = data.SCF;
         datamodel.SCL = data.SCL;
 
+        // std::cout << data.SCF << " " << data.SCL << " > " << data.pos << " " << data.depth << std::endl;
+
         focusReadDepth->push_back(datamodel);
     }
 }
@@ -156,7 +158,6 @@ bool ReadDepthAnalysis::filterInversion(Evidence e)
 bool ReadDepthAnalysis::filterDeletion(Evidence e)
 {
 
-   
     if (e.getFrequency() <= 1)
     {
         return false;
@@ -164,17 +165,16 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 
     if (readDepthStat.getReadDepthByChr(e.getChr()) < 15)
     {
-
     }
     else if (e.getFrequency() < getDivider(readDepthStat.getReadDepthByChr(e.getChr()), 2, 100, 1))
     {
         return false;
     }
 
-    if (sumStartSCL<=1 && sumEndSCF<=1) {
+    if (sumStartSCL <= 1 && sumEndSCF <= 1)
+    {
         return false;
     }
- 
 
     return true;
 }
@@ -182,23 +182,26 @@ bool ReadDepthAnalysis::filterDeletion(Evidence e)
 bool ReadDepthAnalysis::filterInsertion(Evidence e)
 {
 
+    // std::cout << "getReadDepthAverageFocusArea " << getReadDepthAverageFocusArea(&startFocusReadDepth) << " " << (readDepthStat.getReadDepthByChr(e.getChr()) * 2) << std::endl;
+
     if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
     {
         return false;
     }
 
-    if (getReadDepthAverageFocusArea(&endFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    {
-        return false;
-    }
- 
+    // std::cout << "getFrequency " << e.getFrequency() << std::endl;
+
     if (e.getFrequency() <= 3)
     {
         return false;
     }
 
+
     if (sumStartSCL <= 3 && sumStartSCF <= 3)
     {
+        // std::cout << e.getChr() << " " << e.getPos() << " = " << e.getEnd() <<" > sumStartSCL :" << sumStartSCL << " " << sumStartSCF << " -> " << startFocusReadDepth.size() << std::endl;
+        
+
         return false;
     }
 
@@ -211,18 +214,19 @@ bool ReadDepthAnalysis::filterDuplication(Evidence e)
     {
         return true;
     }
- 
+
     if (sumStartSCL <= 1 && sumStartSCF <= 1)
     {
         return false;
     }
 
-     if (e.getFrequency() <= 1)
+    if (e.getFrequency() <= 1)
     {
         return false;
     }
 
-    if (e.getMaxMapQ()<20) {
+    if (e.getMaxMapQ() < 20)
+    {
         return false;
     }
 
@@ -270,39 +274,62 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
 
-    setFocusReadDepth(e.getPosDiscordantRead() - configRound, e.getLastPosDiscordantRead() + configRound, &startFocusReadDepth);
-    setFocusReadDepth(e.getEndDiscordantRead() - configRound, e.getLastEndDiscordantRead() + configRound, &endFocusReadDepth);
-    collectNewData();
-
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500 && getReadDepthAverageFocusArea(&endFocusReadDepth)>500)
-    {
-        return false;
-    }
-
     if (e.getVariantType() == "DEL")
     {
+        setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+        setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
+        collectNewData();
+
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 500 && getReadDepthAverageFocusArea(&endFocusReadDepth) > 500)
+        {
+            return false;
+        }
+
         return filterDeletion(e);
     }
 
     if (e.getVariantType() == "INS")
     {
+        setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+        collectNewData();
+        // std::cout << getReadDepthAverageFocusArea(&startFocusReadDepth) << std::endl;
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 400)
+        {
+            return false;
+        }
+
         return filterInsertion(e);
     }
 
     if (e.getVariantType() == "DUP")
     {
+        setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+        setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
+        collectNewData();
+
+        if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800 && getReadDepthAverageFocusArea(&endFocusReadDepth) > 800)
+        {
+            return false;
+        }
 
         return filterDuplication(e);
     }
 
     if (e.getVariantType() == "INV")
     {
+        setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+        setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
+        collectNewData();
 
         return filterInversion(e);
     }
 
     if (e.getVariantType() == "BND")
     {
+        setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
+        setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
+        collectNewData();
+
         return filterTranslocation(e);
     }
 
@@ -410,10 +437,10 @@ void ReadDepthAnalysis::collectNewData()
     sumEndSCL = 0;
 
     sumStartR1_MUN = 0;
-     sumStartR2_MUN = 0;
+    sumStartR2_MUN = 0;
 
-     sumEndR1_MUN = 0;
-     sumEndR2_MUN = 0;
+    sumEndR1_MUN = 0;
+    sumEndR2_MUN = 0;
 
     for (auto n : startFocusReadDepth)
     {
@@ -428,11 +455,10 @@ void ReadDepthAnalysis::collectNewData()
         sumStartTRA += n.TRA2;
         sumStartINS += n.INS1;
         sumStartINS += n.INS2;
-        sumStartSCF += n.SCF;
-        sumStartSCL += n.SCL;
         
         sumStartSCF += n.SCF;
         sumStartSCL += n.SCL;
+
         sumStartR1_MUN += n.R1_MUN;
         sumStartR2_MUN += n.R1_MUN;
     }
@@ -450,9 +476,11 @@ void ReadDepthAnalysis::collectNewData()
         sumEndTRA += n.TRA2;
         sumEndINS += n.INS1;
         sumEndINS += n.INS2;
+
         sumEndSCF += n.SCF;
         sumEndSCL += n.SCL;
-         sumEndR1_MUN += n.R1_MUN;
+
+        sumEndR1_MUN += n.R1_MUN;
         sumEndR2_MUN += n.R1_MUN;
     }
 }
@@ -532,6 +560,9 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
             temp.SCF = std::stoi(token.at(13));
             temp.SCL = std::stoi(token.at(14));
 
+            temp.R1_MUN = std::stoi(token.at(15));
+            temp.R2_MUN = std::stoi(token.at(16));
+
             sumRD += temp.depth;
             count++;
             mapReadDepthLineSegment[temp.pos] = temp;
@@ -547,25 +578,6 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
     // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }
 
-// void ReadDepthAnalysis::loadReadDepthStat() {
-//     std::string filepath = filemanager->getReadDepthStatPath()+"/readdepthstat.txt";
-//     std::string line;
-//     std::ifstream myfile(filepath);
-//     if (myfile.is_open())
-//     {
-//         while (getline(myfile, line))
-//         {
-//             ReadDepthHelper::ReadDepthVector temp;
-//             std::vector<std::string> token = split(line, '=');
-
-//             readdepthlist[std::stoi(token.at(1))]++;
-//         }
-//         myfile.close();
-//     }
-//     else
-//         std::cout << "Unable to open file";
-
-// }
 
 std::vector<std::string> ReadDepthAnalysis::split(const std::string &s, char delimiter)
 {
