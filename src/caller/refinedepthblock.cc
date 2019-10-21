@@ -226,6 +226,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultTranslocation(std::vector
 
 std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evidence> *master)
 {
+
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
@@ -249,24 +250,24 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             continue;
         }
 
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 7, 100, 3))
-        {
-            continue;
-        }
-
-        if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
-        {
-            continue;
-        }
-
         if ((n.getMark() == "MATEUNMAPPED"))
         {
-            if (n.getMaxMapQ() < 30)
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 4))
             {
                 continue;
             }
 
-            if (n.getMaxRPMapQ() < 20)
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 12, 100, 4))
+            {
+                continue;
+            }
+
+            if (n.getMaxMapQ() < 10)
+            {
+                continue;
+            }
+
+            if (n.getMaxRPMapQ() < 10)
             {
                 continue;
             }
@@ -274,11 +275,32 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         }
         else
         {
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 1))
+            if (n.getMaxMapQ() < 40)
             {
                 continue;
             }
-            // continue;
+
+            if (n.getMaxRPMapQ() < 30)
+            {
+                continue;
+            }
+
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+            {
+                continue;
+            }
+
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+            {
+                continue;
+            }
+
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 15))
+            {
+                continue;
+            }
+
+            continue;
         }
 
         // continue;

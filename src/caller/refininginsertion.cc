@@ -25,6 +25,9 @@ void RefiningInsertion::first()
         return;
     }
 
+    // std::cout << "evidence.getPos() : " << evidence.getPos()
+    // << std::endl;
+
     const char *range = findRange.c_str();
     refineStartToEnd(range);
 }
@@ -86,6 +89,16 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         }
     }
 
+    if (mapSCEnd.size() > 100)
+    {
+        return;
+    }
+
+    if (mapSCStart.size() > 100)
+    {
+        return;
+    }
+
     RefiningInsertion::convertMapSC();
     RefiningInsertion::clearMapSC();
     RefiningInsertion::findBreakpoint();
@@ -115,6 +128,11 @@ void RefiningInsertion::filterBreakpoint()
         else
         {
             averagePos = (n.end + n.pos) / 2;
+        }
+
+        if (n.longmatch < getDivider(samplestat->getReadLength(), 15, 100, 15))
+        {
+            continue;
         }
 
         if (maxFreq >= n.frequency)
@@ -148,10 +166,10 @@ void RefiningInsertion::findBreakpoint()
             continue;
         }
 
-        if (n.getFrequency() <= 1)
-        {
-            continue;
-        }
+        // if (n.getFrequency() < 1)
+        // {
+        //     continue;
+        // }
 
         bool added;
 
@@ -175,10 +193,10 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            if (m.getFrequency() <= 1)
-            {
-                continue;
-            }
+            // if (m.getFrequency() <= 1)
+            // {
+            //     continue;
+            // }
 
             int frequency = 0;
             std::vector<uint8_t> mapq;
@@ -195,11 +213,6 @@ void RefiningInsertion::findBreakpoint()
             {
                 continue;
             }
-            // }
-            // else
-            // {
-            //     frequency = n.getFrequency() + m.getFrequency();
-            // }
 
             if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
             {
@@ -213,15 +226,6 @@ void RefiningInsertion::findBreakpoint()
                 tempBP.longmapstart = n.getLongMapping();
                 tempBP.longmapend = m.getLongMapping();
                 tempBP.mappingqualitylist = mapq;
-
-                // for (auto x : n.getMapQList())
-                // {
-                //     tempBP.mappingqualitylist.push_back(x);
-                // }
-                // for (auto x : m.getMapQList())
-                // {
-                //     tempBP.mappingqualitylist.push_back(x);
-                // }
 
                 if (tempBP.frequency <= 2)
                 {
@@ -428,7 +432,10 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
     // ssa.setPosReference(positionStartReference);
     // ssa.buildReference();
 
-
+    // if (startSeq.size()+endSeq.size())
+    // {
+    // std::cout << "startSeq.size()+endSeq.size() : " << startSeq.size()+endSeq.size() << std::endl;
+    // }
 
     for (CountRefineSeq n : startSeq)
     {
@@ -479,19 +486,19 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
                 tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
                 tempmapq.insert(tempmapq.end(), m.mapqlist.begin(), m.mapqlist.end());
                 *mapq = tempmapq;
-                if (m.seq.size()>=n.seq.size()) {
+                if (m.seq.size() >= n.seq.size())
+                {
                     *longmatch = m.seq.size();
-                }else
+                }
+                else
                 {
                     *longmatch = n.seq.size();
                 }
 
-                return true;  
+                return true;
             }
         }
     }
-
-    
 
     return false;
 }

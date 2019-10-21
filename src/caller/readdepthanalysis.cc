@@ -292,7 +292,13 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
     {
         setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
         collectNewData();
+
+        // if (e.getPos()==18008643)
+        // {
+        //     std::cout << e.getPos() + e.getCiPosLeft() - configRound << " " << e.getPos() + e.getCiPosRight() + configRound << std::endl;
         // std::cout << getReadDepthAverageFocusArea(&startFocusReadDepth) << std::endl;
+        // }
+        
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 400)
         {
             return false;
