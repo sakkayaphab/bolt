@@ -54,7 +54,7 @@ private:
   void clearMapSC();
   std::vector<InsertionPositionDetail> convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> mapSC);
   void findBreakpoint();
-  bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
+  bool checkBetween(int32_t pos, int32_t targetPos, int32_t minusoverlapped, int32_t plusoverlapped);
   void filterBreakpoint();
 
   std::vector<CountRefineSeq> mergeString(InsertionPositionDetail fragmentlist,bool fromstart);

@@ -12,6 +12,7 @@ SplitRead::SplitRead(std::string chrname, ReadParser *readparser, SampleStat *sa
 void SplitRead::updateRead()
 {
     findDeletionInRead();
+    findInsertionInRead();
     satag = readparser->getSATag();
     if (satag.size() == 0)
     {
@@ -110,6 +111,47 @@ void SplitRead::findInversion()
                     mapINV[std::make_pair(sa.pos + sa.cigar.at(0).getLength(), readparser->getEnd())].MapQLists.push_back(readparser->getMapQuality());
                 }
             }
+        }
+    }
+}
+
+
+void SplitRead::findInsertionInRead()
+{
+    std::vector<ReadParser::Cigar> cigar = readparser->getCigar();
+
+    if (cigar.size() <= 2)
+    {
+        return;
+    }
+
+    // CIGAR = 20S71M6D43M54D117M = 20 + 71(M) + 43(M) + 117(M)
+    int32_t incrementPos = 0;
+
+    for (int i = 0; i < cigar.size(); i++)
+    {
+        if (cigar.at(i).getOperatorName() == 'M')
+        {
+            incrementPos += cigar.at(i).getLength();
+        }
+
+        if (cigar.at(i).getOperatorName() == 'I')
+        {
+
+            if (cigar.at(i).getLength() > 10)
+            {
+
+                mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead++;
+                mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
+                mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
+
+                // std::cout << "D" << cigar.at(i).getLength() << " " 
+                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength() 
+                // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
+                // << std::endl;
+            }
+
+            incrementPos += cigar.at(i).getLength();
         }
     }
 }
@@ -364,6 +406,7 @@ void SplitRead::printResult()
 {
     printDeletion();
     printSmallDeletion();
+    printSmallInsertion();
     printDuplication();
     printInversion();
 }
@@ -550,6 +593,18 @@ void SplitRead::printInversion()
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
     filterFrequencyLowerThan(1, &vecTemp);
     // filterMapQLowerThan(60, &vecTemp);
+
+    for (auto x : vecTemp)
+    {
+        writeFile(x);
+    }
+}
+
+void SplitRead::printSmallInsertion()
+{
+    auto vecTemp = convertMapToEvidenceList(&mapSmallINS, "INS", "SINS");
+    // mergeEvidence(&vecTemp);
+    filterFrequencyLowerThan(1, &vecTemp);
 
     for (auto x : vecTemp)
     {

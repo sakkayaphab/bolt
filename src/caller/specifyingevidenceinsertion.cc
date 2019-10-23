@@ -232,14 +232,14 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
 
     if (evidence->getMark() == "MATEUNMAPPED")
     {
-        end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
+        // end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
         evidence->setCiPosLeft(-samplestat->getReadLength());
-        evidence->setCiPosRight((end - pos) + samplestat->getAverageSampleStat() + (3 * samplestat->getSDSampleStat()));
+        evidence->setCiPosRight(lastend-pos+samplestat->getReadLength());
 
-        evidence->setCiEndLeft(pos - end);
+        evidence->setCiEndLeft(pos - lastend);
         evidence->setCiEndRight(samplestat->getReadLength());
     }
     else
@@ -264,13 +264,23 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
         return false;
     }
 
-    if (evidence->getMaxMapQ()==0)
+    if (evidence->getMaxMapQ() == 0)
     {
         return false;
     }
 
     if (evidence->getMark() == "MATEUNMAPPED")
     {
+        if (evidence->getLastPosDiscordantRead()-evidence->getPosDiscordantRead()==0)
+        {
+            return false;
+        }
+
+        if (evidence->getLastEndDiscordantRead()-evidence->getEndDiscordantRead()==0)
+        {
+            return false;
+        }
+
         if (evidence->getEnd() == 0)
         {
             return false;

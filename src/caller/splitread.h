@@ -20,6 +20,7 @@ private:
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
    std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallDEL;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
+  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallINS;
 
   std::vector<Evidence> vecINV;
 
@@ -27,6 +28,7 @@ private:
 
 public:
   SplitRead(std::string chrname,ReadParser *readparser, SampleStat *samplestate,FileManager *filepath);
+  void findInsertionInRead();
   void updateRead();
   void findTandemDuplication();
   void findDeletion();
@@ -38,6 +40,7 @@ public:
   int writeFile(Evidence vr);
   void printDeletion();
   void printSmallDeletion();
+  void printSmallInsertion();
   void printDuplication();
   void printInversion();
   std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype,std::string mark);

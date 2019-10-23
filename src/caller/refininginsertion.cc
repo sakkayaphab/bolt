@@ -12,6 +12,14 @@ void RefiningInsertion::execute()
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
     prepareBamReader();
+
+    if (evidence.getMark() == "SINS")
+    {
+        variantresult = evidence;
+        variantresult.setQuailtyPass(true);
+        return;
+    }
+
     first();
 }
 
@@ -25,8 +33,7 @@ void RefiningInsertion::first()
         return;
     }
 
-    // std::cout << "evidence.getPos() : " << evidence.getPos()
-    // << std::endl;
+    // std::cout << "findRange : " << findRange << std::endl;
 
     const char *range = findRange.c_str();
     refineStartToEnd(range);
@@ -115,6 +122,7 @@ void RefiningInsertion::filterBreakpoint()
     std::sort(vectorBP.begin(), vectorBP.end());
 
     int maxFreq = 0;
+    int maxLongMatch = 0;
 
     for (BreakpointPosition n : vectorBP)
     {
@@ -130,17 +138,25 @@ void RefiningInsertion::filterBreakpoint()
             averagePos = (n.end + n.pos) / 2;
         }
 
-        if (n.longmatch < getDivider(samplestat->getReadLength(), 15, 100, 15))
+        if (n.longmatch < getDivider(samplestat->getReadLength(), 10, 100, 15))
         {
             continue;
         }
 
-        if (maxFreq >= n.frequency)
+        if (maxLongMatch >= n.longmatch)
         {
             continue;
         }
 
-        maxFreq = n.frequency;
+        maxLongMatch = n.longmatch;
+
+
+        // if (maxFreq >= n.frequency)
+        // {
+        //     continue;
+        // }
+
+        // maxFreq = n.frequency;
 
         variantresult.setPos(averagePos);
         variantresult.setEnd(averagePos);
@@ -161,7 +177,7 @@ void RefiningInsertion::findBreakpoint()
 
     for (InsertionPositionDetail n : vectorSCStart)
     {
-        if (n.getLongMapping() < 10)
+        if (n.getLongMapping() < 15)
         {
             continue;
         }
@@ -188,7 +204,7 @@ void RefiningInsertion::findBreakpoint()
         for (InsertionPositionDetail m : vectorSCEnd)
         {
 
-            if (m.getLongMapping() < 10)
+            if (m.getLongMapping() < 15)
             {
                 continue;
             }
@@ -214,7 +230,7 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            if (checkBetween(n.getPosition(), m.getPosition(), samplestat->getReadLength()))
+            if (checkBetween(n.getPosition(), m.getPosition(),-samplestat->getReadLength(), samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();
@@ -239,14 +255,14 @@ void RefiningInsertion::findBreakpoint()
     }
 }
 
-bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
+bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t minusoverlapped, int32_t plusoverlapped)
 {
-    if (targetPos - overlapped > pos)
+    if (targetPos + minusoverlapped > pos)
     {
         return false;
     }
 
-    if (targetPos + overlapped < pos)
+    if (targetPos + plusoverlapped < pos)
     {
         return false;
     }
@@ -448,7 +464,6 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
 
         for (CountRefineSeq m : endSeq)
         {
-
             if (m.seq.size() < 20)
             {
                 continue;

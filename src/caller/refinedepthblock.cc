@@ -230,37 +230,62 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
-        auto nextPos = nextNumber(n.getPos(), roundConfig);
-        auto previousPos = previousNumber(n.getPos(), roundConfig);
+        // auto currentPos = roundNumber(n.getPos(), roundConfig);
+        // auto nextPos = nextNumber(n.getPos(), roundConfig);
+        // auto previousPos = previousNumber(n.getPos(), roundConfig);
 
-        auto currentRD = rdf.getBlock(currentPos);
-        auto nextRD = rdf.getBlock(nextPos);
-        auto previousRD = rdf.getBlock(previousPos);
+        // auto currentRD = rdf.getBlock(currentPos);
+        // auto nextRD = rdf.getBlock(nextPos);
+        // auto previousRD = rdf.getBlock(previousPos);
 
-        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
-        {
-            continue;
-        }
+        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+        // {
+        //     continue;
+        // }
 
-        if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
-        {
-            continue;
-        }
+        // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+        // {
+        //     continue;
+        // }
 
         if ((n.getMark() == "MATEUNMAPPED"))
         {
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 4))
+            // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+            // {
+            //     continue;
+            // }
+
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 4, 100, 4))
             {
                 continue;
             }
 
-            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 12, 100, 4))
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 4, 100, 4))
             {
                 continue;
             }
+
+            // if (n.getNumberOfZeroMapQ()>=1)
+            // {
+            //     continue;
+            // }
+
+            // if (n.getNumberOfZeroRPMapQ()>=1)
+            // {
+            //     continue;
+            // }
+
+            // if (n.getAvgMapQ()<10)
+            // {
+            //     continue;
+            // }
+
+            // if (n.getAvgRPMapQ()<30)
+            // {
+            //     continue;
+            // }
 
             if (n.getMaxMapQ() < 10)
             {
@@ -271,10 +296,39 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             {
                 continue;
             }
+
+            if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
+            {
+            }
+            else
+            {
+                continue;
+            }
+
             // continue;
+        }
+        else if ((n.getMark() == "SINS"))
+        {
+            if (n.getSvLength()<50)
+            {
+                continue;
+            }
+
+            // continue;
+
         }
         else
         {
+            // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+            // {
+            //     continue;
+            // }
+
+            if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+            {
+                continue;
+            }
+
             if (n.getMaxMapQ() < 40)
             {
                 continue;
@@ -295,12 +349,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 15, 100, 15))
+            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 15))
             {
                 continue;
             }
 
-            continue;
+            // continue;
         }
 
         // continue;

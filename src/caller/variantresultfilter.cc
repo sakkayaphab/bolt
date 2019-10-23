@@ -73,7 +73,7 @@ bool VariantResultFilter::passFilterTandemDuplication(Evidence *variantresult)
 
 bool VariantResultFilter::passFilterInsertion(Evidence *variantresult)
 {
-    if (variantresult->getFrequency() < 2)
+    if (variantresult->getFrequency() <= 2)
     {
         return false;
     }
