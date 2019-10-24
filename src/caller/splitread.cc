@@ -604,6 +604,8 @@ void SplitRead::printSmallInsertion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapSmallINS, "INS", "SINS");
     // mergeEvidence(&vecTemp);
+    
+    filterLengthMinEvidenceList(&vecTemp, 49);
     filterFrequencyLowerThan(1, &vecTemp);
 
     for (auto x : vecTemp)

@@ -184,24 +184,33 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
 
     // std::cout << "getReadDepthAverageFocusArea " << getReadDepthAverageFocusArea(&startFocusReadDepth) << " " << (readDepthStat.getReadDepthByChr(e.getChr()) * 2) << std::endl;
 
-    if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
-    {
-        return false;
-    }
+    // if (getReadDepthAverageFocusArea(&startFocusReadDepth) > (readDepthStat.getReadDepthByChr(e.getChr()) * 2))
+    // {
+    //     return false;
+    // }
 
-    // std::cout << "getFrequency " << e.getFrequency() << std::endl;
+    if ((e.getMark() == "MATEUNMAPPED"))
+    {
+    }
+    else if ((e.getMark() == "SINS"))
+    {
+        
+    }
+    else
+    {
+        if (e.getMaxMapQ() <= 20)
+        {
+            return false;
+        }
+    }
 
     if (e.getFrequency() <= 3)
     {
         return false;
     }
 
-
     if (sumStartSCL <= 3 && sumStartSCF <= 3)
     {
-        // std::cout << e.getChr() << " " << e.getPos() << " = " << e.getEnd() <<" > sumStartSCL :" << sumStartSCL << " " << sumStartSCF << " -> " << startFocusReadDepth.size() << std::endl;
-        
-
         return false;
     }
 
@@ -293,12 +302,6 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
         collectNewData();
 
-        // if (e.getPos()==18008643)
-        // {
-        //     std::cout << e.getPos() + e.getCiPosLeft() - configRound << " " << e.getPos() + e.getCiPosRight() + configRound << std::endl;
-        // std::cout << getReadDepthAverageFocusArea(&startFocusReadDepth) << std::endl;
-        // }
-        
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 400)
         {
             return false;
@@ -461,7 +464,7 @@ void ReadDepthAnalysis::collectNewData()
         sumStartTRA += n.TRA2;
         sumStartINS += n.INS1;
         sumStartINS += n.INS2;
-        
+
         sumStartSCF += n.SCF;
         sumStartSCL += n.SCL;
 
@@ -583,7 +586,6 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
     avgReadDepthFocus = int(sumRD / count);
     // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }
-
 
 std::vector<std::string> ReadDepthAnalysis::split(const std::string &s, char delimiter)
 {

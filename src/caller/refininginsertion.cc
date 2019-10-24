@@ -138,7 +138,12 @@ void RefiningInsertion::filterBreakpoint()
             averagePos = (n.end + n.pos) / 2;
         }
 
-        if (n.longmatch < getDivider(samplestat->getReadLength(), 10, 100, 15))
+        if (n.frequency <= 3)
+        {
+            continue;
+        }
+
+        if (n.longmatch < getDivider(samplestat->getReadLength(), 10, 100, 10))
         {
             continue;
         }
@@ -149,7 +154,6 @@ void RefiningInsertion::filterBreakpoint()
         }
 
         maxLongMatch = n.longmatch;
-
 
         // if (maxFreq >= n.frequency)
         // {
@@ -230,7 +234,7 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            if (checkBetween(n.getPosition(), m.getPosition(),-samplestat->getReadLength(), samplestat->getReadLength()))
+            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();

@@ -324,10 +324,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             //     continue;
             // }
 
-            if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
-            {
-                continue;
-            }
+            // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
+            // {
+            //     continue;
+            // }
 
             if (n.getMaxMapQ() < 40)
             {
@@ -349,10 +349,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 15))
-            {
-                continue;
-            }
+            // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 15))
+            // {
+            //     continue;
+            // }
 
             // continue;
         }
