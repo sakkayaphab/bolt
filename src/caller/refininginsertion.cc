@@ -123,6 +123,7 @@ void RefiningInsertion::filterBreakpoint()
 
     int maxFreq = 0;
     int maxLongMatch = 0;
+    int maxscore = 0;
 
     for (BreakpointPosition n : vectorBP)
     {
@@ -138,22 +139,29 @@ void RefiningInsertion::filterBreakpoint()
             averagePos = (n.end + n.pos) / 2;
         }
 
-        if (n.frequency <= 3)
+        if (n.frequency <= 2)
         {
             continue;
         }
+
 
         if (n.longmatch < getDivider(samplestat->getReadLength(), 10, 100, 10))
         {
             continue;
         }
 
-        if (maxLongMatch >= n.longmatch)
+        int score = (n.frequency) * (2 * n.longmatch);
+        // std::cout << score << 
+        // " " << n.frequency <<
+        // " " << n.longmatch
+        //  << std::endl;
+
+        if (score <= maxscore)
         {
             continue;
         }
 
-        maxLongMatch = n.longmatch;
+        maxscore = score;
 
         // if (maxFreq >= n.frequency)
         // {

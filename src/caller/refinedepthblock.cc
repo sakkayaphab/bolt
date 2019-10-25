@@ -305,7 +305,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            // continue;
+            continue;
         }
         else if ((n.getMark() == "SINS"))
         {
@@ -314,7 +314,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            // continue;
+            continue;
 
         }
         else
@@ -324,12 +324,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             //     continue;
             // }
 
-            // if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 2)
-            // {
-            //     continue;
-            // }
+            if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 3)
+            {
+                continue;
+            }
 
-            if (n.getMaxMapQ() < 40)
+            if (n.getMaxMapQ() < 10)
             {
                 continue;
             }
@@ -339,20 +339,36 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 2, 100, 2))
             {
                 continue;
             }
 
-            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 3, 100, 3))
             {
                 continue;
             }
 
-            // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 15))
+            if (n.LNGMATCH < 15)
+            {
+                continue;
+            }
+
+            
+
+            // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 10, 100, 10))
             // {
             //     continue;
             // }
+
+            if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
+            {
+
+            }
+            else
+            {
+                continue;
+            }
 
             // continue;
         }

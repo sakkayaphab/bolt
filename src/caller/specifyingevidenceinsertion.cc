@@ -259,7 +259,7 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
 bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
 {
 
-    if (evidence->getFrequency() <= 3)
+    if (evidence->getFrequency() <= 2)
     {
         return false;
     }

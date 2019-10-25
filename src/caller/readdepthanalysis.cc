@@ -198,18 +198,18 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
     }
     else
     {
-        if (e.getMaxMapQ() <= 20)
-        {
-            return false;
-        }
+        // if (e.getMaxMapQ() <= 10)
+        // {
+        //     return false;
+        // }
     }
 
-    if (e.getFrequency() <= 3)
+    if (e.getFrequency() <= 2)
     {
         return false;
     }
 
-    if (sumStartSCL <= 3 && sumStartSCF <= 3)
+    if (sumStartSCL <= 1 && sumStartSCF <= 1)
     {
         return false;
     }
