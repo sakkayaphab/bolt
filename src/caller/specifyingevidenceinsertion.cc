@@ -73,12 +73,11 @@ void SpecifyingEvidenceInsertion::updateRead()
     }
 }
 
-bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t pos, int32_t mpos)
 {
     bool added;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
-
         if (readparser.isMateUnmapped())
         {
             if (readparser.isFirstRead())
@@ -164,7 +163,7 @@ void SpecifyingEvidenceInsertion::checkRange()
     // {
     //     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat() * 3);
     // }
-    added = incrementSVFreq(merge, merge, currentPos, currentMPos);
+    added = incrementSVFreq(merge, currentPos, currentMPos);
 
     checkProveEvidence();
 
@@ -203,7 +202,7 @@ void SpecifyingEvidenceInsertion::checkRange()
 
 void SpecifyingEvidenceInsertion::proveEvidence(int index)
 {
-    int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
+    int32_t plus = samplestat->getAverageSampleStat() + (3*samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
     {
         if (filterEvidence(&preCollectSV.at(index)))
@@ -244,15 +243,15 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
     }
     else
     {
-        end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
+        // end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-samplestat->getReadLength() - samplestat->getAverageSampleStat());
-        evidence->setCiPosRight((end - pos) + samplestat->getAverageSampleStat());
+        evidence->setCiPosLeft(-(2*samplestat->getReadLength()));
+        evidence->setCiPosRight((lastend - pos)+(2*samplestat->getReadLength()));
 
-        evidence->setCiEndLeft(pos - end);
-        evidence->setCiEndRight(samplestat->getReadLength());
+        evidence->setCiEndLeft(pos - end-(2*samplestat->getReadLength()));
+        evidence->setCiEndRight((2*samplestat->getReadLength()));
     }
 }
 
@@ -264,10 +263,10 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
         return false;
     }
 
-    if (evidence->getMaxMapQ() == 0)
-    {
-        return false;
-    }
+    // if (evidence->getMaxMapQ() < 20)
+    // {
+    //     return false;
+    // }
 
     if (evidence->getMark() == "MATEUNMAPPED")
     {

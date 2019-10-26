@@ -242,7 +242,7 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
+            if (checkBetween(n.getPosition(), m.getPosition(), -10, samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();

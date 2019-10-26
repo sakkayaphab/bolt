@@ -21,6 +21,7 @@ private:
    std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallDEL;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallINS;
+  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINS;
 
   std::vector<Evidence> vecINV;
 
@@ -41,8 +42,10 @@ public:
   void printDeletion();
   void printSmallDeletion();
   void printSmallInsertion();
+  void findInsertion();
   void printDuplication();
   void printInversion();
+  void printInsertion();
   std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype,std::string mark);
   void mergeEvidence(std::vector<Evidence> *elist);
   void setAllCIEvidence(std::vector<Evidence> *elist,int32_t rangePos);

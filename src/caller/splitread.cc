@@ -21,6 +21,7 @@ void SplitRead::updateRead()
 
     findInversion();
     findDeletion();
+    // findInsertion();
     findTandemDuplication();
 }
 
@@ -115,7 +116,6 @@ void SplitRead::findInversion()
     }
 }
 
-
 void SplitRead::findInsertionInRead()
 {
     std::vector<ReadParser::Cigar> cigar = readparser->getCigar();
@@ -145,8 +145,8 @@ void SplitRead::findInsertionInRead()
                 mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
                 mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
 
-                // std::cout << "D" << cigar.at(i).getLength() << " " 
-                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength() 
+                // std::cout << "D" << cigar.at(i).getLength() << " "
+                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength()
                 // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
                 // << std::endl;
             }
@@ -185,8 +185,8 @@ void SplitRead::findDeletionInRead()
                 mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
                 mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
 
-                // std::cout << "D" << cigar.at(i).getLength() << " " 
-                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength() 
+                // std::cout << "D" << cigar.at(i).getLength() << " "
+                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength()
                 // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
                 // << std::endl;
             }
@@ -236,6 +236,76 @@ bool SplitRead::haveSmallDeletion()
     //     mapSmallDEL[std::make_pair(indelpos, indelend)].MatchLists.push_back(indelend-indelpos);
     //     mapSmallDEL[std::make_pair(indelpos, indelend)].MapQLists.push_back(readparser->getMapQuality());
     // }
+}
+
+void SplitRead::findInsertion()
+{
+
+    for (ReadParser::SATag sa : satag)
+    {
+        if (sa.cigar.size() != 2)
+        {
+            continue;
+        }
+
+        if (readparser->getChromosomeNameString() != sa.chrname)
+        {
+            continue;
+        }
+
+        if (!(readparser->isReverse() && sa.strand == "-"))
+        {
+            continue;
+        }
+
+        if (!(!readparser->isReverse() && sa.strand == "+"))
+        {
+            continue;
+        }
+
+        // if (readparser->hasFirstCigarSoftclipped() && sa.cigar.at(0).getOperatorName() == 'S')
+        // {
+
+        //     if (checkBetween(readparser->getPos(), sa.pos, samplestate->getReadLength()))
+        //     {
+        //         mapINS[std::make_pair(readparser->getPos(), sa.pos)].NumberOfMatchRead++;
+        //         mapINS[std::make_pair(readparser->getPos(), sa.pos)].MatchLists.push_back(sa.cigar.at(sa.cigar.size() - 1).getLength());
+        //         mapINS[std::make_pair(readparser->getPos(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
+        //     }
+        // }
+
+        if (readparser->hasLastCigarSoftclipped() && sa.cigar.at(0).getOperatorName() == 'S')
+        {
+
+
+            int softclip = readparser->getSoftClippedSequenceEnd().size();
+            int match = 0;
+            if (sa.cigar.at(sa.cigar.size() - 1).getOperatorName()=='M')
+            {
+                match = sa.cigar.at(sa.cigar.size() - 1).getLength();
+            }
+
+            if (match==0)
+            {
+                continue;
+            }
+
+            int lsize = softclip-match;
+
+            if (lsize<50)
+            {
+                continue;
+            }
+
+            if (checkBetween(readparser->getPos(), sa.pos, 5))
+            {
+                
+                mapINS[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
+                mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(lsize);
+                mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
+            }
+        }
+    }
 }
 
 void SplitRead::findDeletion()
@@ -409,6 +479,7 @@ void SplitRead::printResult()
     printSmallInsertion();
     printDuplication();
     printInversion();
+    printInsertion();
 }
 
 std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark)
@@ -600,11 +671,22 @@ void SplitRead::printInversion()
     }
 }
 
+void SplitRead::printInsertion()
+{
+    auto vecTemp = convertMapToEvidenceList(&mapSmallINS, "INS", "SR");
+    // filterLengthMinEvidenceList(&vecTemp, 49);
+    filterFrequencyLowerThan(2, &vecTemp);
+    for (auto x : vecTemp)
+    {
+        writeFile(x);
+    }
+}
+
 void SplitRead::printSmallInsertion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapSmallINS, "INS", "SINS");
     // mergeEvidence(&vecTemp);
-    
+
     filterLengthMinEvidenceList(&vecTemp, 49);
     filterFrequencyLowerThan(1, &vecTemp);
 
@@ -638,7 +720,7 @@ void SplitRead::printDeletion()
 
     for (auto x : vecTemp)
     {
-                std::cout << x.getResultVcfFormatString() << std::endl;
+        std::cout << x.getResultVcfFormatString() << std::endl;
 
         writeFile(x);
     }
