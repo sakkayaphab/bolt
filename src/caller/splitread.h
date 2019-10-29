@@ -11,7 +11,7 @@ class SplitRead
 {
 private:
   ReadParser *readparser;
-  SampleStat *samplestate;
+  SampleStat *samplestat;
   std::string chrname;
   std::vector<ReadParser::SATag> satag;
   FileManager *filepath;
@@ -56,7 +56,7 @@ public:
      void filterFrequencyLowerThan(int number,std::vector<Evidence> *elist);
 
      bool haveSmallDeletion();
-
+int getDivider(int value, int top, int down, int minimum);
 
   
 };

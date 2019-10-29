@@ -13,10 +13,7 @@ bool VariantResultFilter::passFilterSV(Evidence *variantresult)
 
     //  std::cout << variantresult->getResultVcfFormatString() << std::endl;
 
-    if (variantresult->getVariantType() == "INS")
-    {
-        return passFilterInsertion(variantresult);
-    }
+    
 
     if (variantresult->getChr() == "")
     {
@@ -28,27 +25,32 @@ bool VariantResultFilter::passFilterSV(Evidence *variantresult)
         return false;
     }
 
-    if (variantresult->getVariantType() == "DEL")
-    {
-        return passFilterDeletion(variantresult);
-    }
+    // if (variantresult->getVariantType() == "INS")
+    // {
+    //     return passFilterInsertion(variantresult);
+    // }
 
-    if (variantresult->getVariantType() == "INV")
-    {
-        return passFilterInversion(variantresult);
-    }
+    // if (variantresult->getVariantType() == "DEL")
+    // {
+    //     return passFilterDeletion(variantresult);
+    // }
 
-    if (variantresult->getVariantType() == "DUP")
-    {
-        return passFilterTandemDuplication(variantresult);
-    }
+    // if (variantresult->getVariantType() == "INV")
+    // {
+    //     return passFilterInversion(variantresult);
+    // }
 
-    if (variantresult->getVariantType() == "BND")
-    {
-        return passFilterTranslocation(variantresult);
-    }
+    // if (variantresult->getVariantType() == "DUP")
+    // {
+    //     return passFilterTandemDuplication(variantresult);
+    // }
 
-    return false;
+    // if (variantresult->getVariantType() == "BND")
+    // {
+    //     return passFilterTranslocation(variantresult);
+    // }
+
+    return true;
 }
 
 bool VariantResultFilter::passFilterDeletion(Evidence *variantresult)

@@ -1,10 +1,10 @@
 #include "splitread.h"
 #include <iostream>
 #include <fstream>
-SplitRead::SplitRead(std::string chrname, ReadParser *readparser, SampleStat *samplestate, FileManager *filepath)
+SplitRead::SplitRead(std::string chrname, ReadParser *readparser, SampleStat *samplestat, FileManager *filepath)
 {
     SplitRead::readparser = readparser;
-    SplitRead::samplestate = samplestate;
+    SplitRead::samplestat = samplestat;
     SplitRead::chrname = chrname;
     SplitRead::filepath = filepath;
 }
@@ -21,7 +21,7 @@ void SplitRead::updateRead()
 
     findInversion();
     findDeletion();
-    // findInsertion();
+    findInsertion();
     findTandemDuplication();
 }
 
@@ -243,6 +243,7 @@ void SplitRead::findInsertion()
 
     for (ReadParser::SATag sa : satag)
     {
+
         if (sa.cigar.size() != 2)
         {
             continue;
@@ -253,20 +254,22 @@ void SplitRead::findInsertion()
             continue;
         }
 
-        if (!(readparser->isReverse() && sa.strand == "-"))
+        if (readparser->isReverse() && sa.strand == "-")
         {
-            continue;
+            goto findInsertion;
         }
 
-        if (!(!readparser->isReverse() && sa.strand == "+"))
+        if (!readparser->isReverse() && sa.strand == "+")
         {
-            continue;
+            goto findInsertion;
         }
+
+    findInsertion:
 
         // if (readparser->hasFirstCigarSoftclipped() && sa.cigar.at(0).getOperatorName() == 'S')
         // {
 
-        //     if (checkBetween(readparser->getPos(), sa.pos, samplestate->getReadLength()))
+        //     if (checkBetween(readparser->getPos(), sa.pos, getDivider(samplestat->getReadLength(), 1, 10, 1)))
         //     {
         //         mapINS[std::make_pair(readparser->getPos(), sa.pos)].NumberOfMatchRead++;
         //         mapINS[std::make_pair(readparser->getPos(), sa.pos)].MatchLists.push_back(sa.cigar.at(sa.cigar.size() - 1).getLength());
@@ -276,30 +279,29 @@ void SplitRead::findInsertion()
 
         if (readparser->hasLastCigarSoftclipped() && sa.cigar.at(0).getOperatorName() == 'S')
         {
-
-
+            // std::cout << "findInsertion SA" << std::endl;
             int softclip = readparser->getSoftClippedSequenceEnd().size();
             int match = 0;
-            if (sa.cigar.at(sa.cigar.size() - 1).getOperatorName()=='M')
+            if (sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'M')
             {
                 match = sa.cigar.at(sa.cigar.size() - 1).getLength();
             }
 
-            if (match==0)
+            if (match == 0)
             {
                 continue;
             }
 
-            int lsize = softclip-match;
+            int lsize = softclip - match;
 
             if (lsize<50)
             {
                 continue;
             }
 
-            if (checkBetween(readparser->getPos(), sa.pos, 5))
+            if (checkBetween(readparser->getEnd(), sa.pos, getDivider(samplestat->getReadLength(), 1, 10, 1)))
             {
-                
+                std::cout << readparser->getEnd() << " " << sa.pos << std::endl;
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(lsize);
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
@@ -404,7 +406,7 @@ void SplitRead::findTandemDuplication()
 
         if (readparser->getPos() < sa.pos)
         {
-            // if (sa.pos - readparser->getPos() > (samplestate->getReadLength() * 1.5))
+            // if (sa.pos - readparser->getPos() > (samplestat->getReadLength() * 1.5))
             // {
             //     continue;
             // }
@@ -438,7 +440,7 @@ void SplitRead::findTandemDuplication()
         else
         {
 
-            // if (readparser->getPos() - sa.pos > (samplestate->getReadLength() * 1.5))
+            // if (readparser->getPos() - sa.pos > (samplestat->getReadLength() * 1.5))
             // {
             //     continue;
             // }
@@ -643,10 +645,10 @@ void SplitRead::printDuplication()
 {
     auto vecTemp = convertMapToEvidenceList(&mapDUP, "DUP", "SR");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp, samplestate->getReadLength());
+    setAllCIEvidence(&vecTemp, samplestat->getReadLength());
     filterEvidenceList(&vecTemp);
     // filterLengthMinEvidenceList(&vecTemp, 100);
-    filterLengthMaxEvidenceList(&vecTemp, samplestate->getReadLength() * 2);
+    filterLengthMaxEvidenceList(&vecTemp, samplestat->getReadLength() * 2);
 
     for (auto x : vecTemp)
     {
@@ -658,7 +660,7 @@ void SplitRead::printInversion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapINV, "INV", "SR");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp, samplestate->getReadLength() * 2);
+    setAllCIEvidence(&vecTemp, samplestat->getReadLength() * 2);
     filterEvidenceList(&vecTemp);
     // filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
@@ -673,9 +675,10 @@ void SplitRead::printInversion()
 
 void SplitRead::printInsertion()
 {
-    auto vecTemp = convertMapToEvidenceList(&mapSmallINS, "INS", "SR");
+    auto vecTemp = convertMapToEvidenceList(&mapINS, "INS", "SR");
     // filterLengthMinEvidenceList(&vecTemp, 49);
-    filterFrequencyLowerThan(2, &vecTemp);
+    // setAllCIEvidence(&vecTemp, samplestat->getReadLength() * 2);
+    filterFrequencyLowerThan(0, &vecTemp);
     for (auto x : vecTemp)
     {
         writeFile(x);
@@ -712,7 +715,7 @@ void SplitRead::printDeletion()
 {
     auto vecTemp = convertMapToEvidenceList(&mapDEL, "DEL", "SR");
     mergeEvidence(&vecTemp);
-    setAllCIEvidence(&vecTemp, samplestate->getReadLength() * 2);
+    setAllCIEvidence(&vecTemp, samplestat->getReadLength() * 2);
     filterEvidenceList(&vecTemp);
     // filterLengthMinEvidenceList(&vecTemp, 50);
     filterLengthMaxEvidenceList(&vecTemp, 1000000);
@@ -720,7 +723,7 @@ void SplitRead::printDeletion()
 
     for (auto x : vecTemp)
     {
-        std::cout << x.getResultVcfFormatString() << std::endl;
+        // std::cout << x.getResultVcfFormatString() << std::endl;
 
         writeFile(x);
     }
@@ -782,4 +785,16 @@ int SplitRead::writeFile(Evidence vr)
     vcfIdNumber++;
     myfile.close();
     return 0;
+}
+
+int SplitRead::getDivider(int value, int top, int down, int minimum)
+{
+    auto returnvalue = (int)(float(value) * (float(top) / float(down)));
+
+    if (returnvalue > minimum)
+    {
+        return returnvalue;
+    }
+
+    return minimum;
 }

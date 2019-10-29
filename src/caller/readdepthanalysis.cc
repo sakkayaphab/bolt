@@ -191,22 +191,28 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
 
     if ((e.getMark() == "MATEUNMAPPED"))
     {
+        if (e.getFrequency() <= 2)
+        {
+            return false;
+        }
     }
     else if ((e.getMark() == "SINS"))
+    {
+    }
+    else if ((e.getMark() == "SR"))
     {
         
     }
     else
     {
+        if (e.getFrequency() <= 2)
+        {
+            return false;
+        }
         // if (e.getMaxMapQ() <= 10)
         // {
         //     return false;
         // }
-    }
-
-    if (e.getFrequency() <= 2)
-    {
-        return false;
     }
 
     if (sumStartSCL <= 1 && sumStartSCF <= 1)

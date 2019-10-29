@@ -230,13 +230,13 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
+        // auto currentPos = roundNumber(n.getPos(), roundConfig);
         // auto nextPos = nextNumber(n.getPos(), roundConfig);
         // auto previousPos = previousNumber(n.getPos(), roundConfig);
 
-        auto currentRD = rdf.getBlock(currentPos);
+        // auto currentRD = rdf.getBlock(currentPos);
         // auto nextRD = rdf.getBlock(nextPos);
         // auto previousRD = rdf.getBlock(previousPos);
 
@@ -325,7 +325,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            continue;
+            // continue;
         }
         else if ((n.getMark() == "SINS"))
         {
@@ -334,7 +334,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            continue;
+            // continue;
+        }
+        else if ((n.getMark() == "SR"))
+        {
+
+            //    continue;
         }
         else
         {
@@ -368,10 +373,15 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            // if (n.LNGMATCH < 15)
-            // {
-            //     continue;
-            // }
+            if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 15, 100, 15))
+            {
+                continue;
+            }
+
+            if (n.LNGMATCH < 15)
+            {
+                continue;
+            }
 
             if (n.getMaxMapQ() < 60)
             {
@@ -383,7 +393,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             }
             else
             {
-                if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 22, 100, 15))
+                if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 15, 100, 15))
                 {
                     continue;
                 }
@@ -634,7 +644,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
 
         if (n.getSvLength() > 500)
         {
-
             if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
             {
                 continue;

@@ -241,17 +241,29 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
         evidence->setCiEndLeft(pos - lastend);
         evidence->setCiEndRight(samplestat->getReadLength());
     }
+    // else
+    // {
+    //     // end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
+    //     evidence->setPos(pos);
+    //     evidence->setEnd(end);
+
+    //     evidence->setCiPosLeft(-(2*samplestat->getReadLength()));
+    //     evidence->setCiPosRight((lastend - pos)+(2*samplestat->getReadLength()));
+
+    //     evidence->setCiEndLeft(pos - end-(2*samplestat->getReadLength()));
+    //     evidence->setCiEndRight((2*samplestat->getReadLength()));
+    // }
     else
     {
         // end = pos + samplestat->getAverageSampleStat() + samplestat->getSDSampleStat();
         evidence->setPos(pos);
         evidence->setEnd(end);
 
-        evidence->setCiPosLeft(-(2*samplestat->getReadLength()));
-        evidence->setCiPosRight((lastend - pos)+(2*samplestat->getReadLength()));
+        evidence->setCiPosLeft(-(samplestat->getReadLength()));
+        evidence->setCiPosRight((lastend - pos)+(samplestat->getReadLength()));
 
-        evidence->setCiEndLeft(pos - end-(2*samplestat->getReadLength()));
-        evidence->setCiEndRight((2*samplestat->getReadLength()));
+        evidence->setCiEndLeft(pos - end-(samplestat->getReadLength()));
+        evidence->setCiEndRight((samplestat->getReadLength()));
     }
 }
 

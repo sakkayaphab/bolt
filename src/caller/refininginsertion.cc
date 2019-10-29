@@ -20,6 +20,13 @@ void RefiningInsertion::execute()
         return;
     }
 
+    if (evidence.getMark() == "SR")
+    {
+        variantresult = evidence;
+        variantresult.setQuailtyPass(true);
+        return;
+    }
+
     first();
 }
 
@@ -28,15 +35,25 @@ void RefiningInsertion::first()
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(),
                                                  evidence.getPos() + evidence.getCiPosRight());
 
-    if (evidence.getPos() + evidence.getCiPosRight() - evidence.getPos() + evidence.getCiPosLeft() < 200)
+    if (evidence.getPos() + evidence.getCiPosRight() - evidence.getPos() - evidence.getCiPosLeft() < 150)
     {
         return;
     }
 
-    // std::cout << "findRange : " << findRange << std::endl;
+    // std::cout << "findRange : " << findRange << " " << evidence.getPos() + evidence.getCiPosLeft() - (evidence.getPos() + evidence.getCiPosRight()) << std::endl;
 
     const char *range = findRange.c_str();
     refineStartToEnd(range);
+
+    RefiningInsertion::convertMapSC();
+    RefiningInsertion::clearMapSC();
+    RefiningInsertion::findBreakpoint();
+    RefiningInsertion::filterBreakpoint();
+    // RefiningInsertion::refinewithReference();
+}
+
+void RefiningInsertion::refinewithReference()
+{
 }
 
 void RefiningInsertion::refineStartToEnd(const char *range)
@@ -49,6 +66,9 @@ void RefiningInsertion::refineStartToEnd(const char *range)
     read = bam_init1();
     readparser.setBamHeader(bam_header);
     readparser.setBamRead(read);
+
+    int32_t startDist = evidence.getPos() + evidence.getCiPosRight();
+    int32_t endDist = evidence.getPos() + evidence.getCiPosLeft();
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -71,6 +91,18 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         if (readparser.isSupplementaryAlignment())
         {
             continue;
+        }
+
+        // 10000
+        if (readparser.getPos() < startDist - 10000)
+        {
+            break;
+        }
+
+        // 20000
+        if (readparser.getPos() > endDist + 10000)
+        {
+            break;
         }
 
         auto cigar = readparser.getCigar();
@@ -106,11 +138,6 @@ void RefiningInsertion::refineStartToEnd(const char *range)
         return;
     }
 
-    RefiningInsertion::convertMapSC();
-    RefiningInsertion::clearMapSC();
-    RefiningInsertion::findBreakpoint();
-    RefiningInsertion::filterBreakpoint();
-
     hts_itr_destroy(iter);
 
     return;
@@ -144,14 +171,21 @@ void RefiningInsertion::filterBreakpoint()
             continue;
         }
 
-
-        if (n.longmatch < getDivider(samplestat->getReadLength(), 10, 100, 10))
+        if (n.longmatch < getDivider(samplestat->getReadLength(), 15, 100, 15))
         {
             continue;
         }
 
         int score = (n.frequency) * (2 * n.longmatch);
-        // std::cout << score << 
+
+        // int seq1MatchSize = n.seq1.size() - n.longmatch;
+        // int seq2MatchSize = n.seq2.size() - n.longmatch;
+
+        // if (seq1MatchSize + seq2MatchSize + n.longmatch < 50)
+        // {
+        //     continue;
+        // }
+        // std::cout << score <<
         // " " << n.frequency <<
         // " " << n.longmatch
         //  << std::endl;
@@ -233,8 +267,9 @@ void RefiningInsertion::findBreakpoint()
             // {
             std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
             std::vector<uint8_t> tempmapq;
-
-            bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &longmatch, &tempmapq);
+            std::string seq1;
+            std::string seq2;
+            bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &longmatch, &tempmapq,&seq1,&seq2);
             mapq = tempmapq;
 
             if (!passoverlapped)
@@ -242,13 +277,15 @@ void RefiningInsertion::findBreakpoint()
                 continue;
             }
 
-            if (checkBetween(n.getPosition(), m.getPosition(), -10, samplestat->getReadLength()))
+            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
             {
                 BreakpointPosition tempBP;
                 tempBP.pos = n.getPosition();
                 tempBP.end = m.getPosition();
                 tempBP.frequency = frequency;
                 tempBP.longmatch = longmatch;
+                tempBP.seq1 = seq1;
+                tempBP.seq2 = seq2;
 
                 tempBP.score = n.getFrequency() + m.getFrequency();
                 tempBP.longmapstart = n.getLongMapping();
@@ -428,7 +465,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     *s2 = temps2;
 }
 
-bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, int *longmatch, std::vector<uint8_t> *mapq)
+bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, int *longmatch, std::vector<uint8_t> *mapq,std::string *seq1,std::string *seq2)
 {
     // std::cout << "START SEQ" << std::endl;
     // for (CountRefineSeq n : startSeq)
@@ -492,6 +529,20 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
                 int maxmatch = swm.findMaxMatchInsertion(&m.seq);
                 // std::cout << maxmatch << std::endl;
 
+                 int seq1MatchSize = n.seq.size() - maxmatch;
+                int seq2MatchSize = m.seq.size() - maxmatch;
+
+                // std::cout << "total : " << seq1MatchSize + seq2MatchSize + maxmatch
+                // << " seq1MatchSize " << seq1MatchSize
+                // << " seq2MatchSize " << seq2MatchSize
+                // << " maxmatch " << maxmatch
+                // << std::endl;
+
+                if (seq1MatchSize + seq2MatchSize + maxmatch < 50)
+                {
+                    continue;
+                }
+
                 *frequency = n.count + m.count;
                 std::vector<uint8_t> tempmapq;
                 tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
@@ -508,6 +559,9 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
             }
             else
             {
+
+               
+
                 *frequency = n.count + m.count;
                 std::vector<uint8_t> tempmapq;
                 tempmapq.insert(tempmapq.end(), n.mapqlist.begin(), n.mapqlist.end());
