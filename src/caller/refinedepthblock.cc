@@ -233,8 +233,8 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
         // auto currentPos = roundNumber(n.getPos(), roundConfig);
-        // auto nextPos = nextNumber(n.getPos(), roundConfig);
-        // auto previousPos = previousNumber(n.getPos(), roundConfig);
+        // // auto nextPos = nextNumber(n.getPos(), roundConfig);
+        // // auto previousPos = previousNumber(n.getPos(), roundConfig);
 
         // auto currentRD = rdf.getBlock(currentPos);
         // auto nextRD = rdf.getBlock(nextPos);
@@ -277,12 +277,17 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 9, 100, 2))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 4))
             {
                 continue;
             }
 
-            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 9, 100, 2))
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 4))
+            {
+                continue;
+            }
+
+            if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 30, 100, 15))
             {
                 continue;
             }
@@ -339,7 +344,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         else if ((n.getMark() == "SR"))
         {
 
-            //    continue;
+            // continue;
+        }
+        else if ((n.getMark() == "UNMERGE"))
+        {
+
+            continue;
         }
         else
         {
@@ -349,12 +359,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.getMaxMapQ() < 20)
+            if (n.getMaxMapQ() < 30)
             {
                 continue;
             }
 
-            if (n.getMaxRPMapQ() < 20)
+            if (n.getMaxRPMapQ() < 30)
             {
                 continue;
             }
@@ -363,12 +373,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             5 make temp_srr66 loss 1000 true
             */
 
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 4, 100, 2))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 2))
             {
                 continue;
             }
 
-            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 3))
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 7, 100, 3))
             {
                 continue;
             }
@@ -378,10 +388,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.LNGMATCH < 15)
-            {
-                continue;
-            }
+            // if (n.LNGMATCH < 15)
+            // {
+            //     continue;
+            // }
 
             if (n.getMaxMapQ() < 60)
             {
@@ -393,20 +403,20 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
             }
             else
             {
-                if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 15, 100, 15))
+                if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 20, 100, 15))
                 {
                     continue;
                 }
                 // continue;
             }
 
-            if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
-            {
-            }
-            else
-            {
-                continue;
-            }
+            // if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
+            // {
+            // }
+            // else
+            // {
+            //     continue;
+            // }
 
             // continue;
         }
