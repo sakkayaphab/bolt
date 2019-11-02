@@ -490,7 +490,7 @@ std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int
     for (auto const &x : *mapSV)
     {
 
-        if (x.second.MapQLists.size() >= 2)
+        if (x.second.MapQLists.size() >= 1)
         {
             Evidence evidence;
             evidence.setPos(x.first.first);

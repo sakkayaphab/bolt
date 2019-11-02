@@ -161,7 +161,6 @@ void RefiningInsertion::filterBreakpoint()
 
     for (BreakpointPosition n : vectorBP)
     {
-        // std::cout << "# filterBreakpoint : " << vectorBP.size() << std::endl;
 
         int32_t averagePos = 0;
         if (n.pos > n.end)
@@ -178,6 +177,39 @@ void RefiningInsertion::filterBreakpoint()
             continue;
         }
 
+        if (evidence.getMark() == "")
+        {
+
+            if ((*evidence.getMapQVector()).size() <= 3)
+            {
+                continue;
+            }
+
+            if (getMaxUInt8FromVector(n.mappingqualitylist) < 60)
+            {
+                if (n.longmatch <= getDivider(samplestat->getReadLength(), 15, 100, 15))
+                {
+                    continue;
+                }
+                // continue;
+            }
+            else
+            {
+                if (n.longmatch <= getDivider(samplestat->getReadLength(), 20, 100, 15))
+                {
+                    continue;
+                }
+                // continue;
+            }
+        }
+        else if (evidence.getMark() == "MATEUNMAPPED")
+        {
+            if (n.longmatch <= getDivider(samplestat->getReadLength(), 30, 100, 15))
+            {
+                continue;
+            }
+        }
+
         if (n.longmatch < getDivider(samplestat->getReadLength(), 15, 100, 15))
         {
             continue;
@@ -185,39 +217,12 @@ void RefiningInsertion::filterBreakpoint()
 
         int score = (n.frequency) * (2 * n.longmatch);
 
-        // int seq1MatchSize = n.seq1.size() - n.longmatch;
-        // int seq2MatchSize = n.seq2.size() - n.longmatch;
-
-        // if (seq1MatchSize + seq2MatchSize + n.longmatch < 50)
-        // {
-        //     continue;
-        // }
-        // std::cout << score <<
-        // " " << n.frequency <<
-        // " " << n.longmatch
-        //  << std::endl;
-
         if (score <= maxscore)
         {
             continue;
         }
 
         maxscore = score;
-
-        // if (evidence.getMark() != "MATEUNMAPPED")
-        // {
-        //     if (maxFreq >= n.frequency)
-        //     {
-        //         continue;
-        //     }
-        // }
-
-        // if (maxFreq >= n.frequency)
-        // {
-        //     continue;
-        // }
-
-        // maxFreq = n.frequency;
 
         variantresult.setPos(averagePos);
         variantresult.setEnd(averagePos);

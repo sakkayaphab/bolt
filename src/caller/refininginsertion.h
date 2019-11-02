@@ -63,7 +63,7 @@ private:
   void substringSeq(std::string *s1,std::string *s2,bool fromstart);
   bool getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,int *longmatch,std::vector<uint8_t> *mapq,std::string *seq1,std::string *seq2);
   void refinewithReference();
-
+uint8_t getMaxVector();
 public:
   RefiningInsertion();
   void execute();
