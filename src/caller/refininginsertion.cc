@@ -180,7 +180,12 @@ void RefiningInsertion::filterBreakpoint()
         if (evidence.getMark() == "")
         {
 
-            if ((*evidence.getMapQVector()).size() <= 3)
+            if (evidence.getFrequency() <= 3)
+            {
+                continue;
+            }
+
+            if (getMaxUInt8FromVector(n.mappingqualitylist) < 10)
             {
                 continue;
             }
@@ -204,6 +209,26 @@ void RefiningInsertion::filterBreakpoint()
         }
         else if (evidence.getMark() == "MATEUNMAPPED")
         {
+            if (evidence.getFrequency() <= 4)
+            {
+                continue;
+            }
+
+            if (n.frequency <= 4)
+            {
+                continue;
+            }
+
+            if (getMaxUInt8FromVector(n.mappingqualitylist) < 20)
+            {
+                continue;
+            }
+
+            if (evidence.getMaxMapQ() < 40)
+            {
+                continue;
+            }
+
             if (n.longmatch <= getDivider(samplestat->getReadLength(), 30, 100, 15))
             {
                 continue;

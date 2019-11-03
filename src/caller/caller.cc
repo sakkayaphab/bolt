@@ -349,16 +349,18 @@ void Caller::catEvidenceFile()
         if (myfile.is_open())
         {
             std::string svtype = n.substr(n.size() - 7, 3);
+            // std::cout << n << std::endl;
             // std::cout << svtype << std::endl;
-            if (svtype != "INS")
-            {
-                continue;
-            }
+            // if (svtype != "INS")
+            // {
+            //     continue;
+            // }
 
             while (getline(myfile, line))
             {
                 Evidence e;
                 e.setEvidenceByString(line);
+                // std::cout << line << std::endl;
                 if (rda.analyzeByEvidence(e))
                 {
                     cache.push_back(line);
@@ -563,6 +565,12 @@ int Caller::findBreakPoint()
         // << std::endl;
 
         mxRead.unlock();
+
+        if (thisEvidence.getVariantType() != "DUP")
+        {
+            goto skip;
+        }
+        
         //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
         if (thisEvidence.getVariantType() == "DEL")
         {
@@ -628,6 +636,8 @@ int Caller::findBreakPoint()
             rfd.execute();
             variantresult = rfd.getVariantResult();
         }
+
+        skip:
 
         VariantResultFilter vrf;
         if (vrf.passFilterSV(&variantresult))

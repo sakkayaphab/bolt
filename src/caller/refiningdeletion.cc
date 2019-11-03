@@ -377,7 +377,6 @@ void RefiningDeletion::refineEndToStart(const char *range)
     bool SCRead = false;
     int32_t SCsize = 0;
     int32_t AlterSCsize = 0;
-    
 
     while (sam_itr_next(inFile, iter, read) >= 0)
     {
@@ -530,8 +529,7 @@ void RefiningDeletion::refineEndToStart(const char *range)
             }
 
             // std::cout << mPos << " " << mEnd << " = " << SCsize << std::endl;
-            
-            
+
             std::vector<ReadParser::SATag> satag = readparser.getSATag();
             for (ReadParser::SATag sa : satag)
             {
@@ -596,6 +594,29 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
             continue;
         }
 
+        if (x.first.second - x.first.first < 20)
+        {
+            continue;
+        }
+
+        if (evidence.getMark() == "SR")
+        {
+            if (evidence.getMaxMapQ() < 60)
+            {
+                continue;
+            }
+        }
+
+        if (getMaxUInt8FromVector(x.second.MapQLists) < 30)
+        {
+            continue;
+        }
+
+        if (evidence.getMaxMapQ() < 30)
+        {
+            continue;
+        }
+
         if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
         {
             continue;
@@ -651,9 +672,9 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
     result.LNGMATCH = bMaxMatchSize;
     result.setVariantType("DEL");
     // result.AltSA = BAltSA;
-    for (auto n:BAltSA) 
+    for (auto n : BAltSA)
     {
-        result.addAlterSA(n.chr,n.pos);
+        result.addAlterSA(n.chr, n.pos);
     }
 
     if (bHit <= 1)

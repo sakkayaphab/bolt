@@ -274,6 +274,7 @@ std::vector<std::string> split(const std::string &s, char delimiter)
 
 void Evidence::setEvidenceByString(std::string line)
 {
+    // std::cout << "setEvidenceByString" << std::endl;
     std::vector<std::string> results = split(line, '\t');
     int i = 0;
     Evidence e;

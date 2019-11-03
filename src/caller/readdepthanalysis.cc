@@ -281,6 +281,8 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (cachechr != e.getChr())
     {
+            std::cout << e.convertToVcfString() << std::endl;
+
         loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt");
         std::cout << "✓ : " << e.getChr() << std::endl;
         cachechr = e.getChr();
@@ -288,6 +290,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
+
 
     if (e.getVariantType() == "DEL")
     {
@@ -321,7 +324,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
         setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
         collectNewData();
-
+        
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800 && getReadDepthAverageFocusArea(&endFocusReadDepth) > 800)
         {
             return false;
@@ -589,7 +592,14 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
     else
         std::cout << "Unable to open file";
 
-    avgReadDepthFocus = int(sumRD / count);
+    if (sumRD==0) {
+        avgReadDepthFocus = 0;
+    }else
+    {
+       avgReadDepthFocus = int(sumRD / count);
+    }
+    
+    
     // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }
 
