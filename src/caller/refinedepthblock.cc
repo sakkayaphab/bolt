@@ -405,7 +405,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
 
             if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
             {
-                
+
             }
             else
             {
@@ -428,7 +428,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
     {
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
-        if (n.getSvLength() < 80)
+        if (n.getSvLength() < 90)
         {
             continue;
         }
@@ -585,14 +585,17 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
-        auto currentPos = roundNumber(n.getPos(), roundConfig);
-        auto nextPos = nextNumber(n.getPos(), roundConfig);
-        auto previousPos = previousNumber(n.getPos(), roundConfig);
 
-        auto currentRD = rdf.getBlock(currentPos);
-        auto nextRD = rdf.getBlock(nextPos);
-        auto previousRD = rdf.getBlock(previousPos);
+        cache.push_back(n);
+        continue;
+        // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+        // auto currentPos = roundNumber(n.getPos(), roundConfig);
+        // auto nextPos = nextNumber(n.getPos(), roundConfig);
+        // auto previousPos = previousNumber(n.getPos(), roundConfig);
+
+        // auto currentRD = rdf.getBlock(currentPos);
+        // auto nextRD = rdf.getBlock(nextPos);
+        // auto previousRD = rdf.getBlock(previousPos);
 
         if (n.getMark() == "SR")
         {
@@ -623,82 +626,82 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
 
         // continue;
 
-        if (n.getMark() == "")
-        {
-            if (n.LNGMATCH < 15)
-            {
-                continue;
-            }
-        }
+        // if (n.getMark() == "")
+        // {
+        //     if (n.LNGMATCH < 15)
+        //     {
+        //         continue;
+        //     }
+        // }
 
-        if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 5, 1))
-        {
-            continue;
-        }
+        // if (n.LNGMATCH < getDivider(samplestat->getReadLength(), 1, 5, 1))
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 4)
-        {
-            continue;
-        }
+        // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 4)
+        // {
+        //     continue;
+        // }
 
-        if (currentRD.depth == 0)
-        {
-            continue;
-        }
+        // if (currentRD.depth == 0)
+        // {
+        //     continue;
+        // }
 
-        if (n.getSvLength() > 500)
-        {
-            if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
-            {
-                continue;
-            }
+        // if (n.getSvLength() > 500)
+        // {
+        //     if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentRD.INS1 + currentRD.INS2 >= n.getFrequency())
-            {
-                continue;
-            }
+        //     if (currentRD.INS1 + currentRD.INS2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
-            {
-                continue;
-            }
+        //     if (currentRD.TRA1 + currentRD.TRA2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
-            {
-                continue;
-            }
-        }
+        //     if (currentRD.DUP1 + currentRD.DUP2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
+        // }
 
-        auto currentEnd = roundNumber(n.getEnd(), roundConfig);
-        auto nextEnd = nextNumber(n.getEnd(), roundConfig);
-        auto previousEnd = previousNumber(n.getEnd(), roundConfig);
+        // auto currentEnd = roundNumber(n.getEnd(), roundConfig);
+        // auto nextEnd = nextNumber(n.getEnd(), roundConfig);
+        // auto previousEnd = previousNumber(n.getEnd(), roundConfig);
 
-        auto currentEndRD = rdf.getBlock(currentEnd);
-        auto nextEndRD = rdf.getBlock(nextEnd);
-        auto previousEndRD = rdf.getBlock(previousEnd);
+        // auto currentEndRD = rdf.getBlock(currentEnd);
+        // auto nextEndRD = rdf.getBlock(nextEnd);
+        // auto previousEndRD = rdf.getBlock(previousEnd);
 
-        if (n.getSvLength() > 500)
-        {
-            if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
-            {
-                continue;
-            }
+        // if (n.getSvLength() > 500)
+        // {
+        //     if (currentEndRD.DEL1 + currentEndRD.DEL2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentEndRD.TRA1 + currentEndRD.TRA2 >= n.getFrequency())
-            {
-                continue;
-            }
+        //     if (currentEndRD.TRA1 + currentEndRD.TRA2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
-            {
-                continue;
-            }
+        //     if (currentEndRD.DUP1 + currentEndRD.DUP2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
 
-            if (currentEndRD.INS1 + currentEndRD.INS2 >= n.getFrequency())
-            {
-                continue;
-            }
-        }
+        //     if (currentEndRD.INS1 + currentEndRD.INS2 >= n.getFrequency())
+        //     {
+        //         continue;
+        //     }
+        // }
 
         if (n.getFrequency() <= 2)
         {
@@ -710,10 +713,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             continue;
         }
 
-        if (n.getSvLength() < 80)
-        {
-            continue;
-        }
+        // if (n.getSvLength() < 80)
+        // {
+        //     continue;
+        // }
 
         if (n.getMaxMapQ() == 0)
         {

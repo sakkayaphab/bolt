@@ -150,7 +150,7 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         for (auto n : result)
         {
 
-            if (n.matchCount + n.missmatchCount +5 < cigar.at(0).getLength())
+            if (n.matchCount + n.missmatchCount + 5 < cigar.at(0).getLength())
             {
                 continue;
             }
@@ -368,7 +368,7 @@ Evidence RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<
     int bMaxMatchSize = 0;
     int bFrequency = 0;
     std::vector<uint8_t> bMapQList;
-     std::vector<AlternativeSA> BAltSA;
+    std::vector<AlternativeSA> BAltSA;
     int32_t svlength = evidence.getEndDiscordantRead() - evidence.getPosDiscordantRead() - samplestat->getAverageSampleStat();
     // std::cout << "svlength :" << svlength << std::endl;
     int lastscore = 0;
@@ -392,6 +392,21 @@ Evidence RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<
         int number = x.second.NumberOfMatchRead;
 
         int score = (number) * (2 * maxMatchSize);
+
+        // if (number <= 1)
+        // {
+        //     continue;
+        // }
+
+        // if (getMaxUInt8FromVector(x.second.MapQLists) < 30)
+        // {
+        //     continue;
+        // }
+
+        // if (evidence.getMaxMapQ() == 0)
+        // {
+        //     continue;
+        // }
 
         if (score > lastscore)
         {
