@@ -3,6 +3,7 @@ dist: xenial
 compiler: gcc
 
 script: 
-  - cmake .
+  - cmake . -DBUILD_TESTS=ON
   - make
+  - ctest
   - ./bin/bolt
