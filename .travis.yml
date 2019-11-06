@@ -1,0 +1,9 @@
+language: cpp
+dist: xenial
+compiler: gcc
+
+script: 
+  - cmake . -DBUILD_TESTS=ON
+  - make
+  - ctest --verbose
+  - ./bin/bolt
