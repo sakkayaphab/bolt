@@ -429,10 +429,10 @@ void Caller::mergeReadDepthFile()
 
             std::string svtype = n.substr(n.size() - 7, 3);
             // std::cout << svtype << std::endl;
-            if (svtype != "DEL")
-            {
-                continue;
-            }
+            // if (svtype != "INV")
+            // {
+            //     continue;
+            // }
             std::string chr = n.substr(filepath.getTempEvidencePath().size() + 1, n.size() - filepath.getTempEvidencePath().size() - 9);
             std::cout << chr << std::endl;
 
@@ -566,10 +566,10 @@ int Caller::findBreakPoint()
 
         mxRead.unlock();
 
-        if (thisEvidence.getVariantType() != "DUP")
-        {
-            goto skip;
-        }
+        // if (thisEvidence.getVariantType() != "INV")
+        // {
+        //     goto skip;
+        // }
         
         //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
         if (thisEvidence.getVariantType() == "DEL")
@@ -637,7 +637,7 @@ int Caller::findBreakPoint()
             variantresult = rfd.getVariantResult();
         }
 
-        skip:
+        // skip:
 
         VariantResultFilter vrf;
         if (vrf.passFilterSV(&variantresult))

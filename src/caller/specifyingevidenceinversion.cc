@@ -150,8 +150,8 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
     int32_t lastEnd = 0;
     int32_t avgEnd = 0;
 
-    int32_t difflengthPos = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
-    int32_t difflengthEnd = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 2) + (samplestat->getReadLength());
+    int32_t difflengthPos = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 3) + (samplestat->getReadLength());
+    int32_t difflengthEnd = (samplestat->getAverageSampleStat()) + (samplestat->getSDSampleStat() * 3) + (samplestat->getReadLength());
 
     firstPos = evidence->getLastPosDiscordantRead();
     lastPos = evidence->getLastPosDiscordantRead();
@@ -166,7 +166,6 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
         evidence->setEnd(lastPos);
     }
 
-    
     evidence->setCiPosLeft(-difflengthPos);
     evidence->setCiPosRight(difflengthPos);
    

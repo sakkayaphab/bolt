@@ -38,18 +38,16 @@ Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
         return result;
     }
 
-    // if (r1.LNGMATCH > r2.LNGMATCH)
-    // {
-    //     return r1;
-    // }
-
     if (r1.getFrequency() > r2.getFrequency())
     {
         return r1;
     }
 
     return r2;
+ 
 }
+
+
 
 void RefiningInversion::first()
 {
@@ -137,8 +135,9 @@ void RefiningInversion::refineStartToEnd(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 3)
+        if (cigar.at(0).getOperatorName() == 'S'&& cigar.at(0).getLength()>=3)
         {
+             
 
             if (cigar.at(0).getLength() < 4)
             {
@@ -196,7 +195,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
             }
         }
         // else if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S') && cigar.at(cigar.size() - 1).getLength() >= 3)
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
         {
             if (cigar.at(cigar.size() - 1).getLength() < 4)
             {
@@ -216,7 +215,7 @@ void RefiningInversion::refineStartToEnd(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead, &ssc);
             for (auto n : result)
             {
-                if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
                 {
                     continue;
                 }
@@ -340,9 +339,9 @@ void RefiningInversion::refineEndToStart(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 3)
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength()>=3)
         {
-
+            
             // continue;
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
@@ -350,7 +349,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
-                if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
                 {
                     continue;
                 }
@@ -394,9 +393,11 @@ void RefiningInversion::refineEndToStart(const char *range)
             }
         }
 
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S') && cigar.at(cigar.size() - 1).getLength() >= 3)
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
         // if (true)
         {
+
+           
 
             // continue;
             // if (cigar.at(cigar.size() - 1).getLength() < 10)
@@ -414,7 +415,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
-                if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
                 {
                     continue;
                 }
@@ -497,7 +498,7 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
             continue;
         }
 
-        if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
+         if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
         {
             continue;
         }
@@ -506,25 +507,6 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
         {
             continue;
         }
-
-        if (getMaxUInt8FromVector(x.second.MapQLists) == 0)
-        {
-            continue;
-        }
-
-        if (evidence.getMaxMapQ() == 0)
-        {
-            continue;
-        }
-
-        if (evidence.getMark() == "SR")
-    {
-
-        if (x.first.second - x.first.first < samplestat->getReadLength())
-        {
-            continue;
-        }
-    }
 
         int number = x.second.NumberOfMatchRead;
 
