@@ -5,5 +5,5 @@ compiler: gcc
 script: 
   - cmake . -DBUILD_TESTS=ON
   - make
-  - ctest
+  - ctest --verbose
   - ./bin/bolt
