@@ -599,8 +599,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        cache.push_back(n);
-        continue;
+        
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
@@ -749,6 +748,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
     for (auto n : *master)
     {
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
+
+        if (n.getSvLength() < 50)
+            {
+                continue;
+            }
 
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
