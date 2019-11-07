@@ -5,6 +5,8 @@
 #include "caller/readparser.h"
 #include <string>
 #include "caller/editdistance.h"
+#include <thread>
+#include <cstdlib>
 
 Cli::Cli(int m_argc, char **m_argv)
 {
@@ -42,6 +44,8 @@ void Cli::showHelpCallSV()
     std::cout << "\t-b\tsample file path (*required)" << std::endl;
     std::cout << "\t-r\treference file path (*required)" << std::endl;
     std::cout << "\t-o\toutput path (*required)" << std::endl;
+    std::cout << "\t-t\tnumber of threads to use [auto adjust]" << std::endl;
+
     std::cout << std::endl;
 }
 
@@ -117,8 +121,6 @@ int Cli::callSV()
         return 1;
     }
 
-    // std::cout << "reference file = " << refPath << std::endl;
-
     // Find output
     bool foundOut = false;
     std::string outPath;
@@ -142,13 +144,34 @@ int Cli::callSV()
         return 1;
     }
 
-    // std::cout << "output file = " << outPath << std::endl;
+
+    // Find thread
+    unsigned int nthreads = std::thread::hardware_concurrency();
+    std::string ThreadString;
+    bool foundThread = false;
+    for (auto n : args_lists)
+    {
+        if (foundThread)
+        {
+            nthreads = std::atoi(n.c_str());
+            std::cout << "n.c_str() = " << n.c_str() << std::endl;
+
+            break;
+        }
+
+        if (n == "-t")
+        {
+            foundThread = true;
+        }
+    }
+
+    // std::cout << "nthreads = " << nthreads << std::endl;
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
-    caller.setParallel(40);
-    // caller.execute();
-    // caller.catfile();
+    caller.setParallel(nthreads);
+    caller.execute();
+    caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 
