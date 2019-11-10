@@ -616,16 +616,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             {
                 continue;
             }
-            // continue;
+
             if (n.getFrequency() <= 2)
             {
                 continue;
             }
-
-            // if (n.getMaxMapQ() < 40)
-            // {
-            //     continue;
-            // }
 
             if (n.getMaxRPMapQ() == 0)
             {

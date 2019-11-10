@@ -170,8 +170,8 @@ int Cli::callSV()
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     caller.setParallel(nthreads);
-    caller.execute();
-    caller.catfile();
+    // caller.execute();
+    // caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 

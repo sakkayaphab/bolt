@@ -12,6 +12,23 @@ void RefiningInversion::execute()
     variantresult.setEndChr(evidence.getEndChr());
     prepareBamReader();
 
+    // if (evidence.getMark() == "SR")
+    // {
+    //     if (evidence.getSvLength() < samplestat->getReadLength())
+    //     {
+    //         return;
+    //     }
+
+    //     if (evidence.getFrequency() <= 2)
+    //     {
+    //         return;
+    //     }
+
+    //     variantresult = evidence;
+    //     variantresult.setQuailtyPass(true);
+    //     return;
+    // }
+
     first();
     // if (variantresult.isQuailtyPass())
     // {
@@ -44,10 +61,7 @@ Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
     }
 
     return r2;
- 
 }
-
-
 
 void RefiningInversion::first()
 {
@@ -55,7 +69,7 @@ void RefiningInversion::first()
 
     const char *range = findRange.c_str();
     // const char *mChr = evidence.getChr().c_str();
-    // std::cout << range << "/" << samplestat->getReadLength() << std::endl;
+    std::cout << range << "/" << samplestat->getReadLength() << std::endl;
     refineStartToEnd(range);
 }
 
@@ -87,7 +101,9 @@ void RefiningInversion::refineStartToEnd(const char *range)
                                                             positionStartReference,
                                                             positionEndReference);
     // std::cout << "chr : " << evidence.getEndChr() << ", posDiscordantRead : " << evidence.getEndDiscordantRead() - 500 << ", end : " << evidence.getLastEndDiscordantRead() + 500 << std::endl;
+    std::cout << "chr : " << evidence.getEndChr() << ", pos : " << positionStartReference << ", end : " << positionEndReference << std::endl;
 
+    // std::cout << seqrefString << std::endl;
     replaceSeqToUppercase(&seqrefString);
     std::map<std::pair<int32_t, int32_t>, MatchRead> listPosition;
     std::map<int32_t, int> SCReadLists;
@@ -135,15 +151,16 @@ void RefiningInversion::refineStartToEnd(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S'&& cigar.at(0).getLength()>=3)
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 3)
         {
-             
 
             if (cigar.at(0).getLength() < 4)
             {
                 continue;
             }
             std::string fullRead = readparser.getSequence();
+            std::cout << fullRead << std::endl;
+
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
             StringSearchConfig ssc;
             ssc.setAllowMissMatch(2);
@@ -151,12 +168,19 @@ void RefiningInversion::refineStartToEnd(const char *range)
             ssc.setMaxAllowAlign(cigar.at(0).getLength());
 
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
+
+            // if (result.size()!=0)
+            // {
+            //     std::cout << fullRead << std::endl;
+            // }
             for (auto n : result)
             {
+                
                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
                 {
                     continue;
                 }
+
                 if (n.matchCount <= 4)
                 {
                     continue;
@@ -171,32 +195,19 @@ void RefiningInversion::refineStartToEnd(const char *range)
                 }
 
                 // std::cout << "mPos : " << mPos << std::endl;
-                // std::cout << "mtEnd : " << mEnd << std::endl;
+                // std::cout << "mEnd : " << mEnd << std::endl;
                 // std::cout << "pattern : " << n.pattern << std::endl;
                 auto rangeMapping = n.endseq;
                 listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
                 listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
                 listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
-
-                // for (int i = 0; i < rangeMapping; i++)
-                // {
-                //     int32_t tempPos = mPos - i;
-                //     int32_t tempEnd = mEnd + i;
-
-                //     if (i > 6)
-                //     {
-                //         break;
-                //     }
-
-                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // }
+ 
             }
         }
         // else if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S'))
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S') && cigar.at(cigar.size() - 1).getLength() >= 3)
         {
+            // continue;
             if (cigar.at(cigar.size() - 1).getLength() < 4)
             {
                 continue;
@@ -213,9 +224,14 @@ void RefiningInversion::refineStartToEnd(const char *range)
             ssc.setMaxContinueMissMatch(1);
             ssc.setMaxAllowAlign(cigar.at(cigar.size() - 1).getLength());
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCE(&fullRead, &ssc);
+            // if (result.size()!=0)
+            // {
+            //     std::cout << fullRead << std::endl;
+            // }
             for (auto n : result)
             {
-                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
                 {
                     continue;
                 }
@@ -242,26 +258,9 @@ void RefiningInversion::refineStartToEnd(const char *range)
                 listPosition[std::make_pair(mPos, mEnd)].NumberOfMatchRead++;
                 listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
                 listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
-
-                // for (int i = 0; i < rangeMapping; i++)
-                // {
-                //     int32_t tempPos = mPos + i;
-                //     int32_t tempEnd = mEnd - i;
-
-                //     if (i > 6)
-                //     {
-                //         break;
-                //     }
-
-                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                //     // {
-                //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                //     // }
-                // }
+ 
             }
+            
         }
     }
 
@@ -339,9 +338,9 @@ void RefiningInversion::refineEndToStart(const char *range)
         // }
 
         // if ((cigar.at(0).getOperatorName() == 'S' && cigar.at(1).getOperatorName() == 'M'))
-        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength()>=3)
+        if (cigar.at(0).getOperatorName() == 'S' && cigar.at(0).getLength() >= 3)
         {
-            
+
             // continue;
             std::string fullRead = readparser.getSequence();
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCS(&fullRead);
@@ -349,7 +348,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             std::vector<StringSearch::Score> result = ssa.alignInversionTargetAtStartSCS(&fullRead, &ssc);
             for (auto n : result)
             {
-                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(0).getLength())
                 {
                     continue;
                 }
@@ -376,28 +375,13 @@ void RefiningInversion::refineEndToStart(const char *range)
                 listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
                 listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-                // for (int i = 0; i < rangeMapping; i++)
-                // {
-                //     int32_t tempPos = mPos - i;
-                //     int32_t tempEnd = mEnd + i;
 
-                //     if (i > 6)
-                //     {
-                //         break;
-                //     }
-
-                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                // }
             }
         }
 
-        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S')&& cigar.at(cigar.size() - 1).getLength()>=3)
+        if ((cigar.at(cigar.size() - 1).getOperatorName() == 'S') && cigar.at(cigar.size() - 1).getLength() >= 3)
         // if (true)
         {
-
-           
 
             // continue;
             // if (cigar.at(cigar.size() - 1).getLength() < 10)
@@ -415,7 +399,7 @@ void RefiningInversion::refineEndToStart(const char *range)
             // std::vector<SmithWaterman::ScoreAlignment> result = alignment.alignInversionTargetAtStartSCE(&fullRead);
             for (auto n : result)
             {
-                 if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
+                if (n.matchCount + n.missmatchCount + 4 < cigar.at(cigar.size() - 1).getLength())
                 {
                     continue;
                 }
@@ -444,24 +428,6 @@ void RefiningInversion::refineEndToStart(const char *range)
                 listPosition[std::make_pair(mPos, mEnd)].MatchLists.push_back(rangeMapping);
                 listPosition[std::make_pair(mPos, mEnd)].MapQLists.push_back(readparser.getMapQuality());
 
-                // for (int i = 0; i < rangeMapping; i++)
-                // {
-                //     int32_t tempPos = mPos - i;
-                //     int32_t tempEnd = mEnd + i;
-
-                //     if (i > 6)
-                //     {
-                //         break;
-                //     }
-
-                //     listPosition[std::make_pair(tempPos, tempEnd)].NumberOfMatchRead++;
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MatchLists.push_back(rangeMapping - i);
-                //     listPosition[std::make_pair(tempPos, tempEnd)].MapQLists.push_back(readparser.getMapQuality());
-                //     // if (listPosition[std::make_pair(tempPos, tempEnd)].Sequence.size() < n.scorepattern - 1)
-                //     // {
-                //     //     listPosition[std::make_pair(tempPos, tempEnd)].maxMatchSequence = n.pattern.size() - 1;
-                //     // }
-                // }
             }
         }
     }
@@ -498,9 +464,17 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
             continue;
         }
 
-         if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
+        if (maxQuality == 0)
         {
             continue;
+        }
+
+        if (maxMatchSize > 30)
+        {
+            if (maxMatchSize < getDivider(samplestat->getReadLength(), 1, 5, 1))
+            {
+                continue;
+            }
         }
 
         if (bFrequency <= 1)
@@ -530,16 +504,16 @@ Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t,
         result.setMark("SR");
         result.setMapQList(bMapQList);
 
-        if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
-        {
-            if (bPos == 0 || bEnd == 0)
-            {
-                bPos = evidence.getPos();
-                bEnd = evidence.getEnd();
-                bHit = evidence.getFrequency();
-                result.setMapQList(*evidence.getMapQVector());
-            }
-        }
+        // if (evidence.getFrequency() >= 2 && (bPos == 0 || bEnd == 0))
+        // {
+        //     if (bPos == 0 || bEnd == 0)
+        //     {
+        //         bPos = evidence.getPos();
+        //         bEnd = evidence.getEnd();
+        //         bHit = evidence.getFrequency();
+        //         result.setMapQList(*evidence.getMapQVector());
+        //     }
+        // }
     }
     else
     {
