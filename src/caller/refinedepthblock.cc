@@ -104,27 +104,10 @@ void RefineDepthBlock::execute()
         {
             result = variantlist;
         }
-        // if (variantlist.)
-
-        // auto result = getRefineResultDeletion(&variantlist);
-        // auto result = getResultWithOutOverlapped(&variantlist, &variantlist);
-
+        
         writeFile(&result);
     }
 
-    // DepthBlockFile rdf;
-    // // rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt")
-    // for (int i = 0; i < 40; i++)
-    // {
-    //          rdf.loadDataToCache(filemanager->getReadDepthPath() + "/chr1.txt");
-    //     auto rd = rdf.getBlock(240000000);
-    //     // auto rd = rdf.findBlockWithFile(240000000, filemanager->getReadDepthPath() + "/chr1.txt", 250);
-    //     std::cout << rd.pos << std::endl;
-    // }
-
-    // std::cout << roundNumber(1124, 250) << std::endl;
-    // std::cout << nextNumber(1124, 250) << std::endl;
-    // std::cout << previousNumber(1124, 250) << std::endl;
 }
 
 void RefineDepthBlock::setSampleStat(SampleStat *samplestat)
@@ -323,29 +306,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         }
         else if ((n.getMark() == "SR"))
         {
-
-            // if (n.getMaxMapQ() < 30)
-            // {
-            //     continue;
-            // }
-
-            // if (n.getMaxMapQ() < 60)
-            // {
-            //     if (n.getNumberOfRP() <= getDivider(samplestat->getReadLength(), 1, 100, 1))
-            //     {
-            //         continue;
-            //     }
-            //     // continue;
-            // }
-            // else
-            // {
-            //     // if (n.getNumberOfRP() <= getDivider(samplestat->getReadLength(), 20, 100, 15))
-            //     // {
-            //     //     continue;
-            //     // }
-            //     // continue;
-            // }
-
             if (n.getNumberOfRP() <= 1)
             {
                 continue;
@@ -360,10 +320,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
         }
         else
         {
-            // if (currentRD.depth > readDepthStat.getReadDepthByChr(n.getChr()) * 3)
-            // {
-            //     continue;
-            // }
 
             if (n.getFrequency() > readDepthStat.getReadDepthByChr(n.getChr()) * 3)
             {
@@ -407,7 +363,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 {
                     continue;
                 }
-                // continue;
             }
             else
             {
@@ -415,7 +370,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 {
                     continue;
                 }
-                // continue;
             }
 
             if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
@@ -616,16 +570,11 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             {
                 continue;
             }
-            // continue;
+
             if (n.getFrequency() <= 2)
             {
                 continue;
             }
-
-            // if (n.getMaxMapQ() < 40)
-            // {
-            //     continue;
-            // }
 
             if (n.getMaxRPMapQ() == 0)
             {
