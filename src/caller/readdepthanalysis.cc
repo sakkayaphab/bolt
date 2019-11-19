@@ -191,7 +191,7 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
 
     if ((e.getMark() == "MATEUNMAPPED"))
     {
-        if (e.getFrequency() <= 2)
+        if (e.getFrequency() <= 4)
         {
             return false;
         }
@@ -201,21 +201,17 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
     }
     else if ((e.getMark() == "SR"))
     {
-        
     }
     else
     {
-        if (e.getFrequency() <= 2)
+        if (e.getFrequency() <= 3)
         {
             return false;
         }
-        // if (e.getMaxMapQ() <= 10)
-        // {
-        //     return false;
-        // }
+        
     }
 
-    if (sumStartSCL <= 1 && sumStartSCF <= 1)
+    if (sumStartSCL <= 3 && sumStartSCF <= 3)
     {
         return false;
     }
@@ -281,7 +277,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     if (cachechr != e.getChr())
     {
-            std::cout << e.convertToVcfString() << std::endl;
+        std::cout << e.convertToVcfString() << std::endl;
 
         loadDataToCache(filemanager->getReadDepthPath() + "/" + e.getChr() + ".txt");
         std::cout << "✓ : " << e.getChr() << std::endl;
@@ -290,7 +286,6 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
 
     startFocusReadDepth.clear();
     endFocusReadDepth.clear();
-
 
     if (e.getVariantType() == "DEL")
     {
@@ -324,7 +319,7 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
         setFocusReadDepth(e.getPos() + e.getCiPosLeft() - configRound, e.getPos() + e.getCiPosRight() + configRound, &startFocusReadDepth);
         setFocusReadDepth(e.getEnd() + e.getCiEndLeft() - configRound, e.getEnd() + e.getCiEndRight() + configRound, &endFocusReadDepth);
         collectNewData();
-        
+
         if (getReadDepthAverageFocusArea(&startFocusReadDepth) > 800 && getReadDepthAverageFocusArea(&endFocusReadDepth) > 800)
         {
             return false;
@@ -592,14 +587,15 @@ void ReadDepthAnalysis::loadDataToCache(std::string filepath)
     else
         std::cout << "Unable to open file";
 
-    if (sumRD==0) {
-        avgReadDepthFocus = 0;
-    }else
+    if (sumRD == 0)
     {
-       avgReadDepthFocus = int(sumRD / count);
+        avgReadDepthFocus = 0;
     }
-    
-    
+    else
+    {
+        avgReadDepthFocus = int(sumRD / count);
+    }
+
     // std::cout << "avgReadDepthFocus : " << avgReadDepthFocus << std::endl;
 }
 

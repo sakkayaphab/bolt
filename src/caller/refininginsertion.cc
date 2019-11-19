@@ -453,20 +453,10 @@ bool RefiningInsertion::compareEditDistance(std::string s1, std::string s2, bool
     std::string temps2 = s2;
     substringSeq(&temps1, &temps2, fromstart);
 
-    // std::cout << "s1 : " << s1<< std::endl;
-    // std::cout << "s2 : " << s2<< std::endl;
-    // std::cout << "temps1 : " << temps1<< std::endl;
-    // std::cout << "temps2 : " << temps2<< std::endl;
-
     EditDistance editdistance;
     int editpoint = editdistance.Compare(&temps1, &temps2);
 
-    // std::cout << "### editpoint" << std::endl;
-    // std::cout << editpoint << std::endl;
-    // std::cout << temps1 << std::endl;
-    // std::cout << temps2 << std::endl;
-
-    if (editpoint < 4)
+    if (editpoint < 3)
     {
         return true;
     }
