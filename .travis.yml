@@ -4,8 +4,8 @@ compiler: gcc
 
 os:
   - linux
-  - osx
-  
+  # - osx
+
 script: 
   - cmake . -DBUILD_TESTS=ON
   - make
