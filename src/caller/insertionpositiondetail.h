@@ -6,7 +6,6 @@
 #include <map>
 #include <vector>
 #include "refiningsv.h"
-#include <bits/stdc++.h> 
 
 class InsertionPositionDetail
 {
