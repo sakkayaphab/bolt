@@ -104,10 +104,9 @@ void RefineDepthBlock::execute()
         {
             result = variantlist;
         }
-        
+
         writeFile(&result);
     }
-
 }
 
 void RefineDepthBlock::setSampleStat(SampleStat *samplestat)
@@ -357,7 +356,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 }
             }
 
-            if (n.getMaxMapQ() < 60)
+             if (n.getMaxMapQ() < 60)
             {
                 if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 15, 100, 15))
                 {
@@ -553,7 +552,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
-        
+
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
@@ -699,9 +698,9 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
 
         if (n.getSvLength() < 50)
-            {
-                continue;
-            }
+        {
+            continue;
+        }
 
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
