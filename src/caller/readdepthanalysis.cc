@@ -198,7 +198,7 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
 
         if (e.getMaxMapQ() < 40)
         {
-            continue;
+            return false;
         }
     }
     else if ((e.getMark() == "SINS"))
@@ -214,9 +214,9 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
             return false;
         }
 
-        if (n.getMaxMapQ() < 10)
+        if (e.getMaxMapQ() < 10)
         {
-            continue;
+            return false;
         }
     }
 
