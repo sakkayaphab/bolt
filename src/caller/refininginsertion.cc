@@ -562,16 +562,9 @@ bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, s
             {
                 SmithWaterman swm(&n.seq, 0, false);
                 int maxmatch = swm.findMaxMatchInsertion(&m.seq);
-                // std::cout << maxmatch << std::endl;
 
                 int seq1MatchSize = n.seq.size() - maxmatch;
                 int seq2MatchSize = m.seq.size() - maxmatch;
-
-                // std::cout << "total : " << seq1MatchSize + seq2MatchSize + maxmatch
-                // << " seq1MatchSize " << seq1MatchSize
-                // << " seq2MatchSize " << seq2MatchSize
-                // << " maxmatch " << maxmatch
-                // << std::endl;
 
                 if (seq1MatchSize + seq2MatchSize + maxmatch < 50)
                 {
