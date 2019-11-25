@@ -195,6 +195,11 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
         {
             return false;
         }
+
+        if (e.getMaxMapQ() < 40)
+        {
+            return false;
+        }
     }
     else if ((e.getMark() == "SINS"))
     {
@@ -208,7 +213,11 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
         {
             return false;
         }
-        
+
+        if (e.getMaxMapQ() < 10)
+        {
+            return false;
+        }
     }
 
     if (sumStartSCL <= 3 && sumStartSCF <= 3)

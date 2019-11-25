@@ -2,6 +2,10 @@ language: cpp
 dist: xenial
 compiler: gcc
 
+os:
+  - linux
+  # - osx
+
 script: 
   - cmake . -DBUILD_TESTS=ON
   - make
