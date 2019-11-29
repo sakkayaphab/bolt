@@ -86,6 +86,12 @@ void EvidenceFinder::findEvidence()
 
     std::vector<ReadParser::Cigar> cigar;
     SplitRead splitread(*target_chromosome, &readparser, samplestat, filepath);
+    int32_t markduppos = 0;
+    int32_t markdupend = 0;
+    int32_t markdupmatepos = 0;
+    int32_t markdupmateend = 0;
+    uint8_t markdupmapq = 0;
+
     while (sam_itr_next(inT, iterT, read) >= 0)
     {
 
@@ -108,6 +114,23 @@ void EvidenceFinder::findEvidence()
         {
             continue;
         }
+
+        if (markduppos==readparser.getPos() && markdupend==readparser.getEnd()) {
+            if (markdupmatepos==readparser.getMatePos() && markdupmateend==readparser.getMateEnd()) {
+                if (markdupmapq == readparser.getMapQuality()) {
+                    continue;
+                }
+            }
+
+        }
+
+        markduppos = readparser.getPos();
+        markdupend = readparser.getEnd();
+        markdupmatepos = readparser.getMatePos();
+        markdupmateend = readparser.getMateEnd();
+        markdupmapq = readparser.getMapQuality();
+
+
 
         splitread.updateRead();
 

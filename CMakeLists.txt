@@ -18,9 +18,9 @@ include(ExternalProject)
 
 # Build external library
 include(cmake/FindHTSlib.cmake)
-include(cmake/FindZLIBlib.cmake)
-include(cmake/FindLZMAlib.cmake)
-include(cmake/FindBZip2.cmake)
+#include(cmake/FindZLIBlib.cmake)
+#include(cmake/FindLZMAlib.cmake)
+#include(cmake/FindBZip2.cmake)
 include(cmake/FindTBB.cmake)
 
 enable_testing()
