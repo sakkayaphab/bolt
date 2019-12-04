@@ -1,5 +1,6 @@
 # Bolt
 [![Build Status](https://travis-ci.org/sakkayaphab/bolt.svg?branch=master)](https://travis-ci.org/sakkayaphab/bolt)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/sakkayaphab/genie)](https://github.com/sakkayaphab/genie/releases)
 
 
 ## Installation
