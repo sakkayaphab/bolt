@@ -6,8 +6,11 @@ os:
   - linux
   # - osx
 
-script: 
-  - cmake . -DBUILD_TESTS=ON
+script:
+  - sudo apt-get install cmake libhts-dev libtbb-dev -y
+  - cd /usr/include && ls
+  - cd /usr/lib && ls
+  - cd /usr/ && ls
+  - mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu/
   - make
-  - ctest --verbose
   - ./bin/bolt
