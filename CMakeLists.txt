@@ -20,15 +20,20 @@ set(CMAKE_CXX_EXTENSIONS False)
 #include(ExternalProject)
 
 #set(CMAKE_CXX_STANDARD 14)
-link_directories(${LIBRARY_LINK_PREFIX})
-message("LIBRARY_LINK_PREFIX : " ${LIBRARY_LINK_PREFIX})
-include_directories(${INCLUDE_LIBRARY_PREFIX})
-message("INCLUDE_LIBRARY_PREFIX : " ${INCLUDE_LIBRARY_PREFIX})
+set(LIBRARY_LINK_PREFIX "/usr/local/lib/")
+set(LIBRARY_LINK_PREFIX2 "/usr/lib/")
+link_directories(${LIBRARY_LINK_PREFIX} ${LIBRARY_LINK_PREFIX2})
+message("LIBRARY_LINK_PREFIX : " ${LIBRARY_LINK_PREFIX} ${LIBRARY_LINK_PREFIX2})
+set(INCLUDE_LIBRARY_PREFIX "/usr/local/include/")
+set(INCLUDE_LIBRARY_PREFIX2 "/usr/include/")
+include_directories(${INCLUDE_LIBRARY_PREFIX} ${INCLUDE_LIBRARY_PREFIX2})
+
+message("INCLUDE_LIBRARY_PREFIX : " ${INCLUDE_LIBRARY_PREFIX} ${INCLUDE_LIBRARY_PREFIX2})
 message(STATUS $ENV{$LD_LIBRARY_PATH})
 
 set(CMAKE_INSTALL_RPATH ${LIBRARY_LINK_PREFIX})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_CXX_FLAGS "-O3 -I${INCLUDE_LIBRARY_PREFIX} -L${LIBRARY_LINK_PREFIX} -lhts -lz -lbz2 -ltbb")
+set(CMAKE_CXX_FLAGS "-O3 -lhts -lz -lbz2 -ltbb")
 #add_executable(jinn main.cpp)
 
 # Build external library
