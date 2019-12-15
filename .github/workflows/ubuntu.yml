@@ -14,9 +14,9 @@ jobs:
       - name: Include
         run: cd /usr/include && ls
       - name: Lib
-        run: cd /usr/lib && ls
+        run: cd /usr/lib32 && ls
       - name: Lib
-        run: cd /usr/ && ls
+        run: cd /usr/local && ls
       - name: Build
         run: cd build && make
       - name: Test
