@@ -12,6 +12,6 @@ jobs:
       - name: Configure
         run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib
       - name: Build
-        run: make
+        run: cd build && make
       - name: Test
-        run: ./bin/bolt
+        run: cd build && make install
