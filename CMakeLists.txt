@@ -24,6 +24,8 @@ set(LIBRARY_LINK_PREFIX "/usr/local/lib/")
 #set(LIBRARY_LINK_PREFIX2 "/usr/lib/")
 find_library(HTSLIB_LIBRARIES hts HINTS ${LIBRARY_LINK_PREFIX})
 find_library(TBB_IMPORTED_TARGETS tbb HINTS ${LIBRARY_LINK_PREFIX})
+find_library(ZLIB_LIBRARIES z HINTS ${LIBRARY_LINK_PREFIX})
+find_library(BZIP2_LIBRARIES bz2 HINTS ${LIBRARY_LINK_PREFIX})
 
 #link_directories(${LIBRARY_LINK_PREFIX})
 message("LIBRARY_LINK_PREFIX : " ${LIBRARY_LINK_PREFIX})
@@ -36,7 +38,7 @@ message(STATUS $ENV{$LD_LIBRARY_PATH})
 
 set(CMAKE_INSTALL_RPATH ${LIBRARY_LINK_PREFIX})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_CXX_FLAGS "-O3 -lz -lbz2")
+set(CMAKE_CXX_FLAGS "-O3")
 #add_executable(jinn main.cpp)
 
 # Build external library

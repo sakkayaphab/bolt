@@ -18,9 +18,9 @@ if(APPLE)
         vcf
         fasta
         ${HTSLIB_LIBRARIES}
-#        ${ZLIB_LIBRARIES}
+        ${ZLIB_LIBRARIES}
 #        ${LIBLZMA_LIBRARIES}
-#        ${BZIP2_LIBRARIES}
+        ${BZIP2_LIBRARIES}
         ${TBB_IMPORTED_TARGETS}
     )
 elseif(UNIX AND NOT APPLE)
@@ -29,9 +29,9 @@ elseif(UNIX AND NOT APPLE)
         vcf
         fasta
         ${HTSLIB_LIBRARIES}
-#        ${ZLIB_LIBRARIES}
+        ${ZLIB_LIBRARIES}
 #        ${LIBLZMA_LIBRARIES}
-#        ${BZIP2_LIBRARIES}
+        ${BZIP2_LIBRARIES}
         ${TBB_IMPORTED_TARGETS}
     )
 endif()
