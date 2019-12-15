@@ -1,7 +1,7 @@
 #include "smithwaterman.h"
 #include <iostream>
 #include <algorithm>
-#include <bits/stdc++.h>
+
 
 SmithWaterman::SmithWaterman()
 {

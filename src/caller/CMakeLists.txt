@@ -1,8 +1,8 @@
 file(GLOB SOURCES "*.cc")
 
 add_library(caller
-#        STATIC
-        SHARED
+        STATIC
+#        SHARED
         ${SOURCES}
 )
 
@@ -17,21 +17,21 @@ if(APPLE)
         caller
         vcf
         fasta
-        ${HTSLIB_LIBRARIES}
-        ${ZLIB_LIBRARIES}
-        ${LIBLZMA_LIBRARIES}
-        ${BZIP2_LIBRARIES}
-        ${TBB_IMPORTED_TARGETS}
+#        ${HTSLIB_LIBRARIES}
+#        ${ZLIB_LIBRARIES}
+#        ${LIBLZMA_LIBRARIES}
+#        ${BZIP2_LIBRARIES}
+#        ${TBB_IMPORTED_TARGETS}
     )
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(
         caller
         vcf
         fasta
-        ${HTSLIB_LIBRARIES}
-        ${ZLIB_LIBRARIES}
-        ${LIBLZMA_LIBRARIES}
-        ${BZIP2_LIBRARIES}
-        ${TBB_IMPORTED_TARGETS}
+#        ${HTSLIB_LIBRARIES}
+#        ${ZLIB_LIBRARIES}
+#        ${LIBLZMA_LIBRARIES}
+#        ${BZIP2_LIBRARIES}
+#        ${TBB_IMPORTED_TARGETS}
     )
 endif()
