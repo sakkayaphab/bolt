@@ -17,21 +17,21 @@ if(APPLE)
         caller
         vcf
         fasta
-#        ${HTSLIB_LIBRARIES}
+        ${HTSLIB_LIBRARIES}
 #        ${ZLIB_LIBRARIES}
 #        ${LIBLZMA_LIBRARIES}
 #        ${BZIP2_LIBRARIES}
-#        ${TBB_IMPORTED_TARGETS}
+        ${TBB_IMPORTED_TARGETS}
     )
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(
         caller
         vcf
         fasta
-#        ${HTSLIB_LIBRARIES}
+        ${HTSLIB_LIBRARIES}
 #        ${ZLIB_LIBRARIES}
 #        ${LIBLZMA_LIBRARIES}
 #        ${BZIP2_LIBRARIES}
-#        ${TBB_IMPORTED_TARGETS}
+        ${TBB_IMPORTED_TARGETS}
     )
 endif()

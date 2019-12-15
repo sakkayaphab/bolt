@@ -10,7 +10,7 @@ jobs:
         run: sudo apt-get install cmake libtbb-dev -y
       - uses: actions/checkout@v1
       - name: Configure
-        run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/local/include/ -DLIBRARY_LINK_PREFIX=/usr/local/lib/
+        run: mkdir build
       - name: export LD_LIBRARY_PATH
         run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/ && echo $LD_LIBRARY_PATH
       - name: Wget
@@ -18,18 +18,18 @@ jobs:
       - name: Build htslib
         run: cd htslib-1.10 && autoheader && autoconf && ./configure && make && sudo make install
       - name: Include
-        run: cd /usr/local/include/ && ls
+        run: cd /usr/include && ls
       - name: Lib
-        run: cd /usr/local/lib/ && ls
+        run: cd /usr/lib/x86_64-linux-gnu && ls
       - name: Lib
         run: cd /usr/ && ls
       - name: Lib
         run: cd /usr/local/ && ls
       - name: Lib
         run: cd /usr/lib/x86_64-linux-gnu/ && ls
-#      - name: Lib
-#        run: ldconfig -p | grep libhts
+      - name: Lib
+        run: ldconfig -p | grep libhts
       - name: Build
-        run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/local/include/ -DLIBRARY_LINK_PREFIX=/usr/local/lib/  && make
+        run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu  && make
       - name: Test
         run: cd build && make install
