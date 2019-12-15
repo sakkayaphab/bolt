@@ -32,4 +32,4 @@ jobs:
       - name: Build
         run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu  && make
       - name: Test
-        run: cd build && make install
+        run: cd build && ls && cd src && ./bolt
