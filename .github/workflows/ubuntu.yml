@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Lib
-        run: sudo apt-get install cmake libtbb-dev -y
+        run: sudo apt-get install cmake libhts-dev libtbb-dev -y
       - uses: actions/checkout@v1
       - name: Configure
         run: mkdir build
