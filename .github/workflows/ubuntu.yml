@@ -22,7 +22,7 @@ jobs:
       - name: Lib
         run: cd /usr/local/lib && ls
       - name: Lib
-        run: cd /usr/local/include && ls
+        run: ldconfig -p | grep libhts
       - name: Build
         run: cd build && make
       - name: Test
