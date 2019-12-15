@@ -18,9 +18,9 @@ jobs:
       - name: Build htslib
         run: cd htslib-1.10 && autoheader && autoconf && ./configure && make && sudo make install
       - name: Include
-        run: cd /usr/include && ls
+        run: cd /usr/local/include/ && ls
       - name: Lib
-        run: cd /usr/lib && ls
+        run: cd /usr/local/lib/ && ls
       - name: Lib
         run: cd /usr/ && ls
       - name: Lib
