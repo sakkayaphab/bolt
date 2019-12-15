@@ -14,4 +14,6 @@ jobs:
       - name: Build
         run: cd build && make
       - name: Test
-        run: cd build && ls && cd src && ./bolt
+        run: cd build && sudo make install
+      - name: Test
+        run: bolt
