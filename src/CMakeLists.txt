@@ -1,4 +1,4 @@
-project (bolt)
+
 
 file(GLOB SOURCES "*.cc")
 

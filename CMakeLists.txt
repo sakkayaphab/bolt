@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-
+project (bolt)
 set (CMAKE_CXX_STANDARD 17)
 
 #set(CMAKE_VERBOSE_MAKEFILE on)
