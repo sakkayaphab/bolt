@@ -25,6 +25,8 @@ jobs:
         run: cd /usr/lib/x86_64-linux-gnu/ && ls
       - name: Lib
         run: ldconfig -p | grep libhts
+      - name: echo
+        run: echo $LD_LIBRARY_PATH
       - name: Build
         run: cd build && make
       - name: Test
