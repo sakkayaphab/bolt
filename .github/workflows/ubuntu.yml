@@ -15,6 +15,8 @@ jobs:
         run: cd /usr/include && ls
       - name: Lib
         run: cd /usr/lib && ls
+      - name: Lib
+        run: cd /usr/ && ls
       - name: Build
         run: cd build && make
       - name: Test
