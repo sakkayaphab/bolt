@@ -12,9 +12,9 @@ jobs:
       - name: Configure
         run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib
       - name: Include
-        run: cd /usr/share && ls
-      - name: Lib
         run: cd /usr/include && ls
+      - name: Lib
+        run: cd /usr/lib && ls
       - name: Lib
         run: cd /usr/ && ls
       - name: Build
