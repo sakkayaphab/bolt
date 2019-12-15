@@ -16,7 +16,7 @@ jobs:
       - name: Lib
         run: cd /usr/lib && ls
       - name: Lib
-        run: cd /usr/lib32/ && ls
+        run: cd /usr/ && ls
       - name: Lib
         run: cd /usr/local/ && ls
       - name: Lib
