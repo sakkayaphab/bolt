@@ -11,6 +11,7 @@ script:
   - cd /usr/include && ls
   - cd /usr/libx86_64-linux-gnu && ls
   - cd /usr/ && ls
+  - cd x86_64-linux-gnu && ls
   - mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/x86_64-linux-gnu/
   - make
   - ./bin/bolt
