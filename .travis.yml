@@ -9,7 +9,7 @@ os:
 script:
   - sudo apt-get install cmake libhts-dev libtbb-dev -y
   - cd /usr/include && ls
-  - cd /usr/lib && ls
+  - cd /usr/libx86_64-linux-gnu && ls
   - cd /usr/ && ls
   - mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu/
   - make
