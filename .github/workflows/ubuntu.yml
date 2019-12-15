@@ -30,6 +30,6 @@ jobs:
 #      - name: Lib
 #        run: ldconfig -p | grep libhts
       - name: Build
-        run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu  && make
+        run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/local/include/ -DLIBRARY_LINK_PREFIX=/usr/local/lib/  && make
       - name: Test
         run: cd build && make install
