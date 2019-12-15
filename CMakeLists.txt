@@ -28,7 +28,7 @@ message(STATUS $ENV{$LD_LIBRARY_PATH})
 
 set(CMAKE_INSTALL_RPATH ${LIBRARY_LINK_PREFIX})
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_CXX_FLAGS "-O3 -lhts -lz -lbz2 -ltbb")
+set(CMAKE_CXX_FLAGS "-O3 -I${INCLUDE_LIBRARY_PREFIX} -L${LIBRARY_LINK_PREFIX} -lhts -lz -lbz2 -ltbb")
 #add_executable(jinn main.cpp)
 
 # Build external library
