@@ -44,7 +44,7 @@ void Cli::showHelpCallSV()
     std::cout << "\t-b\tsample file path (*required)" << std::endl;
     std::cout << "\t-r\treference file path (*required)" << std::endl;
     std::cout << "\t-o\toutput path (*required)" << std::endl;
-    std::cout << "\t-t\tnumber of threads to use [auto adjust]" << std::endl;
+    std::cout << "\t-t\tnumber of threads to use" << std::endl;
 
     std::cout << std::endl;
 }
