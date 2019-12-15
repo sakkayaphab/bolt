@@ -20,7 +20,7 @@ jobs:
       - name: Lib
         run: cd /usr/local/ && ls
       - name: Lib
-        run: cd /usr/local/lib && ls
+        run: cd /usr/lib/x86_64-linux-gnu/ && ls
       - name: Lib
         run: ldconfig -p | grep libhts
       - name: Build
