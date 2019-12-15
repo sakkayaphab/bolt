@@ -12,7 +12,7 @@ jobs:
       - name: Configure
         run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu
       - name: export LD_LIBRARY_PATH
-        run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
+        run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/ && echo $LD_LIBRARY_PATH
       - name: Include
         run: cd /usr/include && ls
       - name: Lib
@@ -28,6 +28,6 @@ jobs:
       - name: echo
         run: echo $LD_LIBRARY_PATH
       - name: Build
-        run: cd build && make
+        run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu  && make
       - name: Test
         run: cd build && make install
