@@ -10,7 +10,7 @@ jobs:
         run: sudo apt-get install libhts-dev -y
       - uses: actions/checkout@v1
       - name: Configure
-        run: mkdir build && cd build && cmake .. -DINSTALL_BIN_PREFIX=$(pwd) -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib
+        run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib
       - name: Build
         run: make
       - name: Test
