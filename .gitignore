@@ -12,7 +12,7 @@ Makefile
 
 cmake-build-debug
 .idea
-
+*.a
 
 # execute
 run.sh

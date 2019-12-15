@@ -7,7 +7,8 @@
 #include <cstring>
 #include <stdlib.h>
 #include <ctype.h>
-#include <bits/stdc++.h>
+#include <sstream>
+//#include <bits/stdc++.h>
 void ReadParser::setBamRead(bam1_t *bam_read)
 {
     source_bamread = bam_read;
@@ -668,11 +669,12 @@ std::vector<std::string> ReadParser::splitText(std::string s, char delimiter)
 {
     std::vector<std::string> tokens;
 
-    std::stringstream check1(s);
+    std::stringstream ss;
+    ss.str(s);
 
     std::string intermediate;
 
-    while (getline(check1, intermediate, delimiter))
+    while (getline(ss, intermediate, delimiter))
     {
         tokens.push_back(intermediate);
     }

@@ -1,8 +1,8 @@
 file(GLOB SOURCES "*.cc")
 
 add_library(caller
-#        STATIC
-        SHARED
+        STATIC
+#        SHARED
         ${SOURCES}
 )
 
@@ -19,7 +19,6 @@ if(APPLE)
         fasta
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
-        ${LIBLZMA_LIBRARIES}
         ${BZIP2_LIBRARIES}
         ${TBB_IMPORTED_TARGETS}
     )
@@ -30,7 +29,6 @@ elseif(UNIX AND NOT APPLE)
         fasta
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
-        ${LIBLZMA_LIBRARIES}
         ${BZIP2_LIBRARIES}
         ${TBB_IMPORTED_TARGETS}
     )

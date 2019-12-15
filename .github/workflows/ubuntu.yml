@@ -1,0 +1,24 @@
+name: Ubuntu
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Library with APT
+        run: sudo apt-get install cmake libhts-dev libtbb-dev -y
+      - uses: actions/checkout@v1
+      - name: Configure
+        run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu
+      - name: Build
+        run: cd build && make
+      - name: Install
+        run: cd build && sudo make install
+      - name: Run test
+        run: bolt
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: bolt_linux_x86_64bit
+          path: /usr/local/bin/bolt
