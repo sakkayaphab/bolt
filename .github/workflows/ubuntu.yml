@@ -16,7 +16,7 @@ jobs:
       - name: Wget
         run: wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar -xvjf htslib-1.10.tar.bz2 && ls
       - name: Build htslib
-        run: cd htslib-1.10 && autoheader && autoconf && ./configure && make && make install
+        run: cd htslib-1.10 && autoheader && autoconf && ./configure && make && sudo make install
       - name: Include
         run: cd /usr/include && ls
       - name: Lib
