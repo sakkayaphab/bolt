@@ -14,7 +14,7 @@ jobs:
       - name: export LD_LIBRARY_PATH
         run: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/ && echo $LD_LIBRARY_PATH
       - name: Wget
-        run: wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar -jf htslib-1.10.tar.bz2 && ls
+        run: wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2 && tar -xvjf htslib-1.10.tar.bz2 && ls
       - name: Build htslib
         run: autoheader && autoconf && ./configure && make && make install
       - name: Include
