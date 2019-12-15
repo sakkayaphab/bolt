@@ -27,8 +27,8 @@ jobs:
         run: cd /usr/local/ && ls
       - name: Lib
         run: cd /usr/lib/x86_64-linux-gnu/ && ls
-      - name: Lib
-        run: ldconfig -p | grep libhts
+#      - name: Lib
+#        run: ldconfig -p | grep libhts
       - name: Build
         run: cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu  && make
       - name: Test
