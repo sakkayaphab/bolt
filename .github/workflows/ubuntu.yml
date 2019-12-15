@@ -18,7 +18,7 @@ jobs:
       - name: Run test
         run: bolt
       - name: Upload artifact
-          uses: actions/upload-artifact@v1
-          with:
-            name: bolt_linux_x86_64bit
-            path: /usr/local/bin/bolt
+        uses: actions/upload-artifact@v1
+        with:
+          name: bolt_linux_x86_64bit
+          path: /usr/local/bin/bolt
