@@ -1,5 +1,5 @@
 # Bolt
-[![Build Status](https://travis-ci.org/sakkayaphab/bolt.svg?branch=master)](https://travis-ci.org/sakkayaphab/bolt)
+![Build Status](https://github.com/sakkayaphab/bolt/workflows/Ubuntu/badge.svg?branch=master)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/sakkayaphab/bolt)](https://github.com/sakkayaphab/bolt/releases)
 
 
