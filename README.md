@@ -19,7 +19,7 @@ Requirements
 git clone https://github.com/sakkayaphab/bolt.git
 mkdir build
 cd build
-cmake .. -DINSTALL_BIN_PREFIX=(directory for installation) -DINCLUDE_LIBRARY_PREFIX=(directory for include) -DLIBRARY_LINK_PREFIX=(directory for lib)
+cmake .. -DINSTALL_BIN_PREFIX=(directory path for the binary executable file of Bolt) -DINCLUDE_LIBRARY_PREFIX=(directory path for include of libraries) -DLIBRARY_LINK_PREFIX=(directory path for lib of libraries)
 make
 make install
 ```
