@@ -11,10 +11,9 @@
 
 Requirements
 1. GCC >=v5.4
-2. Intel tbb-devel >= 2019.9
-3. Intel tbb-devel >= 2019.9
-4. HTSlib >= 1.9
-
+2. Intel tbb-devel >=2019.9
+3. HTSlib >=v1.9
+4. CMake >=v3.9
 
 ```sh
 git clone https://github.com/sakkayaphab/bolt.git
