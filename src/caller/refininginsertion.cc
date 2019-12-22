@@ -1,7 +1,7 @@
 #include "refininginsertion.h"
 #include <stdlib.h>
 #include "smithwaterman.h"
-
+#include <cmath>
 RefiningInsertion::RefiningInsertion()
 {
     variantresult.setVariantType("INS");
