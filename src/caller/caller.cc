@@ -55,7 +55,6 @@ Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::strin
     // ReadDepthStat readDepthStat;
     // readDepthStat.setFilePath(&filepath);
     // readDepthStat.execute();
-    // std::cout << readDepthStat.getReadDepthByChr("1") << std::endl;
 }
 
 void Caller::setnumberofpair_stat(int n)
@@ -350,8 +349,7 @@ void Caller::catEvidenceFile()
         if (myfile.is_open())
         {
             std::string svtype = n.substr(n.size() - 7, 3);
-            // std::cout << n << std::endl;
-            // std::cout << svtype << std::endl;
+
             // if (svtype != "INS")
             // {
             //     continue;
@@ -361,7 +359,6 @@ void Caller::catEvidenceFile()
             {
                 Evidence e;
                 e.setEvidenceByString(line);
-                // std::cout << line << std::endl;
                 if (rda.analyzeByEvidence(e))
                 {
                     cache.push_back(line);
@@ -384,7 +381,6 @@ void Caller::catEvidenceFile()
         cache.clear();
     }
 
-    // std::cout << count << std::endl;
 }
 
 void Caller::mergeReadDepthFile()
@@ -429,7 +425,6 @@ void Caller::mergeReadDepthFile()
         {
 
             std::string svtype = n.substr(n.size() - 7, 3);
-            // std::cout << svtype << std::endl;
             // if (svtype != "INV")
             // {
             //     continue;

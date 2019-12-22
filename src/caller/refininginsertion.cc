@@ -273,11 +273,6 @@ void RefiningInsertion::findBreakpoint()
             continue;
         }
 
-        // if (n.getFrequency() < 1)
-        // {
-        //     continue;
-        // }
-
         bool added;
 
         // std::cout << n.getSeqList().size() << std::endl;

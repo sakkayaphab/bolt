@@ -23,11 +23,8 @@ void Core::setMapLast()
 
         rankOrder[temp] = i;
 
-        // std::cout << temp << "=" << i << std::endl;
-        // std::cout << mapRankFirst[p.first].size() << std::endl;
     }
 
-    // std::cout << "[" << rankOrder["a0"] << "]" << std::endl;
     // return;
 
     for (int i = 0; i < bwtstore.size(); i++)

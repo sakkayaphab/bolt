@@ -61,11 +61,6 @@ public:
   void setTargetChromosome(std::string *target_chromosome);
   void execute();
   void setHtsIndex(hts_idx_t *index);
-  bool isDEL();
-  bool isDUP();
-  bool isINV();
-  bool isINS();
-  bool isTRA();
 
 
   bool isDeletion();

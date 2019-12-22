@@ -52,7 +52,6 @@ MDtagHelper::MDtagHelper(std::string mdtext,std::string cigar)
 
 MDtagHelper::MDTagList MDtagHelper::convertMDTagList(std::string number, char operatorname)
 {
-    std::cout << number << " = " << operatorname << std::endl;
     MDTagList md;
     md.size = std::stoi(number);
     md.operatename = operatorname;
@@ -89,9 +88,7 @@ std::vector<MDtagHelper::MDTagListWithSeq> MDtagHelper::getMDtagwithSeq(std::str
     int currentPos = currentSize;
     for (int i=mdtaglists.size()-1;i>-1;i--)
     {
-            std::cout << mdtaglists[i].operatename << " / " << mdtaglists[i].size << std::endl;
             currentPos = currentPos-mdtaglists[i].size;
-            std::cout << (*seq).substr(currentPos) << std::endl;
 
             // std::string textCurrent = (*seq).substr(currentSize-mdtaglists[i].size,mdtaglists[i].size);
             // sumText.insert(0,textCurrent);

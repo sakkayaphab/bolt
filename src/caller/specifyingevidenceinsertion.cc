@@ -20,7 +20,6 @@ void SpecifyingEvidenceInsertion::updateRead()
     {
         if (readparser.isMateUnmapped())
         {
-            // std::cout << currentPos << " = " << currentMPos << std::endl;
             checkRange();
             return;
         }
@@ -30,7 +29,6 @@ void SpecifyingEvidenceInsertion::updateRead()
     {
         if (readparser.isMateUnmapped())
         {
-            // std::cout << currentPos << " = " << currentMPos << std::endl;
             checkRange();
             return;
         }
