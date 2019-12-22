@@ -67,11 +67,8 @@ void SpecifyingEvidenceDeletion::updateRead()
         return;
     }
 
-    // std::cout << samplestat->getAverageSampleStat() + int32_t(1.282 * double(samplestat->getSDSampleStat())) << std::endl;
-    // if (insertSizeFirstRead > samplestat->getAverageSampleStat() + int32_t(2 * double(samplestat->getSDSampleStat())))
-    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (2 * samplestat->getSDSampleStat()))
 
-    // if (insertSizeFirstRead > samplestat->getAverageSampleStat() + int32_t(1.037 * double(samplestat->getSDSampleStat())))
+    if (insertSizeFirstRead > samplestat->getAverageSampleStat() + (2 * samplestat->getSDSampleStat()))
     {
         checkRange();
         return;
@@ -92,6 +89,7 @@ void SpecifyingEvidenceDeletion::checkRange()
     added = incrementSVFreq(merge, merge, currentPos, currentMPos);
 
     checkProveEvidence();
+
 
     if (!added)
     {
@@ -115,7 +113,7 @@ void SpecifyingEvidenceDeletion::checkRange()
 
 bool SpecifyingEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
-    bool added;
+    bool added = false;
     for (int i = 0; i < preCollectSV.size(); i++)
     {
         if (checkBetween(pos, preCollectSV.at(i).getPosDiscordantRead(), overlappedpos) && checkBetween(mpos,
@@ -280,6 +278,7 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
 
 void SpecifyingEvidenceDeletion::checkProveEvidence()
 {
+
     for (int i = 0; i < preCollectSV.size(); i++)
     {
         proveEvidence(i);

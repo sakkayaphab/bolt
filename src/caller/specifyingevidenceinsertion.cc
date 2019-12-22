@@ -75,7 +75,7 @@ void SpecifyingEvidenceInsertion::updateRead()
 
 bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t pos, int32_t mpos)
 {
-    bool added;
+    bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
         if (readparser.isMateUnmapped())

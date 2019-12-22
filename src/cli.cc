@@ -180,7 +180,10 @@ int Cli::callSV()
 
 int Cli::debug()
 {
-
+    Caller caller("/data/users/duangdao/kan/simdata/wgsim/survi.20x.bam", "/data/users/duangdao/kan/reference/ucsc_hg19.fa", "/data/users/duangdao/kan/bolt/build/temp_20x");
+    caller.showinfo();
+    caller.setParallel(1);
+    caller.execute();
 
 
     return 0;

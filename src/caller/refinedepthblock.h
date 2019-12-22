@@ -15,6 +15,7 @@ private:
   ReadDepthStat readDepthStat;
   SampleStat *samplestat;
   int minimumdivide = 4;
+  int percentsupportingreads = 2;
 
 public:
   RefineDepthBlock();

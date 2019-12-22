@@ -1,7 +1,7 @@
 # Bolt
 ![Build Status](https://github.com/sakkayaphab/bolt/workflows/Ubuntu/badge.svg?branch=master)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/sakkayaphab/bolt)](https://github.com/sakkayaphab/bolt/releases)
-
+[![Conda](https://img.shields.io/conda/v/bioconda/bolt?color=blue&label=Anaconda%20Cloud)](https://anaconda.org/bioconda/bolt)
 
 
 

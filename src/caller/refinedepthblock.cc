@@ -454,7 +454,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDuplication(std::vector<E
             continue;
         }
 
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
         {
             continue;
         }
@@ -631,7 +631,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
                 continue;
             }
 
-            if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 2, 100, 1))
+            if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
             {
                 continue;
             }
@@ -699,12 +699,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             }
         }
 
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 3, 100, 1))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
         {
             continue;
         }
 
-        if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 3, 100, 1))
+        if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
         {
             continue;
         }
@@ -788,12 +788,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
             {
                 continue;
             }
 
-            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            if (n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1) && n.getNumberOfRP() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
             {
                 continue;
             }
@@ -840,7 +840,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
                 continue;
             }
 
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
             {
                 continue;
             }
@@ -941,14 +941,14 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultDeletion(std::vector<Evid
             continue;
         }
 
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 5, 100, 1))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
         {
             continue;
         }
 
         if (n.getSvLength() < 500)
         {
-            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 10, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 15, 100, 1))
+            if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1) && n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
             {
                 continue;
             }

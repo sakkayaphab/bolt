@@ -94,7 +94,6 @@ void EvidenceFinder::findEvidence()
 
     while (sam_itr_next(inT, iterT, read) >= 0)
     {
-
         if (readparser.isUnmapped())
         {
             continue;

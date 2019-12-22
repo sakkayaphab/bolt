@@ -50,7 +50,7 @@ void SpecifyingEvidenceInversion::updateRead()
 
 bool SpecifyingEvidenceInversion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
-    bool added;
+    bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
     {
         if (checkBetween(pos, preCollectSV.at(positionOverlapped).getPosDiscordantRead(), overlappedpos) && checkBetween(mpos,
