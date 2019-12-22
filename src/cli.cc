@@ -170,9 +170,9 @@ int Cli::callSV()
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     caller.setParallel(nthreads);
-//    caller.execute();
-//    caller.catfile();
-//    caller.findBreakPoint();
+    caller.execute();
+    caller.catfile();
+    caller.findBreakPoint();
     caller.refineDelpthBlock();
 
     return 0;
@@ -180,11 +180,6 @@ int Cli::callSV()
 
 int Cli::debug()
 {
-    Caller caller("/data/users/duangdao/kan/simdata/wgsim/survi.20x.bam", "/data/users/duangdao/kan/reference/ucsc_hg19.fa", "/data/users/duangdao/kan/bolt/build/temp_20x");
-    caller.showinfo();
-    caller.setParallel(1);
-    caller.execute();
-
 
     return 0;
 }
