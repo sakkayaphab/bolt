@@ -1,7 +1,7 @@
 #include "refininginsertion.h"
 #include <stdlib.h>
 #include "smithwaterman.h"
-#include <cmath>
+
 RefiningInsertion::RefiningInsertion()
 {
     variantresult.setVariantType("INS");
@@ -468,7 +468,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     {
         if (!fromstart)
         {
-            temps1 = s1->substr(s1->length() - abs(s2->size()));
+            temps1 = s1->substr(s1->length() - s2->size());
             temps2 = *s2;
         }
         else
@@ -481,7 +481,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     {
         if (!fromstart)
         {
-            temps2 = s2->substr(s2->length() - abs(s1->size()));
+            temps2 = s2->substr(s2->length() - s1->size());
             temps1 = *s1;
         }
         else

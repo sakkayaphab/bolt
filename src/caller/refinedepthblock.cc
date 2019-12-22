@@ -370,6 +370,14 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 }
             }
 
+//            if (n.LNGMATCH==0) {
+//                continue;
+//            }
+
+//            if (n.getSvLength()==0) {
+//                continue;
+//            }
+
             if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
             {
             }

@@ -155,7 +155,7 @@ int Cli::callSV()
             break;
         }
 
-        if (n == "-o")
+        if (n == "-t")
         {
             outThread = true;
         }
@@ -186,9 +186,9 @@ int Cli::callSV()
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     caller.setParallel(threads);
-    caller.execute();
-    caller.catfile();
-    caller.findBreakPoint();
+//    caller.execute();
+//    caller.catfile();
+//    caller.findBreakPoint();
     caller.refineDelpthBlock();
 
     return 0;
