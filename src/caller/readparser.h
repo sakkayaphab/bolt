@@ -84,7 +84,6 @@ class Cigar
         exit(0);
       }
 
-      // std::cout << oper << ":" << operation_n << std::endl;
     }
     void setLength(int length_m)
     {

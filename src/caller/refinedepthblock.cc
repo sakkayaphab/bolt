@@ -574,7 +574,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         {
             if (n.getSvLength() > 500)
             {
-               
+
                 if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
                 {
                     continue;

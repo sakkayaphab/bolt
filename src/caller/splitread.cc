@@ -145,10 +145,6 @@ void SplitRead::findInsertionInRead()
                 mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
                 mapSmallINS[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
 
-                // std::cout << "D" << cigar.at(i).getLength() << " "
-                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength()
-                // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
-                // << std::endl;
             }
 
             incrementPos += cigar.at(i).getLength();
@@ -185,10 +181,6 @@ void SplitRead::findDeletionInRead()
                 mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MatchLists.push_back(cigar.at(i).getLength());
                 mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].MapQLists.push_back(readparser->getMapQuality());
 
-                // std::cout << "D" << cigar.at(i).getLength() << " "
-                // << readparser->getPos() + incrementPos << " = " << readparser->getPos() + incrementPos + cigar.at(i).getLength()
-                // << " " << mapSmallDEL[std::make_pair(readparser->getPos() + incrementPos, readparser->getPos() + incrementPos + cigar.at(i).getLength())].NumberOfMatchRead
-                // << std::endl;
             }
 
             incrementPos += cigar.at(i).getLength();
@@ -279,7 +271,6 @@ void SplitRead::findInsertion()
 
         if (readparser->hasLastCigarSoftclipped() && sa.cigar.at(0).getOperatorName() == 'S')
         {
-            // std::cout << "findInsertion SA" << std::endl;
             int softclip = readparser->getSoftClippedSequenceEnd().size();
             int match = 0;
             if (sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'M')
@@ -301,7 +292,6 @@ void SplitRead::findInsertion()
 
             if (checkBetween(readparser->getEnd(), sa.pos, getDivider(samplestat->getReadLength(), 1, 10, 1)))
             {
-                std::cout << readparser->getEnd() << " " << sa.pos << std::endl;
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(lsize);
                 mapINS[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
@@ -350,7 +340,6 @@ void SplitRead::findDeletion()
             if (sa.cigar.at(0).getOperatorName() == 'S' && sa.cigar.at(sa.cigar.size() - 1).getOperatorName() == 'M')
             {
 
-                // std::cout << readparser->getEnd() << " = " << sa.pos << std::endl;
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(sa.cigar.at(sa.cigar.size() - 1).getLength());
                 mapDEL[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
@@ -723,8 +712,6 @@ void SplitRead::printDeletion()
 
     for (auto x : vecTemp)
     {
-        // std::cout << x.getResultVcfFormatString() << std::endl;
-
         writeFile(x);
     }
 }
@@ -779,7 +766,6 @@ int SplitRead::writeFile(Evidence vr)
 {
     std::ofstream myfile;
     myfile.open(filepath->getOutputPath() + "/analysis/splitread/" + vr.getChr() + "." + vr.getVariantType() + ".txt", std::ios_base::app);
-    // std::cout << filepath->getOutputPath() + "/analysis/splitread/" + vr.getChr() + "." + vr.getVariantType() + ".txt" << std::endl;
     vr.setID("BOLT" + std::to_string(vcfIdNumber));
     myfile << vr.getResultVcfFormatString() << std::endl;
     vcfIdNumber++;

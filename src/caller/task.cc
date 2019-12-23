@@ -32,11 +32,11 @@ void Task::execute()
     EvidenceFinder evidencefinder(&samplestat, filepath, &target_chromosome);
     evidencefinder.setBamHeader(&bam_header);
     evidencefinder.setHtsIndex(bam_index);
-    // std::string compare = "1";
-    // if (target_chromosome == compare)
-    // {
+//     std::string compare = "chr1";
+//     if (target_chromosome == compare)
+//     {
         evidencefinder.execute();
-    // }
+//     }
 }
 
 void Task::showTaskDone()

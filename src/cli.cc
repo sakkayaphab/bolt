@@ -144,32 +144,48 @@ int Cli::callSV()
         return 1;
     }
 
-
-    // Find thread
-    unsigned int nthreads = std::thread::hardware_concurrency();
-    std::string ThreadString;
+    // Find threads
     bool foundThread = false;
+    std::string outThread;
     for (auto n : args_lists)
     {
         if (foundThread)
         {
-            nthreads = std::atoi(n.c_str());
-            std::cout << "n.c_str() = " << n.c_str() << std::endl;
-
+            outThread = n;
             break;
         }
 
         if (n == "-t")
         {
-            foundThread = true;
+            outThread = true;
         }
     }
+
+    unsigned int threads = std::thread::hardware_concurrency();
+    if (outThread != "")
+    {
+        try
+        {
+            threads = std::stoi(outThread);
+        }
+        catch (std::invalid_argument const &e)
+        {
+            std::cout << "Bad input: std::invalid_argument thrown" << '\n';
+            return 1;
+        }
+        catch (std::out_of_range const &e)
+        {
+            std::cout << "Integer overflow: std::out_of_range thrown" << '\n';
+            return 1;
+        }
+    }
+
 
     // std::cout << "nthreads = " << nthreads << std::endl;
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
-    caller.setParallel(nthreads);
+    caller.setParallel(threads);
     caller.execute();
     caller.catfile();
     caller.findBreakPoint();
@@ -180,8 +196,6 @@ int Cli::callSV()
 
 int Cli::debug()
 {
-
-
 
     return 0;
 }

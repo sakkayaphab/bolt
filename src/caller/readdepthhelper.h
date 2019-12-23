@@ -55,8 +55,8 @@ private:
 
     struct VariantRangeRD
     {
-        int32_t pos;
-        int32_t end;
+        int32_t pos = 0;
+        int32_t end = 0;
 
         bool operator<(const ReadDepthVector &rhs) const
         {

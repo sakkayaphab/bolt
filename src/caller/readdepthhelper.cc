@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
 
 ReadDepthHelper::ReadDepthHelper()
 {
@@ -148,30 +149,29 @@ void ReadDepthHelper::loadReadDepthFile(std::string path)
 
 void ReadDepthHelper::calculateAvgReaddepth()
 {
-    int sumRD;
+    uint64_t sumRD = 0;
     for (auto n : vecRDLine)
     {
-        if (n.depth < 1000 || n.depth != 0)
+        if (n.depth < 1000 && n.depth >= 0)
         {
             sumRD += n.depth;
         }
     }
 
-    int size = vecRDLine.size();
+    uint64_t size = vecRDLine.size();
 
     if (size != 0)
     {
         int avg = int(sumRD / size);
 
         setAvgReadDepth(avg);
-        // std::cout << "size : " << size << " rd : " << sumRD << " AVG : " << avg << std::endl;
+        std::cout << target_chromosome << " size : " << size << " rd : " << sumRD << " AVG : " << avg << std::endl;
     }
     else
     {
         setAvgReadDepth(0);
     }
 
-    //    setAvgReadDepth(avg);
 }
 
 int ReadDepthHelper::getAvgReadDepth()
@@ -225,7 +225,6 @@ void ReadDepthHelper::findEvidence()
                     }
                     else
                     {
-                        // std::cout << pCurrentPos << " / " << pCurrentEnd << " = " << diff << std::endl;
                         VariantRangeRD vrrd;
                         vrrd.pos = pCurrentPos;
                         vrrd.end = pCurrentEnd;
@@ -303,7 +302,6 @@ bool ReadDepthHelper::isRangeDisorderByMorethanRD(int32_t pos, int32_t end, int 
 {
     std::vector<ReadDepthVector> collect;
     bool firstSector;
-    //    std::cout << vecRDLine.size() << std::endl;
 
     for (int i = 0; i < vecRDLine.size(); i++)
     {
