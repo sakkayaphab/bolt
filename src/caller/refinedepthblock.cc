@@ -8,6 +8,7 @@ int32_t RefineDepthBlock::roundNumber(int32_t number, int32_t round)
 {
     if (number % round == 0)
     {
+        // std::cout << number % round << " is even " << std::endl;
         return number;
     }
 
@@ -370,14 +371,6 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 }
             }
 
-//            if (n.LNGMATCH==0) {
-//                continue;
-//            }
-
-//            if (n.getSvLength()==0) {
-//                continue;
-//            }
-
             if (n.getMaxMapQ() >= 60 || n.getMaxRPMapQ() >= 60)
             {
             }
@@ -559,6 +552,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
     std::vector<Evidence> cache;
     for (auto n : *master)
     {
+
         rdf.loadDataToCache(filemanager->getReadDepthPath() + "/" + n.getChr() + ".txt");
         auto currentPos = roundNumber(n.getPos(), roundConfig);
         auto nextPos = nextNumber(n.getPos(), roundConfig);
@@ -580,7 +574,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
         {
             if (n.getSvLength() > 500)
             {
-               
+
                 if (currentRD.DEL1 + currentRD.DEL2 >= n.getFrequency())
                 {
                     continue;
@@ -637,7 +631,7 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
                 continue;
             }
 
-            if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
+            if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 2, 100, 1))
             {
                 continue;
             }
@@ -705,12 +699,12 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInversion(std::vector<Evi
             }
         }
 
-        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
+        if (n.getFrequency() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 3, 100, 1))
         {
             continue;
         }
 
-        if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), percentsupportingreads, 100, 1))
+        if (n.getRPMapQ()->size() <= getDivider(readDepthStat.getReadDepthByChr(n.getChr()), 3, 100, 1))
         {
             continue;
         }
@@ -1045,6 +1039,7 @@ std::vector<Evidence> RefineDepthBlock::getResultRemoveOverlapped(std::vector<Ev
 
             if (checkBetween(n.getPos(), m.getPos(), 10) && checkBetween(n.getEnd(), m.getEnd(), 10))
             {
+                // std::cout << n.getChr() << " " << n.getPos() << " " << m.getEnd() << std::endl;
                 found = true;
                 break;
             }
@@ -1081,6 +1076,7 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
     std::ifstream myfile(filepaht);
     if (myfile.is_open())
     {
+        // std::cout << "load evidence :" << filepaht << std::endl;
         while (getline(myfile, line))
         {
             Evidence e;
@@ -1116,8 +1112,18 @@ std::vector<Evidence> RefineDepthBlock::getEvidenceByFilepath(std::string filepa
                 // }
             }
 
+            // std::cout
+            //     << e.getChr() << "\t"
+            //     << e.getPos() << "\t"
+            //     << e.getEndChr() << "\t"
+            //     << e.getEnd() << "\t"
+            //     << e.getFrequency() << "\t"
+            //     << e.LNGMATCH << "\t"
+            //     << e.convertMapQlistToCommaString() << "\t"
+            //     << std::endl;
         }
         myfile.close();
+        // std::cout << "End + load evidence :" << filepaht << std::endl;
     }
 
     return cache;
@@ -1149,6 +1155,7 @@ std::vector<std::string> RefineDepthBlock::getPathVCFFiles()
             if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".vcf")
             {
                 std::string tempPath = filemanager->getVariantPath() + std::string(dir->d_name);
+                // std::cout << "tempPath : " << tempPath << std::endl;
                 evidenceFilePathLists.push_back(tempPath);
             }
         }

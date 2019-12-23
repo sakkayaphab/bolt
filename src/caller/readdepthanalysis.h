@@ -37,10 +37,10 @@ private:
     int sumStartINS = 0;
     int sumStartSCF = 0;
     int sumStartSCL = 0;
-     int sumStartR1_MUN = 0;
+    int sumStartR1_MUN = 0;
     int sumStartR2_MUN = 0;
 
-     int sumEndDEL = 0;
+    int sumEndDEL = 0;
     int sumEndDUP = 0;
     int sumEndINV = 0;
     int sumEndTRA = 0;
@@ -69,10 +69,10 @@ public:
     bool filterDeletion(Evidence e);
     bool filterInversion(Evidence e);
     bool filterInsertion(Evidence e);
-     bool filterDuplication(Evidence e);
+    bool filterDuplication(Evidence e);
     void loadavgReadDepthFocusStat();
     bool filterTranslocation(Evidence e);
-    
+
 
     int getSCFFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
     int getSCLFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
