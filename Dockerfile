@@ -11,7 +11,7 @@ RUN apt-get -y install manpages-dev
 RUN gcc --version
 RUN apt-get -y install cmake libhts-dev libtbb-dev -y
 RUN cd /usr/include && ls -al
-RUN dpkg -L libhts
+RUN dpkg -L htslib
 RUN cd /usr/lib/apt/ && ls -al
 RUN mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/
 RUN cd build && make
