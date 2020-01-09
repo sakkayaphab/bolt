@@ -33,6 +33,10 @@ conda install -c conda-forge tbb
 conda install -c bioconda bolt
 ```
 
+### 3. Run with docker
+```
+docker run -v /hostpath/:/opt/mount --name bolt sakkayaphab/bolt:latest /project/build/bolt call -b /opt/mount/sample.bam -r ref.fa -t 100 -o /opt/mount/outputfolder
+```
 
 ## Usage
 ```sh
