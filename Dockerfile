@@ -6,7 +6,7 @@ WORKDIR /project
 COPY . .
 
 RUN apt-get update
-RUN apt install build-essential
+RUN apt-get install build-essential
 RUN apt-get install manpages-dev
 RUN gcc --version
 RUN apt-get install cmake libhts-dev libtbb-dev -y
