@@ -9,7 +9,8 @@ RUN apt-get -y update
 RUN apt-get -y install build-essential
 RUN apt-get -y install manpages-dev
 RUN gcc --version
-RUN apt-get -y install cmake libhts-dev libtbb-dev -y
+RUN apt-get -y install zlib1g-dev libncurses5-dev
+RUN apt-get -y install cmake libhts-dev libtbb-dev bzip2
 RUN cd /usr/include && ls -al
 RUN cd /usr/lib/ && ls -al
 RUN cd /usr/lib/x86_64-linux-gnu && ls -al
