@@ -24,8 +24,7 @@ jobs:
         with:
           args: push ${GITHUB_REPOSITORY}:${IMAGE_TAG}
 
-jobs:
-  buildformaster:
+  build_main_public:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
     steps:
@@ -49,3 +48,4 @@ jobs:
         uses: actions-hub/docker@master
         with:
           args: push ${GITHUB_REPOSITORY}:latest
+  
