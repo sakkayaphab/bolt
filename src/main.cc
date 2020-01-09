@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     else if (cli.getCommand()=="version")
     {
         std::cout << "VERSION:" << std::endl;
-        std::cout << "\t0.2.3" << std::endl;
+        std::cout << "\t0.3.0" << std::endl;
         return 0;
     }
     else if (cli.getCommand()=="")
