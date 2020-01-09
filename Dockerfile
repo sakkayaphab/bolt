@@ -14,7 +14,7 @@ RUN cd /usr/include && ls -al
 RUN cd /usr/lib/ && ls -al
 RUN cd /usr/lib/x86_64-linux-gnu && ls -al
 RUN cd /usr/local && ls -al
-RUN mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/
+RUN mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu
 RUN cd build && make
 RUN cd build && make install
 
