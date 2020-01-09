@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@master
 
@@ -13,6 +13,18 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      
+      - name: Build image for latest
+        if: success()
+        if: github.ref == 'refs/heads/master'
+        run: docker build -t ${GITHUB_REPOSITORY}:latest .
+
+      - name: Push to docker registry for latest
+        if: success()
+        if: github.ref == 'refs/heads/master'
+        uses: actions-hub/docker@master
+        with:
+          args: push ${GITHUB_REPOSITORY}:latest
 
       - name: Build image
         if: success()
