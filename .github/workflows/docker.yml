@@ -1,4 +1,4 @@
-name: Ubuntu
+name: Docker
 on: [push]
 jobs:
   build:
