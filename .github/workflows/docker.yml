@@ -24,7 +24,7 @@ jobs:
         with:
           args: push ${GITHUB_REPOSITORY}:${IMAGE_TAG}
 
-  build_main_public:
+  build_latest_tag:
     runs-on: ubuntu-latest
     # if: github.ref == 'refs/heads/master'
     steps:
@@ -37,11 +37,11 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       
-      - name: Build image for latest
+      - name: Build image
         if: success()
         run: docker build -t ${GITHUB_REPOSITORY}:latest .
 
-      - name: Push to docker registry for latest
+      - name: Push to docker registry
         if: success()
         uses: actions-hub/docker@master
         with:
