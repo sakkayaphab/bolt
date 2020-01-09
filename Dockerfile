@@ -19,4 +19,4 @@ RUN mkdir build && cd build && cmake .. -DINSTALL_BIN_PREFIX=${PWD} -DINCLUDE_LI
 RUN cd build && make
 RUN cd build && make install
 
-CMD ["bolt"]
+CMD ["/project/build/bolt"]
