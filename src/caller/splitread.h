@@ -22,6 +22,7 @@ private:
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallINS;
   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINS;
+    std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapTRA;
 
   std::vector<Evidence> vecINV;
 
@@ -54,9 +55,11 @@ public:
   void filterLengthMaxEvidenceList(std::vector<Evidence> *elist,int32_t min);
     void filterMapQLowerThan(uint8_t mapq,std::vector<Evidence> *elist);
      void filterFrequencyLowerThan(int number,std::vector<Evidence> *elist);
-
      bool haveSmallDeletion();
-int getDivider(int value, int top, int down, int minimum);
+    int getDivider(int value, int top, int down, int minimum);
+    void findTranslocation();
+    void printTranslocation();
+    std::vector<Evidence> convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark);
 
   
 };

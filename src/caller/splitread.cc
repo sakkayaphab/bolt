@@ -23,7 +23,50 @@ void SplitRead::updateRead()
     findDeletion();
     findInsertion();
     findTandemDuplication();
+    findTranslocation();
 }
+
+
+void SplitRead::findTranslocation() {
+    for (ReadParser::SATag sa : satag)
+    {
+        if (sa.cigar.size() != 2)
+        {
+            continue;
+        }
+
+        if (readparser->getChromosomeNameString() == sa.chrname)
+        {
+            continue;
+        }
+
+        if (readparser->hasLastCigarSoftclipped())
+        {
+            if (sa.cigar.at(0).getOperatorName() == 'S' && sa.cigar.at(sa.cigar.size()-1).getOperatorName() == 'M')
+            {
+                mapTRA[std::make_pair(readparser->getEnd(), sa.pos)].NumberOfMatchRead++;
+                mapTRA[std::make_pair(readparser->getEnd(), sa.pos)].MatchLists.push_back(sa.cigar.at(0).getLength());
+                mapTRA[std::make_pair(readparser->getEnd(), sa.pos)].MapQLists.push_back(readparser->getMapQuality());
+                mapTRA[std::make_pair(readparser->getEnd(), sa.pos)].endchr = sa.chrname;
+                mapTRA[std::make_pair(readparser->getEnd(), sa.pos)].poschr = readparser->getChromosomeNameString();
+            }
+
+        }
+
+        if (readparser->hasFirstCigarSoftclipped())
+        {
+            if (sa.cigar.at(0).getOperatorName() == 'M' && sa.cigar.at(sa.cigar.size()-1).getOperatorName() == 'S')
+            {
+                mapTRA[std::make_pair(readparser->getPos(), sa.pos+sa.cigar.at(0).getLength())].NumberOfMatchRead++;
+                mapTRA[std::make_pair(readparser->getPos(), sa.pos+sa.cigar.at(0).getLength())].MatchLists.push_back(sa.cigar.at(0).getLength());
+                mapTRA[std::make_pair(readparser->getPos(), sa.pos+sa.cigar.at(0).getLength())].MapQLists.push_back(readparser->getMapQuality());
+                mapTRA[std::make_pair(readparser->getPos(), sa.pos+sa.cigar.at(0).getLength())].endchr = sa.chrname;
+                mapTRA[std::make_pair(readparser->getPos(), sa.pos+sa.cigar.at(0).getLength())].poschr = readparser->getChromosomeNameString();
+            }
+        }
+
+    }
+};
 
 void SplitRead::findInversion()
 {
@@ -465,12 +508,13 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-    printDeletion();
-    printSmallDeletion();
-    printSmallInsertion();
-    printDuplication();
-    printInversion();
-    printInsertion();
+//    printDeletion();
+//    printSmallDeletion();
+//    printSmallInsertion();
+//    printDuplication();
+//    printInversion();
+//    printInsertion();
+    printTranslocation();
 }
 
 std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark)
@@ -478,7 +522,6 @@ std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int
     std::vector<Evidence> vecTemp;
     for (auto const &x : *mapSV)
     {
-
         if (x.second.MapQLists.size() >= 1)
         {
             Evidence evidence;
@@ -698,6 +741,41 @@ void SplitRead::printSmallDeletion()
     {
         writeFile(x);
     }
+}
+
+void SplitRead::printTranslocation()
+{
+    auto vecTemp = convertMapToEvidenceListTRA(&mapSmallDEL, "TRA", "STRA");
+    // mergeEvidence(&vecTemp);
+    filterFrequencyLowerThan(1, &vecTemp);
+    for (auto x : vecTemp)
+    {
+        writeFile(x);
+    }
+}
+
+std::vector<Evidence> SplitRead::convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark)
+{
+    std::vector<Evidence> vecTemp;
+    for (auto const &x : *mapSV)
+    {
+        if (x.second.MapQLists.size() >= 1)
+        {
+            Evidence evidence;
+            evidence.setPos(x.first.first);
+            evidence.setEnd(x.first.second);
+            evidence.setChr(x.second.poschr);
+            evidence.setEndChr(x.second.endchr);
+            evidence.setFrequency(x.second.MapQLists.size());
+            evidence.setVariantType(svtype);
+            evidence.setMark(mark);
+            evidence.setMapQList(x.second.MapQLists);
+
+            vecTemp.push_back(evidence);
+        }
+    }
+
+    return vecTemp;
 }
 
 void SplitRead::printDeletion()
