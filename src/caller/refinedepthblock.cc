@@ -86,7 +86,7 @@ void RefineDepthBlock::execute()
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
             result = getResultRemoveOverlapped(&variantlist, &variantlist);
-            result = getResultRemoveOverlapped(&result, &result);
+//            result = getResultRemoveOverlapped(&result, &result);
 
             // result = getRefineResultTranslocation(&variantlist);
             // result = variantlist;

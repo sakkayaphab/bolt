@@ -2,8 +2,10 @@ file(GLOB SOURCES "*.cc")
 
 add_library(caller
         STATIC
-#        SHARED
         ${SOURCES}
+        ${HTSLIB_LIBRARIES}
+        ${ZLIB_LIBRARIES}
+        ${TBB_IMPORTED_TARGETS}
 )
 
 include_directories(${PROJECT_SOURCE_DIR})
