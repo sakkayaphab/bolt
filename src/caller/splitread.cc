@@ -745,7 +745,7 @@ void SplitRead::printSmallDeletion()
 
 void SplitRead::printTranslocation()
 {
-    auto vecTemp = convertMapToEvidenceListTRA(&mapSmallDEL, "TRA", "STRA");
+    auto vecTemp = convertMapToEvidenceListTRA(&mapTRA, "BND", "SBND");
     // mergeEvidence(&vecTemp);
     filterFrequencyLowerThan(1, &vecTemp);
     for (auto x : vecTemp)
@@ -765,6 +765,7 @@ std::vector<Evidence> SplitRead::convertMapToEvidenceListTRA(std::map<std::pair<
             evidence.setPos(x.first.first);
             evidence.setEnd(x.first.second);
             evidence.setChr(x.second.poschr);
+            std::cout << x.second.poschr << std::endl;
             evidence.setEndChr(x.second.endchr);
             evidence.setFrequency(x.second.MapQLists.size());
             evidence.setVariantType(svtype);
