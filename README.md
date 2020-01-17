@@ -36,13 +36,15 @@ conda install -c bioconda bolt
 
 ### 3. Run with docker
 ```
-docker run -v /hostpath/:/opt/mount --name bolt sakkayaphab/bolt:latest /project/build/bolt call -b /opt/mount/sample.bam -r ref.fa -t 100 -o /opt/mount/outputfolder
+docker run -v /hostpath/:/opt/mount --name bolt sakkayaphab/bolt:latest /project/build/bolt call -b /opt/mount/sample.bam -r /opt/mount/ref.fa -t 100 -o /opt/mount/outputfolder
 ```
 
 ## Usage
 ```sh
-bolt call -b (aligment) -r (reference) -o (output)
+bolt call -b (aligment) -r (reference) -t (number of threads) -o (output)
 ```
+
+
 for [user guide][UserGuide]
 
 
