@@ -10,7 +10,7 @@ jobs:
         run: sudo apt-get install cmake libhts-dev libtbb-dev -y
       - uses: actions/checkout@v1
       - name: Configure
-        run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu
+        run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=/usr/include -DLIBRARY_LINK_PREFIX=/usr/lib/x86_64-linux-gnu -DBUILD_TESTS=ON
       - name: Build
         run: cd build && make
       - name: Testing
