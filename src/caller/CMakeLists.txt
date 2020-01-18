@@ -17,12 +17,6 @@ include_directories(${PROJECT_SOURCE_DIR}/src)
 #find_library(ZLIB_LIBRARIES z HINTS ${LIBRARY_LINK_PREFIX})
 #find_library(BZIP2_LIBRARIES bz2 HINTS ${LIBRARY_LINK_PREFIX})
 
-if (WIN32 OR MSVC)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-elseif (UNIX)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-endif()
-
 if(APPLE)
     target_link_libraries(
         caller
