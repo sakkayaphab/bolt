@@ -18,6 +18,10 @@ jobs:
         if: success()
         run: docker build -t ${GITHUB_REPOSITORY}:${IMAGE_TAG} .
 
+      - name: Run image
+        if: success()
+        run: docker run -v /hostpath/:/opt/mount --name bolt ${GITHUB_REPOSITORY}:${IMAGE_TAG} /project/build/bolt
+
       - name: Push to docker registry
         if: success()
         uses: actions-hub/docker@master
@@ -40,6 +44,10 @@ jobs:
       - name: Build image
         if: success()
         run: docker build -t ${GITHUB_REPOSITORY}:latest .
+
+      - name: Run image
+        if: success()
+        run: docker run -v /hostpath/:/opt/mount --name bolt ${GITHUB_REPOSITORY}:latest /project/build/bolt
 
       - name: Push to docker registry
         if: success()
