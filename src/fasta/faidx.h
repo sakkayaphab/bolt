@@ -13,25 +13,25 @@ private:
   struct FileFormat
   {
     std::string NAME;
-    uint64_t LENGTH;
-    uint64_t OFFSET;
-    uint64_t LINEBASES;
-    uint64_t LINEWIDTH;
-    uint64_t QUALOFFSET;
+    int64_t LENGTH;
+    int64_t OFFSET;
+    int64_t LINEBASES;
+    int64_t LINEWIDTH;
+    int64_t QUALOFFSET;
   };
 
   struct OffsetFile {
-    uint64_t start;
-    uint64_t end;
+    int64_t start;
+    int64_t end;
   };
 
   std::vector<FileFormat> faidxlist;
 
-  uint64_t getApproximateLineStart(std::string chromosome,uint64_t start);
-  uint64_t getApproximateLineEnd(std::string chromosome,uint64_t end);
+  int64_t getApproximateLineStart(std::string chromosome,int64_t start);
+  int64_t getApproximateLineEnd(std::string chromosome,int64_t end);
 
-  uint64_t getApproximateOffsetStart(std::string chromosome,uint64_t start);
-  uint64_t getApproximateOffsetEnd(std::string chromosome,uint64_t end);
+  int64_t getApproximateOffsetStart(std::string chromosome,int64_t start);
+  int64_t getApproximateOffsetEnd(std::string chromosome,int64_t end);
 public:
   Faidx();
   void initialize();
@@ -39,14 +39,14 @@ public:
   std::string getIndexFilePath();
 
   bool hasChromosomeName(std::string chr);
-  uint64_t getLengthbyChromosome(std::string chr);
-  uint64_t getOffsetbyChromosome(std::string chr);
-  uint64_t getLinebasesbyChromosome(std::string chr);
-  uint64_t getLinewidthbyChromosome(std::string chr);
-  uint64_t getQualoffsetbyChromosome(std::string chr);
+  int64_t getLengthbyChromosome(std::string chr);
+  int64_t getOffsetbyChromosome(std::string chr);
+  int64_t getLinebasesbyChromosome(std::string chr);
+  int64_t getLinewidthbyChromosome(std::string chr);
+  int64_t getQualoffsetbyChromosome(std::string chr);
 
-  uint64_t getOffsetEndByPosition(std::string chromosome, uint64_t end);
-  uint64_t getOffsetStartByPosition(std::string chromosome, uint64_t start);
+  int64_t getOffsetEndByPosition(std::string chromosome, int64_t end);
+  int64_t getOffsetStartByPosition(std::string chromosome, int64_t start);
 };
 
 #endif

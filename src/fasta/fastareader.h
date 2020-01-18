@@ -19,11 +19,14 @@ public:
   FastaReader();
   void setFilePath(std::string filepath);
   std::string getFilePath();
+  bool hasFilePath();
   void setIndexFilePath(std::string indexfilepath);
   std::string getIndexFilePath();
-
+  bool hasIndexFilePath();
+  void exitIfNoFilePath();
+  bool FileExists(std::string filename);
   void initialize();
-  std::string getSeqbyPosition(std::string chromosome, uint64_t start, uint64_t end);
+  std::string getSeqbyPosition(std::string chromosome, int64_t start, int64_t end);
 
   void replaceSeqToUppercase(std::string *str)
   {

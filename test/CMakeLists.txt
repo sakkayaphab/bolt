@@ -32,3 +32,4 @@ endif()
 
 # add test
 add_subdirectory(caller)
+add_subdirectory(fasta)
