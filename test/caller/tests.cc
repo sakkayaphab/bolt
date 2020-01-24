@@ -2,7 +2,6 @@
 //#include "caller/filemanager.h"
 //#include "caller/evidence.h"
 //#include "caller/smithwaterman.h"
-#include <bits/stdc++.h>
 //#include "caller/alignment.h"
 //#include "caller/readdepthanalysis.h"
 //#include "caller/stringsearch.h"
