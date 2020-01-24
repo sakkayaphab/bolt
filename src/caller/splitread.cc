@@ -508,12 +508,12 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-//    printDeletion();
-//    printSmallDeletion();
-//    printSmallInsertion();
-//    printDuplication();
-//    printInversion();
-//    printInsertion();
+    printDeletion();
+    printSmallDeletion();
+    printSmallInsertion();
+    printDuplication();
+    printInversion();
+    printInsertion();
     printTranslocation();
 }
 

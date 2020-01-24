@@ -138,10 +138,10 @@ void EvidenceFinder::findEvidence()
 
         cigar = readparser.getCigar();
 
-//        seDeletion.updateRead();
-//        seInsertion.updateRead();
-//        seInversion.updateRead();
-//        seTandemDuplication.updateRead();
+        seDeletion.updateRead();
+        seInsertion.updateRead();
+        seInversion.updateRead();
+        seTandemDuplication.updateRead();
         seTranslocation.updateRead();
 
         //Read depth
