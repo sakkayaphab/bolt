@@ -25,7 +25,6 @@ if(APPLE)
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
         #${BZIP2_LIBRARIES}
-        ${TBB_IMPORTED_TARGETS}
     )
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(
@@ -35,6 +34,5 @@ elseif(UNIX AND NOT APPLE)
         ${HTSLIB_LIBRARIES}
         ${ZLIB_LIBRARIES}
         #${BZIP2_LIBRARIES}
-        ${TBB_IMPORTED_TARGETS}
     )
 endif()

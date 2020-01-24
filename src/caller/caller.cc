@@ -22,7 +22,6 @@
 #include <iostream>
 #include <dirent.h>
 #include "variantresultfilter.h"
-#include <tbb/tbb.h>
 #include "readdepthhelper.h"
 #include "readdepthanalysis.h"
 #include "refinedepthblock.h"
@@ -216,38 +215,6 @@ void Caller::mergeSplitRead()
 
     std::sort(evidenceFilePathLists.begin(), evidenceFilePathLists.end());
 
-    //write file
-
-    // int count = 0;
-    // for (auto n : evidenceFilePathLists)
-    // {
-    //     std::vector<std::string> cache;
-
-    //     std::string line;
-    //     std::ifstream myfile(n);
-    //     if (myfile.is_open())
-    //     {
-
-    //         while (getline(myfile, line))
-    //         {
-    //                 cache.push_back(line);
-    //                 count++;
-
-    //         }
-    //         myfile.close();
-
-    //         std::ofstream writefile;
-    //         writefile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
-    //         for (auto a : cache)
-    //         {
-    //             writefile << a << std::endl;
-    //         }
-    //         writefile.close();
-
-    //     }
-
-    //     cache.clear();
-    // }
 }
 
 void Caller::refineDelpthBlock()
@@ -475,17 +442,16 @@ int Caller::writeFile(Evidence vr)
     return 0;
 }
 
+void Caller::findBreakpointJob(Task task) {
+
+}
+
 int Caller::findBreakPoint()
 {
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Refine breakpoint : " << std::endl;
     std::cout << "------------------------------" << std::endl;
-
-    // removeResult();
-
-    //    ReadDepthHelper readdepthHelper;
-    //    readdepthHelper.loadReadDepthFile()
 
     FastaReader fastaReader;
     fastaReader.setFilePath((filepath.getReferencePath()));
@@ -518,122 +484,271 @@ int Caller::findBreakPoint()
     // float incrementevery = float(1)/float(sizeLoop);
     // std::cout << incrementevery << std::endl;
 
-    tbb::parallel_for(0, sizeLoop, [&](int i) {
-        
+    std::vector<std::thread> threads(numberofparallel);
 
-        mxRead.lock();
-        // int barWidth = 50;
-        // std::cout << "[";
-        // int pos = barWidth * progress;
-        // for (int i = 0; i < barWidth; ++i) {
-        //     if (i < pos) std::cout << "=";
-        //     else if (i == pos) std::cout << ">";
-        //     else std::cout << " ";
-        // }
-        // std::cout << "] " << int(progress * 100.0) << " %\r";
-        // std::cout.flush();
-
-        // progress += incrementevery;
-
+    for(int i = 0; i < bam_header.n_targets; i++) {
         if (ep.isEmpty())
         {
             std::cout << "end" << std::endl;
         }
         Evidence thisEvidence = ep.getEvidence();
         Evidence variantresult;
-        // std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr()
-        // << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
-        // << std::endl;
 
-        mxRead.unlock();
+//        if (thisEvidence.getVariantType() == "DEL")
+//        {
+//            // EvidenceFilter ef;
+//            // if (ef.passFilterEvidence(&thisEvidence))
+//            // {
+//            RefiningDeletion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//            // }
+//        }
+//        else if (thisEvidence.getVariantType() == "DUP")
+//        {
+//            RefiningTandemDuplication rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "INS")
+//        {
+//
+//            RefiningInsertion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "INV")
+//        {
+//            RefiningInversion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "BND")
+//        {
+//            RefiningTranslocation rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//        }
+//
+//        // skip:
+//
+//        VariantResultFilter vrf;
+//        if (vrf.passFilterSV(&variantresult))
+//        {
+//            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//
+//            mxWriteFile.lock();
+//            // rda.analyzeByBreakPoint(variantresult);
+//            // if (variantresult.isQuailtyPass()) {
+//            writeFile(variantresult);
+//            // }
+//            mxWriteFile.unlock();
+//        }
+//        countRunEvidence++;
+//
+//
+//        Task task(samplestat, &filepath, tp);
+//        task.setHtsIndex(bam_index);
+//        task.setBamHeader(bam_header);
+//        start_thread(threads, [=]{ findEvidenceJob(task);});
+    }
 
-        // if (thisEvidence.getVariantType() != "INV")
-        // {
-        //     goto skip;
-        // }
-        
-        //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
-        if (thisEvidence.getVariantType() == "DEL")
-        {
-            // EvidenceFilter ef;
-            // if (ef.passFilterEvidence(&thisEvidence))
-            // {
-            RefiningDeletion rfd;
-            rfd.setHtsIndex(bam_index);
-            rfd.setFilePath(&filepath);
-            rfd.setEvidence(thisEvidence);
-            rfd.setSampleStat(&samplestat);
-            rfd.setFastaReader(fastaReader);
-            rfd.execute();
-            variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-            // }
-        }
-        else if (thisEvidence.getVariantType() == "DUP")
-        {
-            RefiningTandemDuplication rfd;
-            rfd.setHtsIndex(bam_index);
-            rfd.setFilePath(&filepath);
-            rfd.setEvidence(thisEvidence);
-            rfd.setSampleStat(&samplestat);
-            rfd.setFastaReader(fastaReader);
-            rfd.execute();
-            variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-        }
-        else if (thisEvidence.getVariantType() == "INS")
-        {
+    // wait for any unfinished threads
+    for(auto&& thread: threads)
+        if(thread.joinable())
+            thread.join();
 
-            RefiningInsertion rfd;
-            rfd.setHtsIndex(bam_index);
-            rfd.setFilePath(&filepath);
-            rfd.setEvidence(thisEvidence);
-            rfd.setSampleStat(&samplestat);
-            rfd.setFastaReader(fastaReader);
-            rfd.execute();
-            variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-        }
-        else if (thisEvidence.getVariantType() == "INV")
-        {
-            RefiningInversion rfd;
-            rfd.setHtsIndex(bam_index);
-            rfd.setFilePath(&filepath);
-            rfd.setEvidence(thisEvidence);
-            rfd.setSampleStat(&samplestat);
-            rfd.setFastaReader(fastaReader);
-            rfd.execute();
-            variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-        }
-        else if (thisEvidence.getVariantType() == "BND")
-        {
-            RefiningTranslocation rfd;
-            rfd.setHtsIndex(bam_index);
-            rfd.setFilePath(&filepath);
-            rfd.setEvidence(thisEvidence);
-            rfd.setSampleStat(&samplestat);
-            rfd.setFastaReader(fastaReader);
-            rfd.execute();
-            variantresult = rfd.getVariantResult();
-        }
 
-        // skip:
 
-        VariantResultFilter vrf;
-        if (vrf.passFilterSV(&variantresult))
-        {
-            std::cout << variantresult.getResultVcfFormatString() << std::endl;
 
-            mxWriteFile.lock();
-            // rda.analyzeByBreakPoint(variantresult);
-            // if (variantresult.isQuailtyPass()) {
-            writeFile(variantresult);
-            // }
-            mxWriteFile.unlock();
-        }
-        countRunEvidence++;
-    });
+
+
+
+
+
+
+
+    // removeResult();
+
+    //    ReadDepthHelper readdepthHelper;
+    //    readdepthHelper.loadReadDepthFile()
+
+//    FastaReader fastaReader;
+//    fastaReader.setFilePath((filepath.getReferencePath()));
+//    fastaReader.setIndexFilePath((filepath.getReferencePath()) + ".fai");
+//    fastaReader.initialize();
+//
+//    samFile *inFile = sam_open(filepath.getSamplePath().c_str(), "r");
+//    if (inFile == NULL)
+//    {
+//        return 1;
+//    }
+//
+//    hts_idx_t *bam_index = sam_index_load(inFile, filepath.getSamplePath().c_str());
+//    if (bam_index == NULL)
+//    {
+//        return 1;
+//    }
+//
+//    std::mutex mxRead;
+//    std::mutex mxWriteFile;
+//    EvidenceProvider ep(&filepath);
+//    int sizeLoop = ep.getEvidenceSize();
+//    // std::cout << "sizeLoop : " << sizeLoop << std::endl;
+//
+//    int countRunEvidence = 0;
+//    // tbb::task_scheduler_init init(1);
+//
+//    ReadDepthAnalysis rda(&filepath);
+//    // float progress = 0.0;
+//    // float incrementevery = float(1)/float(sizeLoop);
+//    // std::cout << incrementevery << std::endl;
+//
+//    tbb::parallel_for(0, sizeLoop, [&](int i) {
+//
+//
+//        mxRead.lock();
+//        // int barWidth = 50;
+//        // std::cout << "[";
+//        // int pos = barWidth * progress;
+//        // for (int i = 0; i < barWidth; ++i) {
+//        //     if (i < pos) std::cout << "=";
+//        //     else if (i == pos) std::cout << ">";
+//        //     else std::cout << " ";
+//        // }
+//        // std::cout << "] " << int(progress * 100.0) << " %\r";
+//        // std::cout.flush();
+//
+//        // progress += incrementevery;
+//
+//        if (ep.isEmpty())
+//        {
+//            std::cout << "end" << std::endl;
+//        }
+//        Evidence thisEvidence = ep.getEvidence();
+//        Evidence variantresult;
+//        // std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr()
+//        // << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
+//        // << std::endl;
+//
+//        mxRead.unlock();
+//
+//        // if (thisEvidence.getVariantType() != "INV")
+//        // {
+//        //     goto skip;
+//        // }
+//
+//        //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
+//        if (thisEvidence.getVariantType() == "DEL")
+//        {
+//            // EvidenceFilter ef;
+//            // if (ef.passFilterEvidence(&thisEvidence))
+//            // {
+//            RefiningDeletion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//            // }
+//        }
+//        else if (thisEvidence.getVariantType() == "DUP")
+//        {
+//            RefiningTandemDuplication rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "INS")
+//        {
+//
+//            RefiningInsertion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "INV")
+//        {
+//            RefiningInversion rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//        }
+//        else if (thisEvidence.getVariantType() == "BND")
+//        {
+//            RefiningTranslocation rfd;
+//            rfd.setHtsIndex(bam_index);
+//            rfd.setFilePath(&filepath);
+//            rfd.setEvidence(thisEvidence);
+//            rfd.setSampleStat(&samplestat);
+//            rfd.setFastaReader(fastaReader);
+//            rfd.execute();
+//            variantresult = rfd.getVariantResult();
+//        }
+//
+//        // skip:
+//
+//        VariantResultFilter vrf;
+//        if (vrf.passFilterSV(&variantresult))
+//        {
+//            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//
+//            mxWriteFile.lock();
+//            // rda.analyzeByBreakPoint(variantresult);
+//            // if (variantresult.isQuailtyPass()) {
+//            writeFile(variantresult);
+//            // }
+//            mxWriteFile.unlock();
+//        }
+//        countRunEvidence++;
+//    });
 }
 
 void Caller::removeResult()
@@ -643,20 +758,4 @@ void Caller::removeResult()
         perror("Error deleting file");
     else
         puts("File successfully deleted");
-}
-
-void Caller::debugEvidenceProvider()
-{
-    int count = 0;
-    int loop = 110;
-    tbb::parallel_for(0, loop, [&](int i) {
-        count++;
-        if (count == 90)
-        {
-            loop += 10;
-        }
-        std::cout << "Hello" << i << "/" << count << std::endl;
-    });
-
-    return;
 }

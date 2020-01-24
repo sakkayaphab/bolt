@@ -26,7 +26,7 @@ public:
     template<typename Job>
     void start_thread(std::vector<std::thread>& threads, Job&& job);
     void findEvidenceJob(Task task);
-
+    void findBreakpointJob(Task task);
 
   void execute();
   void execSampleStat();
