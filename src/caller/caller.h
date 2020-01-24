@@ -53,7 +53,7 @@ public:
     template<typename Job>
     void start_thread(std::vector<std::thread>& threads, Job&& job);
     void findEvidenceJob(Task task);
-    void findBreakpointJob(Evidence thisEvidence,Evidence variantresult);
+    void findBreakpointJob(Evidence thisEvidence,Evidence variantresult,FastaReader fastaReader);
 
   void execute();
   void execSampleStat();

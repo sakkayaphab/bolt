@@ -416,74 +416,74 @@ int Caller::writeFile(Evidence vr)
     return 0;
 }
 
-void Caller::findBreakpointJob(Evidence thisEvidence,Evidence variantresult) {
+void Caller::findBreakpointJob(Evidence thisEvidence,Evidence variantresult,FastaReader fastaReader) {
 
-//    if (thisEvidence.getVariantType() == "DEL")
-//    {
-//        // EvidenceFilter ef;
-//        // if (ef.passFilterEvidence(&thisEvidence))
-//        // {
-//        RefiningDeletion rfd;
-//        rfd.setHtsIndex(bam_index);
-//        rfd.setFilePath(&filepath);
-//        rfd.setEvidence(thisEvidence);
-//        rfd.setSampleStat(&samplestat);
-//        rfd.setFastaReader(fastaReader);
-//        rfd.execute();
-//        variantresult = rfd.getVariantResult();
-//        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//        // }
-//    }
-//    else if (thisEvidence.getVariantType() == "DUP")
-//    {
-//        RefiningTandemDuplication rfd;
-//        rfd.setHtsIndex(bam_index);
-//        rfd.setFilePath(&filepath);
-//        rfd.setEvidence(thisEvidence);
-//        rfd.setSampleStat(&samplestat);
-//        rfd.setFastaReader(fastaReader);
-//        rfd.execute();
-//        variantresult = rfd.getVariantResult();
-//        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//    }
-//    else if (thisEvidence.getVariantType() == "INS")
-//    {
-//
-//        RefiningInsertion rfd;
-//        rfd.setHtsIndex(bam_index);
-//        rfd.setFilePath(&filepath);
-//        rfd.setEvidence(thisEvidence);
-//        rfd.setSampleStat(&samplestat);
-//        rfd.setFastaReader(fastaReader);
-//        rfd.execute();
-//        variantresult = rfd.getVariantResult();
-//        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//    }
-//    else if (thisEvidence.getVariantType() == "INV")
-//    {
-//        RefiningInversion rfd;
-//        rfd.setHtsIndex(bam_index);
-//        rfd.setFilePath(&filepath);
-//        rfd.setEvidence(thisEvidence);
-//        rfd.setSampleStat(&samplestat);
-//        rfd.setFastaReader(fastaReader);
-//        rfd.execute();
-//        variantresult = rfd.getVariantResult();
-//        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//    }
-//    else if (thisEvidence.getVariantType() == "BND")
-//    {
-//        RefiningTranslocation rfd;
-//        rfd.setHtsIndex(bam_index);
-//        rfd.setFilePath(&filepath);
-//        rfd.setEvidence(thisEvidence);
-//        rfd.setSampleStat(&samplestat);
-//        rfd.setFastaReader(fastaReader);
-//        rfd.execute();
-//        variantresult = rfd.getVariantResult();
-//    }
+    if (thisEvidence.getVariantType() == "DEL")
+    {
+        // EvidenceFilter ef;
+        // if (ef.passFilterEvidence(&thisEvidence))
+        // {
+        RefiningDeletion rfd;
+        rfd.setHtsIndex(bam_index);
+        rfd.setFilePath(&filepath);
+        rfd.setEvidence(thisEvidence);
+        rfd.setSampleStat(&samplestat);
+        rfd.setFastaReader(fastaReader);
+        rfd.execute();
+        variantresult = rfd.getVariantResult();
+        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+        // }
+    }
+    else if (thisEvidence.getVariantType() == "DUP")
+    {
+        RefiningTandemDuplication rfd;
+        rfd.setHtsIndex(bam_index);
+        rfd.setFilePath(&filepath);
+        rfd.setEvidence(thisEvidence);
+        rfd.setSampleStat(&samplestat);
+        rfd.setFastaReader(fastaReader);
+        rfd.execute();
+        variantresult = rfd.getVariantResult();
+        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+    }
+    else if (thisEvidence.getVariantType() == "INS")
+    {
 
-    // skip:
+        RefiningInsertion rfd;
+        rfd.setHtsIndex(bam_index);
+        rfd.setFilePath(&filepath);
+        rfd.setEvidence(thisEvidence);
+        rfd.setSampleStat(&samplestat);
+        rfd.setFastaReader(fastaReader);
+        rfd.execute();
+        variantresult = rfd.getVariantResult();
+        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+    }
+    else if (thisEvidence.getVariantType() == "INV")
+    {
+        RefiningInversion rfd;
+        rfd.setHtsIndex(bam_index);
+        rfd.setFilePath(&filepath);
+        rfd.setEvidence(thisEvidence);
+        rfd.setSampleStat(&samplestat);
+        rfd.setFastaReader(fastaReader);
+        rfd.execute();
+        variantresult = rfd.getVariantResult();
+        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+    }
+    else if (thisEvidence.getVariantType() == "BND")
+    {
+        RefiningTranslocation rfd;
+        rfd.setHtsIndex(bam_index);
+        rfd.setFilePath(&filepath);
+        rfd.setEvidence(thisEvidence);
+        rfd.setSampleStat(&samplestat);
+        rfd.setFastaReader(fastaReader);
+        rfd.execute();
+        variantresult = rfd.getVariantResult();
+    }
+
+//     skip:
 
 //        VariantResultFilter vrf;
 //        if (vrf.passFilterSV(&variantresult))
@@ -548,92 +548,7 @@ int Caller::findBreakPoint()
         Evidence thisEvidence = ep.getEvidence();
         Evidence variantresult;
 
-//        if (thisEvidence.getVariantType() == "DEL")
-//        {
-//            // EvidenceFilter ef;
-//            // if (ef.passFilterEvidence(&thisEvidence))
-//            // {
-//            RefiningDeletion rfd;
-//            rfd.setHtsIndex(bam_index);
-//            rfd.setFilePath(&filepath);
-//            rfd.setEvidence(thisEvidence);
-//            rfd.setSampleStat(&samplestat);
-//            rfd.setFastaReader(fastaReader);
-//            rfd.execute();
-//            variantresult = rfd.getVariantResult();
-//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//            // }
-//        }
-//        else if (thisEvidence.getVariantType() == "DUP")
-//        {
-//            RefiningTandemDuplication rfd;
-//            rfd.setHtsIndex(bam_index);
-//            rfd.setFilePath(&filepath);
-//            rfd.setEvidence(thisEvidence);
-//            rfd.setSampleStat(&samplestat);
-//            rfd.setFastaReader(fastaReader);
-//            rfd.execute();
-//            variantresult = rfd.getVariantResult();
-//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//        }
-//        else if (thisEvidence.getVariantType() == "INS")
-//        {
-//
-//            RefiningInsertion rfd;
-//            rfd.setHtsIndex(bam_index);
-//            rfd.setFilePath(&filepath);
-//            rfd.setEvidence(thisEvidence);
-//            rfd.setSampleStat(&samplestat);
-//            rfd.setFastaReader(fastaReader);
-//            rfd.execute();
-//            variantresult = rfd.getVariantResult();
-//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//        }
-//        else if (thisEvidence.getVariantType() == "INV")
-//        {
-//            RefiningInversion rfd;
-//            rfd.setHtsIndex(bam_index);
-//            rfd.setFilePath(&filepath);
-//            rfd.setEvidence(thisEvidence);
-//            rfd.setSampleStat(&samplestat);
-//            rfd.setFastaReader(fastaReader);
-//            rfd.execute();
-//            variantresult = rfd.getVariantResult();
-//            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//        }
-//        else if (thisEvidence.getVariantType() == "BND")
-//        {
-//            RefiningTranslocation rfd;
-//            rfd.setHtsIndex(bam_index);
-//            rfd.setFilePath(&filepath);
-//            rfd.setEvidence(thisEvidence);
-//            rfd.setSampleStat(&samplestat);
-//            rfd.setFastaReader(fastaReader);
-//            rfd.execute();
-//            variantresult = rfd.getVariantResult();
-//        }
-//
-//        // skip:
-//
-//        VariantResultFilter vrf;
-//        if (vrf.passFilterSV(&variantresult))
-//        {
-//            std::cout << variantresult.getResultVcfFormatString() << std::endl;
-//
-//            mxWriteFile.lock();
-//            // rda.analyzeByBreakPoint(variantresult);
-//            // if (variantresult.isQuailtyPass()) {
-//            writeFile(variantresult);
-//            // }
-//            mxWriteFile.unlock();
-//        }
-//        countRunEvidence++;
-//
-//
-//        Task task(samplestat, &filepath, tp);
-//        task.setHtsIndex(bam_index);
-//        task.setBamHeader(bam_header);
-//        start_thread(threads, [=]{ findEvidenceJob(task);});
+        start_thread(threads, [=]{ findBreakpointJob(thisEvidence,variantresult,fastaReader);});
     }
 
     // wait for any unfinished threads
