@@ -13,6 +13,7 @@ if(APPLE)
             fasta
             ${HTSLIB_LIBRARIES}
             ${ZLIB_LIBRARIES}
+            ${CMAKE_THREAD_LIBS_INIT}
     )
 elseif(UNIX AND NOT APPLE)
     target_link_libraries(
@@ -20,6 +21,7 @@ elseif(UNIX AND NOT APPLE)
             fasta
             ${HTSLIB_LIBRARIES}
             ${ZLIB_LIBRARIES}
+            ${CMAKE_THREAD_LIBS_INIT}
     )
 endif()
 
