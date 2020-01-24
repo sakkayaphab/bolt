@@ -1,5 +1,6 @@
 # Bolt
 ![Ubuntu](https://github.com/sakkayaphab/bolt/workflows/Ubuntu/badge.svg?branch=master)
+![MacOS](https://github.com/sakkayaphab/bolt/workflows/MacOS/badge.svg?branch=master)
 ![Docker](https://github.com/sakkayaphab/bolt/workflows/Docker/badge.svg?branch=master)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/sakkayaphab/bolt)](https://github.com/sakkayaphab/bolt/releases)
 [![Conda](https://img.shields.io/conda/v/bioconda/bolt?color=blue&label=Anaconda%20Cloud)](https://anaconda.org/bioconda/bolt)
@@ -12,9 +13,8 @@
 
 Requirements
 1. GCC >=v5.4
-2. Intel tbb-devel >=2019.9
-3. HTSlib >=v1.9
-4. CMake >=v3.9
+2. HTSlib >=v1.9
+3. CMake >=v3.9
 
 ```sh
 git clone https://github.com/sakkayaphab/bolt.git
@@ -30,7 +30,6 @@ make install
 
 
 ```sh
-conda install -c conda-forge tbb
 conda install -c bioconda bolt
 ```
 

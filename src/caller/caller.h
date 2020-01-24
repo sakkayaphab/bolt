@@ -45,6 +45,7 @@ private:
   int vcfIdNumber = 0;
   samFile *inFile = NULL;
   hts_idx_t *bam_index = NULL;
+  std::mutex mxWriteFile;
 
 public:
   Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T);
