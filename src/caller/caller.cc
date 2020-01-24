@@ -3,7 +3,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <iomanip>
-#include "task.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -131,75 +130,61 @@ bam_hdr_t *Caller::getBamHeader()
     return headerT;
 }
 
+void Caller::findEvidenceJob(Task task)
+{
+         task.execute();
+         task.showTaskDone();
+//    sync_out("thread: " << id);
+}
+
+template<typename Job>
+void Caller::start_thread(std::vector<std::thread>& threads, Job&& job)
+{
+    // find an ended thread
+    for(auto&& thread: threads)
+    {
+        if(thread.joinable()) // still running or waiting to join
+            continue;
+
+        thread = std::thread(job);
+        return;
+    }
+
+    // if not wait for one
+    for(auto&& thread: threads)
+    {
+        if(!thread.joinable()) // dead thread (not run or already joined)
+            continue;
+
+        thread.join();
+        thread = std::thread(job);
+        return;
+    }
+}
+
 void Caller::execute()
 {
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Find evidence :" << std::endl;
     std::cout << "------------------------------" << std::endl;
-    // find evidence by using threads
 
-    // tbb::task_scheduler_init init(35);
-    // std::mutex mxRead;
-    // int32_t tasks = bam_header.n_targets;
-    // //    std::cout << tasks << std::endl;
-    // tbb::parallel_for(0, tasks, [&](int i) {
-    //     //        mxRead.lock();
-    //     i++;
-    //     std::string tp(bam_header.target_name[i - 1]);
-    //     Task task(samplestat, &filepath, tp);
-    //     task.setHtsIndex(bam_index);
-    //     task.setBamHeader(bam_header);
-    //     //        mxRead.unlock();
-    //     task.execute();
-    //     task.showTaskDone();
-    // });
 
-    // std::cout << "start executing" << std::endl;
-    // find evidence by using multiple process
-    // int max_active = numberofparallel;
-    int max_active = numberofparallel;
-    int number_active = 0;
-    bool done = false;
-    int32_t tasks = bam_header.n_targets;
-    int i = 0;
-    for (; !done; ++number_active)
-    {
-        i++;
-        std::string tp(bam_header.target_name[i - 1]);
+    std::vector<std::thread> threads(numberofparallel);
+
+    for(int i = 0; i < bam_header.n_targets; i++) {
+        std::string tp(bam_header.target_name[i]);
         Task task(samplestat, &filepath, tp);
         task.setHtsIndex(bam_index);
         task.setBamHeader(bam_header);
-        if (i >= tasks - 1)
-        {
-            done = true;
-        }
-
-        for (; number_active >= max_active; --number_active)
-        {
-            wait(NULL);
-        }
-
-        auto pid = fork();
-        if (pid < 0)
-        {
-        }
-        if (pid == 0)
-        {
-            // std::cout << "executing : " << tp << std::endl;
-            task.execute();
-            exit(0);
-        }
-        else
-        {
-            
-        }
+        start_thread(threads, [=]{ findEvidenceJob(task);});
     }
 
-    for (i = 0; i < max_active; i++)
-    {
-        wait(NULL);
-    }
+    // wait for any unfinished threads
+    for(auto&& thread: threads)
+        if(thread.joinable())
+            thread.join();
+
 }
 
 void Caller::mergeSplitRead()

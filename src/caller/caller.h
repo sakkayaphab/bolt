@@ -4,6 +4,8 @@
 #include "samplestat.h"
 #include "filemanager.h"
 #include "evidence.h"
+#include <thread>
+#include "task.h"
 class Caller
 {
 
@@ -20,6 +22,12 @@ private:
 public:
   Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T);
   ~Caller();
+
+    template<typename Job>
+    void start_thread(std::vector<std::thread>& threads, Job&& job);
+    void findEvidenceJob(Task task);
+
+
   void execute();
   void execSampleStat();
   void showinfo();
@@ -38,6 +46,8 @@ public:
   void prepareHts();
   void refineDelpthBlock();
   void mergeSplitRead();
+
+
 
 };
 
