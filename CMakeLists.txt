@@ -11,11 +11,11 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # using Clang
     message( "bolt -> Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # using GCC
     message( "bolt -> GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread")
 endif()
 
 include(GNUInstallDirs)
