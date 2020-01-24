@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
-#include "fasta/fastareader.h"
+#include "fasta/reader.h"
 #include <string>
 #include <bits/stdc++.h>
 

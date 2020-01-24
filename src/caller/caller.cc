@@ -1,7 +1,6 @@
 #include "caller.h"
 
 
-
 Caller::~Caller()
 {
     if (inFile != NULL)
