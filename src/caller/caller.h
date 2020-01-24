@@ -5,7 +5,34 @@
 #include "filemanager.h"
 #include "evidence.h"
 #include <thread>
+#include "samplestat.h"
+#include <iostream>
+#include <stdio.h>
+#include <iomanip>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <cstdlib>
+#include <iostream>
+#include <unistd.h>
 #include "task.h"
+#include "evidenceprovider.h"
+#include <fstream>
+#include <unistd.h>
+#include <mutex>
+#include <iostream>
+#include <dirent.h>
+#include "variantresultfilter.h"
+#include "readdepthhelper.h"
+#include "readdepthanalysis.h"
+#include "refinedepthblock.h"
+#include "depthblockfile.h"
+#include <fasta/fastareader.h>
+#include "refiningtandemduplication.h"
+#include "refiningtranslocation.h"
+#include "refininginversion.h"
+#include "refininginsertion.h"
+#include "refiningdeletion.h"
 class Caller
 {
 
@@ -26,7 +53,7 @@ public:
     template<typename Job>
     void start_thread(std::vector<std::thread>& threads, Job&& job);
     void findEvidenceJob(Task task);
-    void findBreakpointJob(Task task);
+    void findBreakpointJob(Evidence thisEvidence,Evidence variantresult);
 
   void execute();
   void execSampleStat();

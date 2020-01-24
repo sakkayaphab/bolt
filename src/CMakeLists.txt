@@ -1,9 +1,8 @@
-
 file(GLOB SOURCES "*.cc")
 
 add_executable(bolt ${SOURCES})
 
-include_directories(caller)
+include_directories(${PROJECT_SOURCE_DIR}/caller)
 
 add_subdirectory(caller)
 add_subdirectory(fasta)

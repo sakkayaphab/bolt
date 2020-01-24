@@ -48,9 +48,6 @@ message("INCLUDE_LIBRARY_PREFIX : " ${INCLUDE_LIBRARY_PREFIX})
 
 enable_testing()
 
-#include header
-#include_directories(${HTSLIB_INCLUDE_DIRS})
-
 # build bolt
 add_subdirectory(src)
 
