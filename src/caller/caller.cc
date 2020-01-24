@@ -20,9 +20,6 @@ Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::strin
     execSampleStat();
     applyBamHeader();
 
-    // ReadDepthStat readDepthStat;
-    // readDepthStat.setFilePath(&filepath);
-    // readDepthStat.execute();
 }
 
 void Caller::setnumberofpair_stat(int n) {

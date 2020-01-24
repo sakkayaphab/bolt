@@ -193,9 +193,9 @@ int Cli::callSV()
     caller.showinfo();
     caller.setParallel(threads);
     caller.execute();
-//    caller.catfile();
-//    caller.findBreakPoint();
-//    caller.refineDelpthBlock();
+    caller.catfile();
+    caller.findBreakPoint();
+    caller.refineDelpthBlock();
 
     return 0;
 }
