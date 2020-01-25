@@ -15,6 +15,7 @@ Requirements
 1. GCC >=v5.4
 2. HTSlib >=v1.9
 3. CMake >=v3.9
+4. Intel TBB >=v2019.9
 
 ```sh
 git clone https://github.com/sakkayaphab/bolt.git
@@ -28,8 +29,8 @@ make install
 
 ### 2. Installing Bolt with conda
 
-
 ```sh
+conda install -c intel tbb
 conda install -c bioconda bolt
 ```
 
