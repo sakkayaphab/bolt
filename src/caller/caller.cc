@@ -1,4 +1,5 @@
 #include "caller.h"
+#define sync_out(m) do{std::ostringstream o; o << m << '\n'; std::cout << o.str();}while(0)
 
 
 Caller::~Caller() {
@@ -87,56 +88,75 @@ bam_hdr_t *Caller::getBamHeader() {
     return headerT;
 }
 
-void Caller::findEvidenceJob(Task task) {
-    task.execute();
-    task.showTaskDone();
-//    sync_out("thread: " << id);
-}
-
-template<typename Job>
-void Caller::start_thread(std::vector<std::thread> &threads, Job &&job) {
-    // find an ended thread
-    for (auto &&thread: threads) {
-        if (thread.joinable()) // still running or waiting to join
-            continue;
-
-        thread = std::thread(job);
-        return;
-    }
-
-    // if not wait for one
-    for (auto &&thread: threads) {
-        if (!thread.joinable()) // dead thread (not run or already joined)
-            continue;
-
-        thread.join();
-        thread = std::thread(job);
-        return;
-    }
-}
-
-void Caller::execute() {
+void Caller::execute()
+{
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Find evidence :" << std::endl;
     std::cout << "------------------------------" << std::endl;
+    // find evidence by using threads
 
+    // tbb::task_scheduler_init init(35);
+    // std::mutex mxRead;
+    // int32_t tasks = bam_header.n_targets;
+    // //    std::cout << tasks << std::endl;
+    // tbb::parallel_for(0, tasks, [&](int i) {
+    //     //        mxRead.lock();
+    //     i++;
+    //     std::string tp(bam_header.target_name[i - 1]);
+    //     Task task(samplestat, &filepath, tp);
+    //     task.setHtsIndex(bam_index);
+    //     task.setBamHeader(bam_header);
+    //     //        mxRead.unlock();
+    //     task.execute();
+    //     task.showTaskDone();
+    // });
 
-    std::vector<std::thread> threads(numberofparallel);
-
-    for (int i = 0; i < bam_header.n_targets; i++) {
-        std::string tp(bam_header.target_name[i]);
+    // std::cout << "start executing" << std::endl;
+    // find evidence by using multiple process
+    // int max_active = numberofparallel;
+    int max_active = numberofparallel;
+    int number_active = 0;
+    bool done = false;
+    int32_t tasks = bam_header.n_targets;
+    int i = 0;
+    for (; !done; ++number_active)
+    {
+        i++;
+        std::string tp(bam_header.target_name[i - 1]);
         Task task(samplestat, &filepath, tp);
         task.setHtsIndex(bam_index);
         task.setBamHeader(bam_header);
-        start_thread(threads, [=] { findEvidenceJob(task); });
+        if (i >= tasks - 1)
+        {
+            done = true;
+        }
+
+        for (; number_active >= max_active; --number_active)
+        {
+            wait(NULL);
+        }
+
+        auto pid = fork();
+        if (pid < 0)
+        {
+        }
+        if (pid == 0)
+        {
+            // std::cout << "executing : " << tp << std::endl;
+            task.execute();
+            exit(0);
+        }
+        else
+        {
+
+        }
     }
 
-    // wait for any unfinished threads
-    for (auto &&thread: threads)
-        if (thread.joinable())
-            thread.join();
-
+    for (i = 0; i < max_active; i++)
+    {
+        wait(NULL);
+    }
 }
 
 void Caller::mergeSplitRead() {
@@ -364,84 +384,17 @@ int Caller::writeFile(Evidence vr) {
     return 0;
 }
 
-void Caller::findBreakpointJob(Evidence thisEvidence, Evidence variantresult, FastaReader fastaReader) {
-
-    if (thisEvidence.getVariantType() == "DEL") {
-        // EvidenceFilter ef;
-        // if (ef.passFilterEvidence(&thisEvidence))
-        // {
-        RefiningDeletion rfd;
-        rfd.setHtsIndex(bam_index);
-        rfd.setFilePath(&filepath);
-        rfd.setEvidence(thisEvidence);
-        rfd.setSampleStat(&samplestat);
-        rfd.setFastaReader(fastaReader);
-        rfd.execute();
-        variantresult = rfd.getVariantResult();
-        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-        // }
-    } else if (thisEvidence.getVariantType() == "DUP") {
-        RefiningTandemDuplication rfd;
-        rfd.setHtsIndex(bam_index);
-        rfd.setFilePath(&filepath);
-        rfd.setEvidence(thisEvidence);
-        rfd.setSampleStat(&samplestat);
-        rfd.setFastaReader(fastaReader);
-        rfd.execute();
-        variantresult = rfd.getVariantResult();
-        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-    } else if (thisEvidence.getVariantType() == "INS") {
-
-        RefiningInsertion rfd;
-        rfd.setHtsIndex(bam_index);
-        rfd.setFilePath(&filepath);
-        rfd.setEvidence(thisEvidence);
-        rfd.setSampleStat(&samplestat);
-        rfd.setFastaReader(fastaReader);
-        rfd.execute();
-        variantresult = rfd.getVariantResult();
-        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-    } else if (thisEvidence.getVariantType() == "INV") {
-        RefiningInversion rfd;
-        rfd.setHtsIndex(bam_index);
-        rfd.setFilePath(&filepath);
-        rfd.setEvidence(thisEvidence);
-        rfd.setSampleStat(&samplestat);
-        rfd.setFastaReader(fastaReader);
-        rfd.execute();
-        variantresult = rfd.getVariantResult();
-        // std::cout << variantresult.getResultVcfFormatString() << std::endl;
-    } else if (thisEvidence.getVariantType() == "BND") {
-        RefiningTranslocation rfd;
-        rfd.setHtsIndex(bam_index);
-        rfd.setFilePath(&filepath);
-        rfd.setEvidence(thisEvidence);
-        rfd.setSampleStat(&samplestat);
-        rfd.setFastaReader(fastaReader);
-        rfd.execute();
-        variantresult = rfd.getVariantResult();
-    }
-
-
-    VariantResultFilter vrf;
-    if (vrf.passFilterSV(&variantresult)) {
-        std::cout << variantresult.getResultVcfFormatString() << std::endl;
-
-        mxWriteFile.lock();
-        // rda.analyzeByBreakPoint(variantresult);
-        // if (variantresult.isQuailtyPass()) {
-        writeFile(variantresult);
-        // }
-        mxWriteFile.unlock();
-    }
-
-}
-
-int Caller::findBreakPoint() {
+int Caller::findBreakPoint()
+{
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Refine breakpoint : " << std::endl;
     std::cout << "------------------------------" << std::endl;
+
+    // removeResult();
+
+    //    ReadDepthHelper readdepthHelper;
+    //    readdepthHelper.loadReadDepthFile()
 
     FastaReader fastaReader;
     fastaReader.setFilePath((filepath.getReferencePath()));
@@ -449,12 +402,14 @@ int Caller::findBreakPoint() {
     fastaReader.initialize();
 
     samFile *inFile = sam_open(filepath.getSamplePath().c_str(), "r");
-    if (inFile == NULL) {
+    if (inFile == NULL)
+    {
         return 1;
     }
 
     hts_idx_t *bam_index = sam_index_load(inFile, filepath.getSamplePath().c_str());
-    if (bam_index == NULL) {
+    if (bam_index == NULL)
+    {
         return 1;
     }
 
@@ -462,27 +417,132 @@ int Caller::findBreakPoint() {
     std::mutex mxWriteFile;
     EvidenceProvider ep(&filepath);
     int sizeLoop = ep.getEvidenceSize();
+    // std::cout << "sizeLoop : " << sizeLoop << std::endl;
+
+    int countRunEvidence = 0;
+    // tbb::task_scheduler_init init(1);
 
     ReadDepthAnalysis rda(&filepath);
+    // float progress = 0.0;
+    // float incrementevery = float(1)/float(sizeLoop);
+    // std::cout << incrementevery << std::endl;
+
+    tbb::parallel_for(0, sizeLoop, [&](int i) {
 
 
-    std::vector<std::thread> threads(numberofparallel);
+        mxRead.lock();
+        // int barWidth = 50;
+        // std::cout << "[";
+        // int pos = barWidth * progress;
+        // for (int i = 0; i < barWidth; ++i) {
+        //     if (i < pos) std::cout << "=";
+        //     else if (i == pos) std::cout << ">";
+        //     else std::cout << " ";
+        // }
+        // std::cout << "] " << int(progress * 100.0) << " %\r";
+        // std::cout.flush();
 
-    for (int i = 0; i < bam_header.n_targets; i++) {
-        if (ep.isEmpty()) {
+        // progress += incrementevery;
+
+        if (ep.isEmpty())
+        {
             std::cout << "end" << std::endl;
         }
         Evidence thisEvidence = ep.getEvidence();
         Evidence variantresult;
+        // std::cout << thisEvidence.getPos() << " " << thisEvidence.getChr()
+        // << " / " << thisEvidence.getEnd() << " " << thisEvidence.getEndChr()
+        // << std::endl;
 
-        start_thread(threads, [=] { findBreakpointJob(thisEvidence, variantresult, fastaReader); });
-    }
+        mxRead.unlock();
 
-    // wait for any unfinished threads
-    for (auto &&thread: threads)
-        if (thread.joinable())
-            thread.join();
+        // if (thisEvidence.getVariantType() != "INV")
+        // {
+        //     goto skip;
+        // }
 
+        //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
+        if (thisEvidence.getVariantType() == "DEL")
+        {
+            // EvidenceFilter ef;
+            // if (ef.passFilterEvidence(&thisEvidence))
+            // {
+            RefiningDeletion rfd;
+            rfd.setHtsIndex(bam_index);
+            rfd.setFilePath(&filepath);
+            rfd.setEvidence(thisEvidence);
+            rfd.setSampleStat(&samplestat);
+            rfd.setFastaReader(fastaReader);
+            rfd.execute();
+            variantresult = rfd.getVariantResult();
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+            // }
+        }
+        else if (thisEvidence.getVariantType() == "DUP")
+        {
+            RefiningTandemDuplication rfd;
+            rfd.setHtsIndex(bam_index);
+            rfd.setFilePath(&filepath);
+            rfd.setEvidence(thisEvidence);
+            rfd.setSampleStat(&samplestat);
+            rfd.setFastaReader(fastaReader);
+            rfd.execute();
+            variantresult = rfd.getVariantResult();
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+        }
+        else if (thisEvidence.getVariantType() == "INS")
+        {
+
+            RefiningInsertion rfd;
+            rfd.setHtsIndex(bam_index);
+            rfd.setFilePath(&filepath);
+            rfd.setEvidence(thisEvidence);
+            rfd.setSampleStat(&samplestat);
+            rfd.setFastaReader(fastaReader);
+            rfd.execute();
+            variantresult = rfd.getVariantResult();
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+        }
+        else if (thisEvidence.getVariantType() == "INV")
+        {
+            RefiningInversion rfd;
+            rfd.setHtsIndex(bam_index);
+            rfd.setFilePath(&filepath);
+            rfd.setEvidence(thisEvidence);
+            rfd.setSampleStat(&samplestat);
+            rfd.setFastaReader(fastaReader);
+            rfd.execute();
+            variantresult = rfd.getVariantResult();
+            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+        }
+        else if (thisEvidence.getVariantType() == "BND")
+        {
+            RefiningTranslocation rfd;
+            rfd.setHtsIndex(bam_index);
+            rfd.setFilePath(&filepath);
+            rfd.setEvidence(thisEvidence);
+            rfd.setSampleStat(&samplestat);
+            rfd.setFastaReader(fastaReader);
+            rfd.execute();
+            variantresult = rfd.getVariantResult();
+        }
+
+        // skip:
+
+        VariantResultFilter vrf;
+        if (vrf.passFilterSV(&variantresult))
+        {
+            std::cout << variantresult.getResultVcfFormatString() << std::endl;
+
+            mxWriteFile.lock();
+            // rda.analyzeByBreakPoint(variantresult);
+            // if (variantresult.isQuailtyPass()) {
+            writeFile(variantresult);
+            // }
+            mxWriteFile.unlock();
+        }
+        countRunEvidence++;
+    });
 }
 
 void Caller::removeResult() {

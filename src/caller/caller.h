@@ -33,6 +33,7 @@
 #include "refininginversion.h"
 #include "refininginsertion.h"
 #include "refiningdeletion.h"
+#include <tbb/tbb.h>
 class Caller
 {
 
@@ -50,11 +51,6 @@ private:
 public:
   Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T);
   ~Caller();
-
-    template<typename Job>
-    void start_thread(std::vector<std::thread>& threads, Job&& job);
-    void findEvidenceJob(Task task);
-    void findBreakpointJob(Evidence thisEvidence,Evidence variantresult,FastaReader fastaReader);
 
   void execute();
   void execSampleStat();

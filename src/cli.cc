@@ -187,15 +187,15 @@ int Cli::callSV()
     }
 
 
-    // std::cout << "nthreads = " << nthreads << std::endl;
+     std::cout << "threads = " << threads << std::endl;
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     caller.setParallel(threads);
     caller.execute();
-    caller.catfile();
-    caller.findBreakPoint();
-    caller.refineDelpthBlock();
+//    caller.catfile();
+//    caller.findBreakPoint();
+//    caller.refineDelpthBlock();
 
     return 0;
 }
