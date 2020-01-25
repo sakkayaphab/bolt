@@ -1,6 +1,4 @@
 #include "caller.h"
-#define sync_out(m) do{std::ostringstream o; o << m << '\n'; std::cout << o.str();}while(0)
-
 
 Caller::~Caller() {
     if (inFile != NULL) {
@@ -420,7 +418,7 @@ int Caller::findBreakPoint()
     // std::cout << "sizeLoop : " << sizeLoop << std::endl;
 
     int countRunEvidence = 0;
-    // tbb::task_scheduler_init init(1);
+    tbb::task_scheduler_init init(numberofparallel);
 
     ReadDepthAnalysis rda(&filepath);
     // float progress = 0.0;

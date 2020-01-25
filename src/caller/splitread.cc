@@ -23,7 +23,9 @@ void SplitRead::updateRead()
     findDeletion();
     findInsertion();
     findTandemDuplication();
-    findTranslocation();
+
+    // has a bug that make program stop working
+//    findTranslocation();
 }
 
 
