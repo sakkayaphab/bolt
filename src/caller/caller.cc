@@ -418,7 +418,7 @@ int Caller::findBreakPoint()
     // std::cout << "sizeLoop : " << sizeLoop << std::endl;
 
     int countRunEvidence = 0;
-    // tbb::task_scheduler_init init(1);
+    tbb::task_scheduler_init init(numberofparallel);
 
     ReadDepthAnalysis rda(&filepath);
     // float progress = 0.0;
