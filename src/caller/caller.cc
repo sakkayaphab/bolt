@@ -1,6 +1,4 @@
 #include "caller.h"
-#define sync_out(m) do{std::ostringstream o; o << m << '\n'; std::cout << o.str();}while(0)
-
 
 Caller::~Caller() {
     if (inFile != NULL) {
