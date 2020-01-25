@@ -1,49 +1,18 @@
 #include "caller.h"
-#include "samplestat.h"
-#include <iostream>
-#include <stdio.h>
-#include <iomanip>
-#include "task.h"
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <cstdlib>
-#include <iostream>
-#include <unistd.h>
-#include <fasta/fastareader.h>
-#include "refiningtandemduplication.h"
-#include "refiningtranslocation.h"
-#include "refininginversion.h"
-#include "refininginsertion.h"
-#include "refiningdeletion.h"
-#include "evidenceprovider.h"
-#include <fstream>
-#include <unistd.h>
-#include <mutex>
-#include <iostream>
-#include <dirent.h>
-#include "variantresultfilter.h"
-#include <tbb/tbb.h>
-#include "readdepthhelper.h"
-#include "readdepthanalysis.h"
-#include "refinedepthblock.h"
-#include "depthblockfile.h"
+#define sync_out(m) do{std::ostringstream o; o << m << '\n'; std::cout << o.str();}while(0)
 
-Caller::~Caller()
-{
-    if (inFile != NULL)
-    {
+
+Caller::~Caller() {
+    if (inFile != NULL) {
         sam_close(inFile);
     }
 
-    if (bam_index != NULL)
-    {
+    if (bam_index != NULL) {
         hts_idx_destroy(bam_index);
     }
 }
 
-Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T)
-{
+Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T) {
     filepath.setOutputPath(outputpath_T);
     filepath.setReferencePath(referencepath_T);
     filepath.setSamplePath(samplepath_T);
@@ -52,24 +21,18 @@ Caller::Caller(std::string samplepath_T, std::string referencepath_T, std::strin
     execSampleStat();
     applyBamHeader();
 
-    // ReadDepthStat readDepthStat;
-    // readDepthStat.setFilePath(&filepath);
-    // readDepthStat.execute();
 }
 
-void Caller::setnumberofpair_stat(int n)
-{
+void Caller::setnumberofpair_stat(int n) {
     numberofpair_stat = n;
 }
 
-void Caller::execSampleStat()
-{
+void Caller::execSampleStat() {
     samplestat.setSamplePath(filepath.getSamplePath());
     samplestat.execute();
 }
 
-void Caller::showinfo()
-{
+void Caller::showinfo() {
     std::cout << "+" << std::setfill('-') << std::setw(80) << "-" << std::endl;
     std::cout << "| Sample => " << filepath.getSamplePath() << std::endl;
     std::cout << "| Reference => " << filepath.getReferencePath() << std::endl;
@@ -83,36 +46,30 @@ void Caller::showinfo()
     std::cout << "+" << std::setfill('-') << std::setw(80) << "-" << std::endl;
 }
 
-void Caller::prepareHts()
-{
+void Caller::prepareHts() {
     inFile = sam_open(filepath.getSamplePath().c_str(), "r");
-    if (inFile == NULL)
-    {
+    if (inFile == NULL) {
         std::cout << "error : sam_open" << std::endl;
         exit(1);
         return;
     }
 
     bam_index = sam_index_load(inFile, filepath.getSamplePath().c_str());
-    if (bam_index == NULL)
-    {
+    if (bam_index == NULL) {
         std::cout << "error : sam_index_load" << std::endl;
         return;
     }
 }
 
-void Caller::setParallel(int number)
-{
+void Caller::setParallel(int number) {
     numberofparallel = number;
 }
 
-void Caller::applyBamHeader()
-{
+void Caller::applyBamHeader() {
     bam_header = *getBamHeader();
 }
 
-bam_hdr_t *Caller::getBamHeader()
-{
+bam_hdr_t *Caller::getBamHeader() {
     samFile *inT = NULL;
     bam_hdr_t *headerT = NULL;
 
@@ -192,7 +149,7 @@ void Caller::execute()
         }
         else
         {
-            
+
         }
     }
 
@@ -202,25 +159,20 @@ void Caller::execute()
     }
 }
 
-void Caller::mergeSplitRead()
-{
+void Caller::mergeSplitRead() {
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
     struct dirent *dir;
     d = opendir(filepath.getSplitReadPath().c_str());
-    if (d)
-    {
-        while (dir = readdir(d))
-        {
+    if (d) {
+        while (dir = readdir(d)) {
 
-            if (std::string(dir->d_name).size() < 4)
-            {
+            if (std::string(dir->d_name).size() < 4) {
                 continue;
             }
 
-            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-            {
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt") {
                 std::string tempPath = filepath.getSplitReadPath() + "/" + std::string(dir->d_name);
                 std::cout << tempPath << std::endl;
                 evidenceFilePathLists.push_back(tempPath);
@@ -231,42 +183,9 @@ void Caller::mergeSplitRead()
 
     std::sort(evidenceFilePathLists.begin(), evidenceFilePathLists.end());
 
-    //write file
-
-    // int count = 0;
-    // for (auto n : evidenceFilePathLists)
-    // {
-    //     std::vector<std::string> cache;
-
-    //     std::string line;
-    //     std::ifstream myfile(n);
-    //     if (myfile.is_open())
-    //     {
-
-    //         while (getline(myfile, line))
-    //         {
-    //                 cache.push_back(line);
-    //                 count++;
-
-    //         }
-    //         myfile.close();
-
-    //         std::ofstream writefile;
-    //         writefile.open(filepath.getOutputPath() + "/result.vcf", std::ios_base::app);
-    //         for (auto a : cache)
-    //         {
-    //             writefile << a << std::endl;
-    //         }
-    //         writefile.close();
-
-    //     }
-
-    //     cache.clear();
-    // }
 }
 
-void Caller::refineDelpthBlock()
-{
+void Caller::refineDelpthBlock() {
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Filter Breakpoint with Depth block : " << std::endl;
@@ -279,26 +198,21 @@ void Caller::refineDelpthBlock()
     rdb.execute();
 }
 
-void Caller::catEvidenceFile()
-{
+void Caller::catEvidenceFile() {
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
 
     d = opendir(filepath.getTempEvidencePath().c_str());
-    if (d)
-    {
+    if (d) {
         struct dirent *dir;
-        while (dir = readdir(d))
-        {
+        while (dir = readdir(d)) {
 
-            if (std::string(dir->d_name).size() < 4)
-            {
+            if (std::string(dir->d_name).size() < 4) {
                 continue;
             }
 
-            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-            {
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt") {
                 std::string tempPath = filepath.getTempEvidencePath() + "/" + std::string(dir->d_name);
                 evidenceFilePathLists.push_back(tempPath);
             }
@@ -307,19 +221,15 @@ void Caller::catEvidenceFile()
     }
 
     d = opendir(filepath.getSplitReadPath().c_str());
-    if (d)
-    {
+    if (d) {
         struct dirent *dir;
-        while (dir = readdir(d))
-        {
+        while (dir = readdir(d)) {
 
-            if (std::string(dir->d_name).size() < 4)
-            {
+            if (std::string(dir->d_name).size() < 4) {
                 continue;
             }
 
-            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-            {
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt") {
                 std::string tempPath = filepath.getSplitReadPath() + "/" + std::string(dir->d_name);
                 evidenceFilePathLists.push_back(tempPath);
             }
@@ -327,8 +237,7 @@ void Caller::catEvidenceFile()
         closedir(d);
     }
 
-    if (evidenceFilePathLists.size() == 0)
-    {
+    if (evidenceFilePathLists.size() == 0) {
         return;
     }
 
@@ -340,14 +249,12 @@ void Caller::catEvidenceFile()
 
     ReadDepthAnalysis rda(&filepath);
 
-    for (auto n : evidenceFilePathLists)
-    {
+    for (auto n : evidenceFilePathLists) {
         std::vector<std::string> cache;
 
         std::string line;
         std::ifstream myfile(n);
-        if (myfile.is_open())
-        {
+        if (myfile.is_open()) {
             std::string svtype = n.substr(n.size() - 7, 3);
 
             // if (svtype != "INS")
@@ -355,12 +262,10 @@ void Caller::catEvidenceFile()
             //     continue;
             // }
 
-            while (getline(myfile, line))
-            {
+            while (getline(myfile, line)) {
                 Evidence e;
                 e.setEvidenceByString(line);
-                if (rda.analyzeByEvidence(e))
-                {
+                if (rda.analyzeByEvidence(e)) {
                     cache.push_back(line);
                     count++;
                 }
@@ -369,8 +274,7 @@ void Caller::catEvidenceFile()
 
             std::ofstream writefile;
             writefile.open(writeFinal, std::ios_base::app);
-            for (auto a : cache)
-            {
+            for (auto a : cache) {
                 writefile << a << std::endl;
             }
             writefile.close();
@@ -383,25 +287,20 @@ void Caller::catEvidenceFile()
 
 }
 
-void Caller::mergeReadDepthFile()
-{
+void Caller::mergeReadDepthFile() {
     std::vector<std::string> evidenceFilePathLists;
 
     DIR *d;
     struct dirent *dir;
     d = opendir(filepath.getTempEvidencePath().c_str());
-    if (d)
-    {
-        while (dir = readdir(d))
-        {
+    if (d) {
+        while (dir = readdir(d)) {
 
-            if (std::string(dir->d_name).size() < 4)
-            {
+            if (std::string(dir->d_name).size() < 4) {
                 continue;
             }
 
-            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt")
-            {
+            if (std::string(dir->d_name).substr(std::string(dir->d_name).size() - 4) == ".txt") {
                 std::string tempPath = filepath.getTempEvidencePath() + "/" + std::string(dir->d_name);
                 evidenceFilePathLists.push_back(tempPath);
             }
@@ -415,29 +314,26 @@ void Caller::mergeReadDepthFile()
     std::string writeFinal = filepath.getAllEvidencePath();
     int count = 0;
     ReadDepthAnalysis rda(&filepath);
-    for (auto n : evidenceFilePathLists)
-    {
+    for (auto n : evidenceFilePathLists) {
         std::vector<std::string> cache;
 
         std::string line;
         std::ifstream myfile(n);
-        if (myfile.is_open())
-        {
+        if (myfile.is_open()) {
 
             std::string svtype = n.substr(n.size() - 7, 3);
             // if (svtype != "INV")
             // {
             //     continue;
             // }
-            std::string chr = n.substr(filepath.getTempEvidencePath().size() + 1, n.size() - filepath.getTempEvidencePath().size() - 9);
+            std::string chr = n.substr(filepath.getTempEvidencePath().size() + 1,
+                                       n.size() - filepath.getTempEvidencePath().size() - 9);
             std::cout << chr << std::endl;
 
-            while (getline(myfile, line))
-            {
+            while (getline(myfile, line)) {
                 Evidence e;
                 e.setEvidenceByString(line);
-                if (rda.analyzeByEvidence(e))
-                {
+                if (rda.analyzeByEvidence(e)) {
                     cache.push_back(line);
                     count++;
                 }
@@ -446,8 +342,7 @@ void Caller::mergeReadDepthFile()
 
             std::ofstream writefile;
             writefile.open(writeFinal, std::ios_base::app);
-            for (auto a : cache)
-            {
+            for (auto a : cache) {
                 writefile << a << std::endl;
             }
             writefile.close();
@@ -461,8 +356,7 @@ void Caller::mergeReadDepthFile()
     std::cout << count << std::endl;
 }
 
-void Caller::catfile()
-{
+void Caller::catfile() {
     std::cout << std::endl;
     std::cout << "------------------------------" << std::endl;
     std::cout << "# Merge and filter evidence :" << std::endl;
@@ -472,10 +366,10 @@ void Caller::catfile()
     catEvidenceFile();
 }
 
-int Caller::writeFile(Evidence vr)
-{
+int Caller::writeFile(Evidence vr) {
     std::ofstream myfile;
-    myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
+    myfile.open(filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf",
+                std::ios_base::app);
     // if (vr.getVariantType()=="DEL") {
     // myfile.open(filepath.getEvidencePath() + "/" + vr.getChromosome() + "." + vr.getVariantType() + ".vcf", std::ios_base::app);
     // std::cout << filepath.getOutputPath() + "/analysis/variant/" + vr.getChr() + "." + vr.getVariantType() + ".vcf" << std::endl;
@@ -534,7 +428,7 @@ int Caller::findBreakPoint()
     // std::cout << incrementevery << std::endl;
 
     tbb::parallel_for(0, sizeLoop, [&](int i) {
-        
+
 
         mxRead.lock();
         // int barWidth = 50;
@@ -566,7 +460,7 @@ int Caller::findBreakPoint()
         // {
         //     goto skip;
         // }
-        
+
         //    std::cout << thisEvidence.getPos() << " / " << thisEvidence.getEnd() << std::endl;
         if (thisEvidence.getVariantType() == "DEL")
         {
@@ -651,27 +545,10 @@ int Caller::findBreakPoint()
     });
 }
 
-void Caller::removeResult()
-{
+void Caller::removeResult() {
     auto thispathfile = filepath.getOutputPath() + "/result.vcf";
     if (remove(thispathfile.c_str()) != 0)
         perror("Error deleting file");
     else
         puts("File successfully deleted");
-}
-
-void Caller::debugEvidenceProvider()
-{
-    int count = 0;
-    int loop = 110;
-    tbb::parallel_for(0, loop, [&](int i) {
-        count++;
-        if (count == 90)
-        {
-            loop += 10;
-        }
-        std::cout << "Hello" << i << "/" << count << std::endl;
-    });
-
-    return;
 }

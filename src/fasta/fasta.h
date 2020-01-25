@@ -17,7 +17,7 @@ public:
   std::string getFilePath();
   void initialize();
 
-  std::string  getSeqByOffset(uint64_t start,uint64_t end);
+  std::string  getSeqByOffset(int64_t start,int64_t end);
 };
 
 #endif 

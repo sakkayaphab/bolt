@@ -131,7 +131,6 @@ void EvidenceFinder::findEvidence()
         markdupmapq = readparser.getMapQuality();
 
 
-
         splitread.updateRead();
 
         currentPos = read->core.pos + 1;
@@ -210,12 +209,8 @@ void EvidenceFinder::findEvidence()
 
     splitread.printResult();
 
-    // std::cout << "---------------------------------------" << std::endl;
     std::cout << "✓ " << *target_chromosome << std::endl;
-    // std::cout << "number of read : " << countT << std::endl;
-    // std::cout << "number of region deletion : " << countDEL << std::endl;
-    // std::cout << "size of read depth line segment : " << ReadDepthLineSegment.size() << std::endl;
-    // std::cout << "---------------------------------------" << std::endl;
+
 
     hts_itr_destroy(iterT);
     bam_destroy1(read);

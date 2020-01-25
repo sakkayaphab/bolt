@@ -157,15 +157,21 @@ int Cli::callSV()
 
         if (n == "-t")
         {
-            outThread = true;
+            foundThread = true;
         }
     }
+
+    std::cout << outThread << std::endl;
+    std::cout << outPath << std::endl;
+    std::cout << bamPath << std::endl;
+    std::cout << refPath << std::endl;
 
     unsigned int threads = std::thread::hardware_concurrency();
     if (outThread != "")
     {
         try
         {
+            std::cout << outThread << std::endl;
             threads = std::stoi(outThread);
         }
         catch (std::invalid_argument const &e)
@@ -181,7 +187,7 @@ int Cli::callSV()
     }
 
 
-    // std::cout << "nthreads = " << nthreads << std::endl;
+     std::cout << "threads = " << threads << std::endl;
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();

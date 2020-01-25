@@ -1,62 +1,47 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 
-set (CMAKE_CXX_STANDARD 14)
-project (bolt)
+project (bolt CXX)
 
-#set(CMAKE_VERBOSE_MAKEFILE on)
-#set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-#set(CMAKE_CXX_FLAGS_DEBUG "-g")
-#set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_MACOSX_RPATH 1)
-#include(GNUInstallDirs)
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-set(CMAKE_CXX_EXTENSIONS False)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_INSTALL_RPATH ${LIBRARY_LINK_PREFIX})
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_CXX_FLAGS "-O3")
-# add external project
-#include(ExternalProject)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # using Clang
+    message( "bolt -> Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    # using GCC
+    message( "bolt -> GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
 
-#set(CMAKE_CXX_STANDARD 14)
-#set(LIBRARY_LINK_PREFIX2 "/usr/lib/")
+include(GNUInstallDirs)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR})
+find_package (Threads)
+#find_package (SeqAn3 REQUIRED)
 find_library(HTSLIB_LIBRARIES hts HINTS ${LIBRARY_LINK_PREFIX})
 find_library(TBB_IMPORTED_TARGETS tbb HINTS ${LIBRARY_LINK_PREFIX})
 find_library(ZLIB_LIBRARIES z HINTS ${LIBRARY_LINK_PREFIX})
-#find_library(BZIP2_LIBRARIES bz2 HINTS ${LIBRARY_LINK_PREFIX})
+#find_library(SEQAN3_LIBRARIES seqan3 HINTS ${LIBRARY_LINK_PREFIX})
+#find_library(HTSLIB_LIBRARIES hts HINTS ${LIBRARY_LINK_PREFIX})
+#find_library(TBB_IMPORTED_TARGETS tbb HINTS ${LIBRARY_LINK_PREFIX})
+#find_library(ZLIB_LIBRARIES z HINTS ${LIBRARY_LINK_PREFIX})
 
-#link_directories(${LIBRARY_LINK_PREFIX})
 message("LIBRARY_LINK_PREFIX : " ${LIBRARY_LINK_PREFIX})
-#set(INCLUDE_LIBRARY_PREFIX "/usr/local/include/")
-#set(INCLUDE_LIBRARY_PREFIX2 "/usr/include/")
 include_directories(${INCLUDE_LIBRARY_PREFIX})
-
+include_directories(${INCLUDE_LIBRARY_PREFIX}/seqan3/submodules/range-v3/include)
+include_directories(${INCLUDE_LIBRARY_PREFIX}/seqan3/submodules/sdsl/include)
 message("INCLUDE_LIBRARY_PREFIX : " ${INCLUDE_LIBRARY_PREFIX})
 
-
-#add_executable(jinn main.cpp)
-
-# Build external library
-#include(cmake/FindHTSlib.cmake)
-#include(cmake/FindZLIBlib.cmake)
-#include(cmake/FindLZMAlib.cmake)
-#include(cmake/FindBZip2.cmake)
-#include(cmake/FindTBB.cmake)
-
-#enable_testing()
-
-#include header
-#include_directories(${HTSLIB_INCLUDE_DIRS})
-
-# build bolt
+enable_testing()
 add_subdirectory(src)
 
-#option(BUILD_TESTS "Build test" OFF)
-#if(BUILD_TESTS)
-#    add_subdirectory(test)
-#endif(BUILD_TESTS)
-
+option(BUILD_TESTS "Build test" OFF)
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif(BUILD_TESTS)

@@ -9,7 +9,6 @@ target_link_libraries(
     test_caller
     gtest_main
     caller
-    bwt
     )
 
 add_test(

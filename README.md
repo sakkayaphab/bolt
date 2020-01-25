@@ -1,5 +1,6 @@
 # Bolt
 ![Ubuntu](https://github.com/sakkayaphab/bolt/workflows/Ubuntu/badge.svg?branch=master)
+![MacOS](https://github.com/sakkayaphab/bolt/workflows/MacOS/badge.svg?branch=master)
 ![Docker](https://github.com/sakkayaphab/bolt/workflows/Docker/badge.svg?branch=master)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/sakkayaphab/bolt)](https://github.com/sakkayaphab/bolt/releases)
 [![Conda](https://img.shields.io/conda/v/bioconda/bolt?color=blue&label=Anaconda%20Cloud)](https://anaconda.org/bioconda/bolt)
@@ -12,9 +13,9 @@
 
 Requirements
 1. GCC >=v5.4
-2. Intel tbb-devel >=2019.9
-3. HTSlib >=v1.9
-4. CMake >=v3.9
+2. HTSlib >=v1.9
+3. CMake >=v3.9
+4. Intel TBB >=v2019.9
 
 ```sh
 git clone https://github.com/sakkayaphab/bolt.git
@@ -28,21 +29,22 @@ make install
 
 ### 2. Installing Bolt with conda
 
-
 ```sh
-conda install -c conda-forge tbb
+conda install -c intel tbb
 conda install -c bioconda bolt
 ```
 
 ### 3. Run with docker
 ```
-docker run -v /hostpath/:/opt/mount --name bolt sakkayaphab/bolt:latest /project/build/bolt call -b /opt/mount/sample.bam -r ref.fa -t 100 -o /opt/mount/outputfolder
+docker run -v /hostpath/:/opt/mount --name bolt sakkayaphab/bolt:latest /project/build/bolt call -b /opt/mount/sample.bam -r /opt/mount/ref.fa -t 100 -o /opt/mount/outputfolder
 ```
 
 ## Usage
 ```sh
-bolt call -b (aligment) -r (reference) -o (output)
+bolt call -b (aligment) -r (reference) -t (number of threads) -o (output)
 ```
+
+
 for [user guide][UserGuide]
 
 

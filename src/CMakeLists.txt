@@ -1,16 +1,13 @@
-
 file(GLOB SOURCES "*.cc")
 
 add_executable(bolt ${SOURCES})
 
-include_directories(caller)
-
+include_directories(${PROJECT_SOURCE_DIR}/src)
 add_subdirectory(caller)
 add_subdirectory(fasta)
-add_subdirectory(vcf)
 
 target_link_libraries(bolt
-    caller
+        caller
   )
 
 if (NOT ${INSTALL_BIN_PREFIX} STREQUAL "")

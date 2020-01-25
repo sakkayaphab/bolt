@@ -83,10 +83,11 @@ void RefineDepthBlock::execute()
         }
         else if (variantlist.at(0).getSVType() == "BND")
         {
+            std::cout << " variantlist size : " << variantlist.size() << std::endl;
 
             // result = getResultWithOutOverlapped(&variantlist, &variantlist);
             result = getResultRemoveOverlapped(&variantlist, &variantlist);
-            result = getResultRemoveOverlapped(&result, &result);
+//            result = getResultRemoveOverlapped(&result, &result);
 
             // result = getRefineResultTranslocation(&variantlist);
             // result = variantlist;

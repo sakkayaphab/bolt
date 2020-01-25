@@ -20,13 +20,13 @@ std::string Fasta::getFilePath()
     return filepath;
 }
 
-std::string Fasta::getSeqByOffset(uint64_t start, uint64_t end)
+std::string Fasta::getSeqByOffset(int64_t start, int64_t end)
 {
     std::ifstream file(filepath);
     file.seekg(start);
 
-    uint64_t sumOffset = start;
-    uint64_t currentPosition = file.tellg();
+    int64_t sumOffset = start;
+    int64_t currentPosition = file.tellg();
 
     std::string output;
     std::string line;
@@ -41,7 +41,7 @@ std::string Fasta::getSeqByOffset(uint64_t start, uint64_t end)
         }
         else if (sumOffset > end)
         {
-            uint64_t diff = sumOffset - end;
+            int64_t diff = sumOffset - end;
             output += line.substr(0, line.size() - diff + 1);
             break;
         }

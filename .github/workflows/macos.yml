@@ -1,18 +1,18 @@
-name: Ubuntu
+name: MacOS
 on: [push]
 jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
       - name: Install miniconda
         run: |
           if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-              wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+              wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
           else
-              wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+              wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
           fi
           bash miniconda.sh -b -p $HOME/miniconda
           export PATH="$HOME/miniconda/bin:$PATH"
@@ -20,6 +20,7 @@ jobs:
           conda config --set always_yes yes
           conda update -q conda
           conda install -y -c bioconda htslib
+          conda install -y -c anaconda cmake
           conda install -y -c intel tbb-devel
       - name: Configure
         run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=$HOME/miniconda/include -DLIBRARY_LINK_PREFIX=$HOME/miniconda/lib/ -DBUILD_TESTS=ON
@@ -34,5 +35,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v1
         with:
-          name: bolt_linux_x86_64bit
+          name: bolt_macos_x86_64bit
           path: /usr/local/bin/bolt

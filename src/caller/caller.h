@@ -4,6 +4,37 @@
 #include "samplestat.h"
 #include "filemanager.h"
 #include "evidence.h"
+#include <thread>
+#include "samplestat.h"
+#include <iostream>
+#include <stdio.h>
+#include <iomanip>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <cstdlib>
+#include <iostream>
+#include <unistd.h>
+#include "task.h"
+#include "evidenceprovider.h"
+#include <fstream>
+#include <unistd.h>
+#include <mutex>
+#include <iostream>
+#include <dirent.h>
+#include "variantresultfilter.h"
+#include "readdepthhelper.h"
+#include "readdepthanalysis.h"
+#include "refinedepthblock.h"
+#include "depthblockfile.h"
+#include <fasta/fastareader.h>
+#include "refiningtandemduplication.h"
+#include "refiningtranslocation.h"
+#include "refininginversion.h"
+#include "refininginsertion.h"
+#include "refiningdeletion.h"
+#include <tbb/tbb.h>
+
 class Caller
 {
 
@@ -16,10 +47,12 @@ private:
   int vcfIdNumber = 0;
   samFile *inFile = NULL;
   hts_idx_t *bam_index = NULL;
+  std::mutex mxWriteFile;
 
 public:
   Caller(std::string samplepath_T, std::string referencepath_T, std::string outputpath_T);
   ~Caller();
+
   void execute();
   void execSampleStat();
   void showinfo();
@@ -38,6 +71,8 @@ public:
   void prepareHts();
   void refineDelpthBlock();
   void mergeSplitRead();
+
+
 
 };
 

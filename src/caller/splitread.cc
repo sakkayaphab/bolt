@@ -508,12 +508,12 @@ void SplitRead::findTandemDuplication()
 
 void SplitRead::printResult()
 {
-//    printDeletion();
-//    printSmallDeletion();
-//    printSmallInsertion();
-//    printDuplication();
-//    printInversion();
-//    printInsertion();
+    printDeletion();
+    printSmallDeletion();
+    printSmallInsertion();
+    printDuplication();
+    printInversion();
+    printInsertion();
     printTranslocation();
 }
 
@@ -745,7 +745,7 @@ void SplitRead::printSmallDeletion()
 
 void SplitRead::printTranslocation()
 {
-    auto vecTemp = convertMapToEvidenceListTRA(&mapSmallDEL, "TRA", "STRA");
+    auto vecTemp = convertMapToEvidenceListTRA(&mapTRA, "BND", "SBND");
     // mergeEvidence(&vecTemp);
     filterFrequencyLowerThan(1, &vecTemp);
     for (auto x : vecTemp)
