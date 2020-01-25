@@ -23,7 +23,7 @@ void SplitRead::updateRead()
     findDeletion();
     findInsertion();
     findTandemDuplication();
-    findTranslocation();
+//    findTranslocation();
 }
 
 
