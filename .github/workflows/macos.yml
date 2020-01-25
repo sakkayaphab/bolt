@@ -21,6 +21,7 @@ jobs:
           conda update -q conda
           conda install -y -c bioconda htslib
           conda install -y -c anaconda cmake
+          conda install -y -c intel tbb-devel
       - name: Configure
         run: mkdir build && cd build && cmake .. -DINCLUDE_LIBRARY_PREFIX=$HOME/miniconda/include -DLIBRARY_LINK_PREFIX=$HOME/miniconda/lib/ -DBUILD_TESTS=ON
       - name: Build
