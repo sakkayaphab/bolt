@@ -10,7 +10,7 @@
 #include "specifyevidenceinsertion.h"
 #include "specifyevidenceinversion.h"
 #include "specifyevidencetandemduplication.h"
-#include "specifyingevidencetranslocation.h"
+#include "specifyevidencetranslocation.h"
 #include <unistd.h>
 #include "readdepthhelper.h"
 #include "splitread.h"
