@@ -5,9 +5,9 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 
-class RefiningTandemDuplication : public RefiningSV
+class RefineTandemDuplication : public RefineSV
 {
 private:
   void first();
@@ -19,9 +19,9 @@ private:
   Evidence resultSecond;
 
 public:
-  RefiningTandemDuplication();
+  RefineTandemDuplication();
   void execute();
-  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition);
   Evidence getBestResult(Evidence r1, Evidence r2);
 };
 

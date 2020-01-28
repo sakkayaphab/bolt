@@ -1,9 +1,9 @@
-#ifndef SPECIFYINGEVIDENCEINSERTION_H
-#define SPECIFYINGEVIDENCEINSERTION_H
-#include "specifyingevidence.h"
+#ifndef SPECIFYINGEVIDENCEINVERSION_H
+#define SPECIFYINGEVIDENCEINVERSION_H
+#include "specifyevidence.h"
 #include "evidence.h"
 
-class SpecifyingEvidenceInsertion : public SpecifyingEvidence
+class SpecifyEvidenceInversion : public SpecifyEvidence
 {
 private:
   void checkRange();
@@ -14,13 +14,13 @@ private:
   void checkProveEvidence();
   bool filterEvidence(Evidence *evidence);
   void calculateVCF(Evidence *evidence);
+  bool incrementSVFreq(int32_t overlappedpos,int32_t overlappedsvlength, int32_t pos, int32_t mpos);
 protected:
-
 public:
-  SpecifyingEvidenceInsertion();
+  SpecifyEvidenceInversion();
   void updateRead();
   void done();
-  bool incrementSVFreq(int32_t overlappedpos, int32_t pos, int32_t mpos);
+  
 };
 
 #endif

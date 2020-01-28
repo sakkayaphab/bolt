@@ -1,13 +1,13 @@
-#include "refiningtandemduplication.h"
+#include "refinetandemduplication.h"
 #include "smithwaterman.h"
 #include "readdepthanalysis.h"
 
-RefiningTandemDuplication::RefiningTandemDuplication()
+RefineTandemDuplication::RefineTandemDuplication()
 {
     variantresult.setVariantType("DUP");
 }
 
-void RefiningTandemDuplication::execute()
+void RefineTandemDuplication::execute()
 {
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -21,7 +21,7 @@ void RefiningTandemDuplication::execute()
     variantresult = getBestResult(resultFirst, resultSecond);
 }
 
-Evidence RefiningTandemDuplication::getBestResult(Evidence r1, Evidence r2)
+Evidence RefineTandemDuplication::getBestResult(Evidence r1, Evidence r2)
 {
 
     if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
@@ -38,7 +38,7 @@ Evidence RefiningTandemDuplication::getBestResult(Evidence r1, Evidence r2)
     return r2;
 }
 
-void RefiningTandemDuplication::first()
+void RefineTandemDuplication::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(), evidence.getPos() + evidence.getCiPosRight());
 
@@ -48,7 +48,7 @@ void RefiningTandemDuplication::first()
     refineStartToEnd(range);
 }
 
-void RefiningTandemDuplication::refineStartToEnd(const char *range)
+void RefineTandemDuplication::refineStartToEnd(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -184,14 +184,14 @@ void RefiningTandemDuplication::refineStartToEnd(const char *range)
         }
     }
 
-    resultFirst = RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultFirst = RefineTandemDuplication::calculateFinalBreakpoint(&listPosition);
     resultFirst.setEvidenceFrom(resultFirst.getPos());
 
     hts_itr_destroy(iter);
     return;
 }
 
-void RefiningTandemDuplication::second()
+void RefineTandemDuplication::second()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getEnd() + evidence.getCiEndLeft(), evidence.getEnd() + evidence.getCiEndRight() + 1000);
 
@@ -201,7 +201,7 @@ void RefiningTandemDuplication::second()
     refineEndToStart(range);
 }
 
-void RefiningTandemDuplication::refineEndToStart(const char *range)
+void RefineTandemDuplication::refineEndToStart(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -352,14 +352,14 @@ void RefiningTandemDuplication::refineEndToStart(const char *range)
         }
     }
 
-    resultSecond = RefiningTandemDuplication::calculateFinalBreakpoint(&listPosition);
+    resultSecond = RefineTandemDuplication::calculateFinalBreakpoint(&listPosition);
     resultSecond.setEvidenceFrom(resultSecond.getEnd());
     // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
 
-Evidence RefiningTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+Evidence RefineTandemDuplication::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition)
 {
     int32_t bPos = 0;
     int32_t bEnd = 0;

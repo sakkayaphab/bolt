@@ -1,12 +1,12 @@
-#include "refininginversion.h"
+#include "refineinversion.h"
 #include "smithwaterman.h"
 
-RefiningInversion::RefiningInversion()
+RefineInversion::RefineInversion()
 {
     variantresult.setVariantType("INV");
 }
 
-void RefiningInversion::execute()
+void RefineInversion::execute()
 {
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -46,7 +46,7 @@ void RefiningInversion::execute()
     // }
 }
 
-Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
+Evidence RefineInversion::getBestResult(Evidence r1, Evidence r2)
 {
 
     if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
@@ -63,7 +63,7 @@ Evidence RefiningInversion::getBestResult(Evidence r1, Evidence r2)
     return r2;
 }
 
-void RefiningInversion::first()
+void RefineInversion::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(), evidence.getPos() + evidence.getCiPosRight());
 
@@ -73,7 +73,7 @@ void RefiningInversion::first()
     refineStartToEnd(range);
 }
 
-void RefiningInversion::second()
+void RefineInversion::second()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getEnd() + evidence.getCiEndLeft(), evidence.getEnd() + evidence.getCiEndRight());
 
@@ -83,7 +83,7 @@ void RefiningInversion::second()
     refineEndToStart(range);
 }
 
-void RefiningInversion::refineStartToEnd(const char *range)
+void RefineInversion::refineStartToEnd(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -264,13 +264,13 @@ void RefiningInversion::refineStartToEnd(const char *range)
         }
     }
 
-    resultFirst = RefiningInversion::calculateFinalBreakpoint(&listPosition);
+    resultFirst = RefineInversion::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
 }
 
-void RefiningInversion::refineEndToStart(const char *range)
+void RefineInversion::refineEndToStart(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -432,13 +432,13 @@ void RefiningInversion::refineEndToStart(const char *range)
         }
     }
 
-    resultSecond = RefiningInversion::calculateFinalBreakpoint(&listPosition);
+    resultSecond = RefineInversion::calculateFinalBreakpoint(&listPosition);
     // std::cout << variantresult.getPos() << std::endl;
     hts_itr_destroy(iter);
     return;
 }
 
-Evidence RefiningInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+Evidence RefineInversion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition)
 {
     int32_t bPos = 0;
     int32_t bEnd = 0;

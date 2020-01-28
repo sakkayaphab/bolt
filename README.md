@@ -51,8 +51,8 @@ for [user guide][UserGuide]
 [UserGuide]:docs/README.md
 
 ## License
-Bolt is distributed under the [MIT License][MITLicense]. However, Bolt includes several third-party open-source libraries, please see [Third Party Software Notices][LICENSETHIRDPARTY] for details.
+Bolt is distributed under the [GPLv3][GPLv3]. However, Bolt includes several third-party open-source libraries, please see [Third Party Software Notices][LICENSETHIRDPARTY] for details.
 
 
-[MITLicense]:LICENSE
+[GPLv3]:LICENSE
 [LICENSETHIRDPARTY]:THIRD-PARTY-LICENSE

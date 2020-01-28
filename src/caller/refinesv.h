@@ -6,7 +6,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 #include <fasta/fastareader.h>
 #include "readparser.h"
 #include "evidence.h"
@@ -15,7 +15,7 @@
 #include "stringsearchalignment.h"
 #include "stringsearchconfig.h"
 
-class RefiningSV
+class RefineSV
 {
 private:
 protected:
@@ -55,8 +55,8 @@ public:
   };
 
 public:
-  RefiningSV();
-  ~RefiningSV();
+  RefineSV();
+  ~RefineSV();
   Evidence variantresult;
 
   int getMaxIntFromVector(std::vector<int> value);
@@ -88,7 +88,7 @@ public:
   Evidence getVariantResult();
   int getReadDepthAtPosition(const char *range, int32_t pos);
 
-  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition);
 
   bool haveIndel(std::vector<ReadParser::Cigar> cigar);
   int32_t getDivider(int value, int top, int down, int minimum);

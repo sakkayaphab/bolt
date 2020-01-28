@@ -1,11 +1,11 @@
-#include "specifyingevidencedeletion.h"
+#include "specifyevidencedeletion.h"
 
-SpecifyingEvidenceDeletion::SpecifyingEvidenceDeletion()
+SpecifyEvidenceDeletion::SpecifyEvidenceDeletion()
 {
     svtype = "DEL";
 }
 
-void SpecifyingEvidenceDeletion::updateRead()
+void SpecifyEvidenceDeletion::updateRead()
 {
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
@@ -75,12 +75,12 @@ void SpecifyingEvidenceDeletion::updateRead()
     }
 }
 
-int32_t SpecifyingEvidenceDeletion::getSVLength()
+int32_t SpecifyEvidenceDeletion::getSVLength()
 {
     return currentMPos - currentPos - (samplestat->getAverageSampleStat() + samplestat->getSDSampleStat());
 }
 
-void SpecifyingEvidenceDeletion::checkRange()
+void SpecifyEvidenceDeletion::checkRange()
 {
     bool added = false;
 
@@ -111,7 +111,7 @@ void SpecifyingEvidenceDeletion::checkRange()
     }
 }
 
-bool SpecifyingEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+bool SpecifyEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added = false;
     for (int i = 0; i < preCollectSV.size(); i++)
@@ -146,7 +146,7 @@ bool SpecifyingEvidenceDeletion::incrementSVFreq(int32_t overlappedpos, int32_t 
     return added;
 }
 
-void SpecifyingEvidenceDeletion::proveEvidence(int index)
+void SpecifyEvidenceDeletion::proveEvidence(int index)
 {
     int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat() * 2) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
@@ -171,7 +171,7 @@ void SpecifyingEvidenceDeletion::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceDeletion::removeDuplicateFinalEvidence()
+void SpecifyEvidenceDeletion::removeDuplicateFinalEvidence()
 {
     int number = 0;
     std::vector<Evidence> tempEvidence;
@@ -207,7 +207,7 @@ void SpecifyingEvidenceDeletion::removeDuplicateFinalEvidence()
     finalEvidence = tempEvidence;
 }
 
-void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
+void SpecifyEvidenceDeletion::calculateVCF(Evidence *evidence)
 {
 
     int32_t firstPos = 0;
@@ -254,7 +254,7 @@ void SpecifyingEvidenceDeletion::calculateVCF(Evidence *evidence)
     evidence->setCiEndLeft(-(difflengthEnd));
 }
 
-bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
+bool SpecifyEvidenceDeletion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
@@ -276,7 +276,7 @@ bool SpecifyingEvidenceDeletion::filterEvidence(Evidence *evidence)
     return true;
 }
 
-void SpecifyingEvidenceDeletion::checkProveEvidence()
+void SpecifyEvidenceDeletion::checkProveEvidence()
 {
 
     for (int i = 0; i < preCollectSV.size(); i++)
@@ -285,7 +285,7 @@ void SpecifyingEvidenceDeletion::checkProveEvidence()
     }
 }
 
-void SpecifyingEvidenceDeletion::done()
+void SpecifyEvidenceDeletion::done()
 {
     checkProveEvidence();
     writeFinalEvidenceAndClear();

@@ -1,20 +1,20 @@
-#include "refiningdeletion.h"
+#include "refinedeletion.h"
 #include <fasta/fastareader.h>
 #include <string.h>
 #include "smithwaterman.h"
 #include "alignment.h"
 #include "readdepthanalysis.h"
 
-RefiningDeletion::RefiningDeletion()
+RefineDeletion::RefineDeletion()
 {
     variantresult.setVariantType("DEL");
 }
 
-RefiningDeletion::~RefiningDeletion()
+RefineDeletion::~RefineDeletion()
 {
 }
 
-void RefiningDeletion::execute()
+void RefineDeletion::execute()
 {
     // std::cout << evidence.getResultVcfFormatString() << std::endl;
 
@@ -39,7 +39,7 @@ void RefiningDeletion::execute()
     // std::cout << variantresult.getResultVcfFormatString() << std::endl;
 }
 
-Evidence RefiningDeletion::getBestResult(Evidence r1, Evidence r2)
+Evidence RefineDeletion::getBestResult(Evidence r1, Evidence r2)
 {
 
     if (r1.isQuailtyPass() == false && r2.isQuailtyPass() == false)
@@ -56,7 +56,7 @@ Evidence RefiningDeletion::getBestResult(Evidence r1, Evidence r2)
     return r2;
 }
 
-void RefiningDeletion::approximate()
+void RefineDeletion::approximate()
 {
     variantresult.setPos(evidence.getLastPosDiscordantRead());
     variantresult.setEnd(evidence.getEndDiscordantRead());
@@ -69,7 +69,7 @@ void RefiningDeletion::approximate()
     }
 }
 
-void RefiningDeletion::first()
+void RefineDeletion::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(), evidence.getPos() + evidence.getCiPosRight());
 
@@ -79,7 +79,7 @@ void RefiningDeletion::first()
     refineStartToEnd(range);
 }
 
-void RefiningDeletion::second()
+void RefineDeletion::second()
 {
     std::string findRange = convertRangeToString(evidence.getEndChr(), evidence.getEnd() + evidence.getCiEndLeft(),
                                                  evidence.getEnd() + evidence.getCiEndRight());
@@ -89,7 +89,7 @@ void RefiningDeletion::second()
     refineEndToStart(range);
 }
 
-void RefiningDeletion::refineStartToEnd(const char *range)
+void RefineDeletion::refineStartToEnd(const char *range)
 {
     hts_itr_t *iter = NULL;
     // std::cout << "refineStartToEnd range :" << range << std::endl;
@@ -330,14 +330,14 @@ void RefiningDeletion::refineStartToEnd(const char *range)
         }
     }
 
-    resultFirst = RefiningDeletion::calculateFinalBreakpoint(&listPosition);
+    resultFirst = RefineDeletion::calculateFinalBreakpoint(&listPosition);
     resultFirst.setEvidenceFrom(resultFirst.getPos());
 
     hts_itr_destroy(iter);
     return;
 }
 
-void RefiningDeletion::refineEndToStart(const char *range)
+void RefineDeletion::refineEndToStart(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -554,13 +554,13 @@ void RefiningDeletion::refineEndToStart(const char *range)
         }
     }
 
-    resultSecond = RefiningDeletion::calculateFinalBreakpoint(&listPosition);
+    resultSecond = RefineDeletion::calculateFinalBreakpoint(&listPosition);
     resultSecond.setEvidenceFrom(resultSecond.getEnd());
     hts_itr_destroy(iter);
     return;
 }
 
-Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+Evidence RefineDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition)
 {
 
     int32_t bPos = 0;
@@ -701,7 +701,7 @@ Evidence RefiningDeletion::calculateFinalBreakpoint(std::map<std::pair<int32_t, 
     return result;
 }
 
-int RefiningDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist, uint8_t start, uint8_t end)
+int RefineDeletion::getNumberMapQ(std::vector<uint8_t> mapqlist, uint8_t start, uint8_t end)
 {
     int count = 0;
     for (auto n : mapqlist)

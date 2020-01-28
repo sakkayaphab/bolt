@@ -5,11 +5,11 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 #include "insertionpositiondetail.h"
 #include "editdistance.h"
 
-class RefiningInsertion : public RefiningSV
+class RefineInsertion : public RefineSV
 {
 private:
   void first();
@@ -65,7 +65,7 @@ private:
   void refinewithReference();
 uint8_t getMaxVector();
 public:
-  RefiningInsertion();
+  RefineInsertion();
   void execute();
   
 };

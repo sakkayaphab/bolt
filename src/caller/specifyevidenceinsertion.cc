@@ -1,11 +1,11 @@
-#include "specifyingevidenceinsertion.h"
+#include "specifyevidenceinsertion.h"
 
-SpecifyingEvidenceInsertion::SpecifyingEvidenceInsertion()
+SpecifyEvidenceInsertion::SpecifyEvidenceInsertion()
 {
     svtype = "INS";
 }
 
-void SpecifyingEvidenceInsertion::updateRead()
+void SpecifyEvidenceInsertion::updateRead()
 {
 
     if (readparser.isUnmapped())
@@ -71,7 +71,7 @@ void SpecifyingEvidenceInsertion::updateRead()
     }
 }
 
-bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t pos, int32_t mpos)
+bool SpecifyEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t pos, int32_t mpos)
 {
     bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
@@ -153,7 +153,7 @@ bool SpecifyingEvidenceInsertion::incrementSVFreq(int32_t overlappedpos, int32_t
     return added;
 }
 
-void SpecifyingEvidenceInsertion::checkRange()
+void SpecifyEvidenceInsertion::checkRange()
 {
     bool added = false;
     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat() * 3);
@@ -198,7 +198,7 @@ void SpecifyingEvidenceInsertion::checkRange()
     }
 }
 
-void SpecifyingEvidenceInsertion::proveEvidence(int index)
+void SpecifyEvidenceInsertion::proveEvidence(int index)
 {
     int32_t plus = samplestat->getAverageSampleStat() + (3*samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
@@ -218,7 +218,7 @@ void SpecifyingEvidenceInsertion::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
+void SpecifyEvidenceInsertion::calculateVCF(Evidence *evidence)
 {
 
     int32_t pos = evidence->getPosDiscordantRead();
@@ -265,7 +265,7 @@ void SpecifyingEvidenceInsertion::calculateVCF(Evidence *evidence)
     // }
 }
 
-bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
+bool SpecifyEvidenceInsertion::filterEvidence(Evidence *evidence)
 {
 
     if (evidence->getFrequency() <= 2)
@@ -299,7 +299,7 @@ bool SpecifyingEvidenceInsertion::filterEvidence(Evidence *evidence)
     return true;
 }
 
-void SpecifyingEvidenceInsertion::checkProveEvidence()
+void SpecifyEvidenceInsertion::checkProveEvidence()
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -307,7 +307,7 @@ void SpecifyingEvidenceInsertion::checkProveEvidence()
     }
 }
 
-void SpecifyingEvidenceInsertion::done()
+void SpecifyEvidenceInsertion::done()
 {
     std::vector<Evidence> temp;
     for (auto n : finalEvidence)

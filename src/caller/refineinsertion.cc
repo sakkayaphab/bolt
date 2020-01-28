@@ -1,13 +1,13 @@
-#include "refininginsertion.h"
+#include "refineinsertion.h"
 #include <stdlib.h>
 #include "smithwaterman.h"
 
-RefiningInsertion::RefiningInsertion()
+RefineInsertion::RefineInsertion()
 {
     variantresult.setVariantType("INS");
 }
 
-void RefiningInsertion::execute()
+void RefineInsertion::execute()
 {
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -30,7 +30,7 @@ void RefiningInsertion::execute()
     first();
 }
 
-void RefiningInsertion::first()
+void RefineInsertion::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(),
                                                  evidence.getPos() + evidence.getCiPosRight());
@@ -45,25 +45,25 @@ void RefiningInsertion::first()
     const char *range = findRange.c_str();
     refineStartToEnd(range);
 
-    RefiningInsertion::convertMapSC();
-    RefiningInsertion::clearMapSC();
-    RefiningInsertion::findBreakpoint();
-    RefiningInsertion::filterBreakpoint();
+    RefineInsertion::convertMapSC();
+    RefineInsertion::clearMapSC();
+    RefineInsertion::findBreakpoint();
+    RefineInsertion::filterBreakpoint();
 
     if (variantresult.isQuailtyPass() == false && evidence.getMark() != "MATEUNMAPPED")
     {
         evidence.setMark("UNMERGE");
-        RefiningInsertion::findBreakpoint();
-        RefiningInsertion::filterBreakpoint();
+        RefineInsertion::findBreakpoint();
+        RefineInsertion::filterBreakpoint();
     }
     // RefiningInsertion::refinewithReference();
 }
 
-void RefiningInsertion::refinewithReference()
+void RefineInsertion::refinewithReference()
 {
 }
 
-void RefiningInsertion::refineStartToEnd(const char *range)
+void RefineInsertion::refineStartToEnd(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -150,7 +150,7 @@ void RefiningInsertion::refineStartToEnd(const char *range)
     return;
 }
 
-void RefiningInsertion::filterBreakpoint()
+void RefineInsertion::filterBreakpoint()
 {
     // std::cout << "# filterBreakpoint : " << vectorBP.size() << std::endl;
     std::sort(vectorBP.begin(), vectorBP.end());
@@ -263,7 +263,7 @@ void RefiningInsertion::filterBreakpoint()
     }
 }
 
-void RefiningInsertion::findBreakpoint()
+void RefineInsertion::findBreakpoint()
 {
 
     for (InsertionPositionDetail n : vectorSCStart)
@@ -344,7 +344,7 @@ void RefiningInsertion::findBreakpoint()
     }
 }
 
-bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t minusoverlapped, int32_t plusoverlapped)
+bool RefineInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t minusoverlapped, int32_t plusoverlapped)
 {
     if (targetPos + minusoverlapped > pos)
     {
@@ -359,7 +359,7 @@ bool RefiningInsertion::checkBetween(int32_t pos, int32_t targetPos, int32_t min
     return true;
 }
 
-void RefiningInsertion::convertMapSC()
+void RefineInsertion::convertMapSC()
 {
     vectorSCStart = convertMapSCToVector(mapSCStart);
     std::sort(vectorSCStart.begin(), vectorSCStart.end());
@@ -370,7 +370,7 @@ void RefiningInsertion::convertMapSC()
     std::sort(vectorSCEnd.begin(), vectorSCEnd.end());
 }
 
-std::vector<InsertionPositionDetail> RefiningInsertion::convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> mapSC)
+std::vector<InsertionPositionDetail> RefineInsertion::convertMapSCToVector(std::map<int32_t, InsertionPositionDetail> mapSC)
 {
 
     std::vector<InsertionPositionDetail> vectorSC;
@@ -388,13 +388,13 @@ std::vector<InsertionPositionDetail> RefiningInsertion::convertMapSCToVector(std
     return vectorSC;
 }
 
-void RefiningInsertion::clearMapSC()
+void RefineInsertion::clearMapSC()
 {
     mapSCStart.clear();
     mapSCEnd.clear();
 }
 
-std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(InsertionPositionDetail fragmentlist, bool fromstart)
+std::vector<RefineInsertion::CountRefineSeq> RefineInsertion::mergeString(InsertionPositionDetail fragmentlist, bool fromstart)
 {
     // compareEditDistance("ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCA", "ACCCCCACAGCTGTTACCCAGCGCCACACACAGAGCAGACGCTGAATCACTGCTTATTGACTGAATCAGCAATGGGGTACCT", false);
 
@@ -442,7 +442,7 @@ std::vector<RefiningInsertion::CountRefineSeq> RefiningInsertion::mergeString(In
     return tempSeq;
 }
 
-bool RefiningInsertion::compareEditDistance(std::string s1, std::string s2, bool fromstart)
+bool RefineInsertion::compareEditDistance(std::string s1, std::string s2, bool fromstart)
 {
     std::string temps1 = s1;
     std::string temps2 = s2;
@@ -459,7 +459,7 @@ bool RefiningInsertion::compareEditDistance(std::string s1, std::string s2, bool
     return false;
 }
 
-void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool fromstart)
+void RefineInsertion::substringSeq(std::string *s1, std::string *s2, bool fromstart)
 {
     std::string temps1;
     std::string temps2;
@@ -495,7 +495,7 @@ void RefiningInsertion::substringSeq(std::string *s1, std::string *s2, bool from
     *s2 = temps2;
 }
 
-bool RefiningInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, int *longmatch, std::vector<uint8_t> *mapq, std::string *seq1, std::string *seq2)
+bool RefineInsertion::getOverlappedSeq(std::vector<CountRefineSeq> startSeq, std::vector<CountRefineSeq> endSeq, int *frequency, int *longmatch, std::vector<uint8_t> *mapq, std::string *seq1, std::string *seq2)
 {
     // std::cout << "START SEQ" << std::endl;
     // for (CountRefineSeq n : startSeq)

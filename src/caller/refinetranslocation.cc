@@ -1,12 +1,12 @@
-#include "refiningtranslocation.h"
+#include "refinetranslocation.h"
 #include "smithwaterman.h"
 
-RefiningTranslocation::RefiningTranslocation()
+RefineTranslocation::RefineTranslocation()
 {
     variantresult.setVariantType("BND");
 }
 
-void RefiningTranslocation::execute()
+void RefineTranslocation::execute()
 {
     variantresult.setChr(evidence.getChr());
     variantresult.setEndChr(evidence.getEndChr());
@@ -24,7 +24,7 @@ void RefiningTranslocation::execute()
     // std::cout << "---+ run complete +--- : " << std::endl;
 }
 
-void RefiningTranslocation::first()
+void RefineTranslocation::first()
 {
     std::string findRange = convertRangeToString(evidence.getChr(), evidence.getPos() + evidence.getCiPosLeft(), evidence.getPos() + evidence.getCiPosRight());
 
@@ -34,7 +34,7 @@ void RefiningTranslocation::first()
     refineStartToEnd(range);
 }
 
-void RefiningTranslocation::refineStartToEnd(const char *range)
+void RefineTranslocation::refineStartToEnd(const char *range)
 {
     hts_itr_t *iter = NULL;
 
@@ -184,14 +184,14 @@ void RefiningTranslocation::refineStartToEnd(const char *range)
         }
     }
 
-    RefiningTranslocation::calculateFinalBreakpoint(&listPosition);
+    RefineTranslocation::calculateFinalBreakpoint(&listPosition);
 
     hts_itr_destroy(iter);
     return;
 }
 
 
-void RefiningTranslocation::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+void RefineTranslocation::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition)
 {
 
     int32_t bPos = 0;

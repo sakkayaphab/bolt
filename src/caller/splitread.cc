@@ -519,7 +519,7 @@ void SplitRead::printResult()
     printTranslocation();
 }
 
-std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark)
+std::vector<Evidence> SplitRead::convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *mapSV, std::string svtype, std::string mark)
 {
     std::vector<Evidence> vecTemp;
     for (auto const &x : *mapSV)
@@ -756,7 +756,7 @@ void SplitRead::printTranslocation()
     }
 }
 
-std::vector<Evidence> SplitRead::convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark)
+std::vector<Evidence> SplitRead::convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *mapSV, std::string svtype, std::string mark)
 {
     std::vector<Evidence> vecTemp;
     for (auto const &x : *mapSV)

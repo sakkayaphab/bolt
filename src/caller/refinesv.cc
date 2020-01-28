@@ -1,12 +1,12 @@
-#include "refiningsv.h"
+#include "refinesv.h"
 
-RefiningSV::RefiningSV()
+RefineSV::RefineSV()
 {
 }
 
 
 
-RefiningSV::~RefiningSV()
+RefineSV::~RefineSV()
 {
 
     if (bam_header != NULL)
@@ -30,7 +30,7 @@ RefiningSV::~RefiningSV()
     // }
 }
 
-int32_t RefiningSV::getDivider(int value, int top, int down, int minimum)
+int32_t RefineSV::getDivider(int value, int top, int down, int minimum)
 {
     auto returnvalue = (int32_t)(float(value) * (float(top) / float(down)));
 
@@ -42,12 +42,12 @@ int32_t RefiningSV::getDivider(int value, int top, int down, int minimum)
     return minimum;
 }
 
-void RefiningSV::setSampleStat(SampleStat *samplestat_T)
+void RefineSV::setSampleStat(SampleStat *samplestat_T)
 {
     samplestat = samplestat_T;
 }
 
-int RefiningSV::getReadDepthAtPosition(const char *range, int32_t pos)
+int RefineSV::getReadDepthAtPosition(const char *range, int32_t pos)
 {
     hts_itr_t *iter = NULL;
 
@@ -81,7 +81,7 @@ int RefiningSV::getReadDepthAtPosition(const char *range, int32_t pos)
     return count;
 }
 
-int RefiningSV::getMaxIntFromVector(std::vector<int> value)
+int RefineSV::getMaxIntFromVector(std::vector<int> value)
 {
     int max = 0;
     for (auto n : value)
@@ -95,7 +95,7 @@ int RefiningSV::getMaxIntFromVector(std::vector<int> value)
     return max;
 }
 
-uint8_t RefiningSV::getMaxUInt8FromVector(std::vector<uint8_t> value)
+uint8_t RefineSV::getMaxUInt8FromVector(std::vector<uint8_t> value)
 {
     uint8_t max = 0;
     for (auto n : value)
@@ -109,51 +109,51 @@ uint8_t RefiningSV::getMaxUInt8FromVector(std::vector<uint8_t> value)
     return max;
 }
 
-void RefiningSV::setFastaReader(FastaReader fasta)
+void RefineSV::setFastaReader(FastaReader fasta)
 {
     fastareader = fasta;
 }
 
-void RefiningSV::setBamHeader(bam_hdr_t *t_bam_header)
+void RefineSV::setBamHeader(bam_hdr_t *t_bam_header)
 {
     bam_header = t_bam_header;
     readparser.setBamHeader(bam_header);
 }
 
-void RefiningSV::setRead(bam1_t *alnT)
+void RefineSV::setRead(bam1_t *alnT)
 {
     read = alnT;
     readparser.setBamRead(alnT);
 }
 
-void RefiningSV::setEvidence(Evidence evidence_m)
+void RefineSV::setEvidence(Evidence evidence_m)
 {
     evidence = evidence_m;
 }
 
-void RefiningSV::setFilePath(FileManager *filepath_T)
+void RefineSV::setFilePath(FileManager *filepath_T)
 {
     filepath = filepath_T;
 }
 
-std::string RefiningSV::convertRangeToString(std::string chr, uint32_t m_pos, uint32_t m_end)
+std::string RefineSV::convertRangeToString(std::string chr, uint32_t m_pos, uint32_t m_end)
 {
     std::string pos = std::to_string(m_pos);
     std::string end = std::to_string(m_end);
     return chr + ":" + pos + "-" + end;
 }
 
-void RefiningSV::setHtsIndex(hts_idx_t *index)
+void RefineSV::setHtsIndex(hts_idx_t *index)
 {
     bam_index = index;
 }
 
-void RefiningSV::replaceSeqToUppercase(std::string *str)
+void RefineSV::replaceSeqToUppercase(std::string *str)
 {
     std::transform((*str).begin(), (*str).end(), (*str).begin(), ::toupper);
 }
 
-void RefiningSV::prepareBamReader()
+void RefineSV::prepareBamReader()
 {
     inFile = sam_open(filepath->getSamplePath().c_str(), "r");
     if (inFile == NULL)
@@ -165,7 +165,7 @@ void RefiningSV::prepareBamReader()
     //     return;
 }
 
-bool RefiningSV::confirmAreaBySCAtStart(std::string chr, uint32_t pos, uint32_t end)
+bool RefineSV::confirmAreaBySCAtStart(std::string chr, uint32_t pos, uint32_t end)
 {
     std::string findRange = convertRangeToString(chr, pos - samplestat->getReadLength(), end + samplestat->getReadLength());
     const char *range = findRange.c_str();
@@ -220,7 +220,7 @@ bool RefiningSV::confirmAreaBySCAtStart(std::string chr, uint32_t pos, uint32_t 
     return false;
 }
 
-bool RefiningSV::confirmAreaBySCAtEnd(std::string chr, uint32_t pos, uint32_t end)
+bool RefineSV::confirmAreaBySCAtEnd(std::string chr, uint32_t pos, uint32_t end)
 {
     std::string findRange = convertRangeToString(chr, pos - samplestat->getReadLength(), end + samplestat->getReadLength());
     const char *range = findRange.c_str();
@@ -277,18 +277,18 @@ bool RefiningSV::confirmAreaBySCAtEnd(std::string chr, uint32_t pos, uint32_t en
     return false;
 }
 
-Evidence RefiningSV::getVariantResult()
+Evidence RefineSV::getVariantResult()
 {
     return variantresult;
 }
 
-std::string RefiningSV::getResultVCFFormat()
+std::string RefineSV::getResultVCFFormat()
 {
     return variantresult.getResultVcfFormatString();
 }
 
 // if compare 449280 = 449281 @ NGB
-bool RefiningSV::isMatchRef(std::string chr, int32_t pos, int32_t end, std::string secondchr, int32_t secondpos, int32_t secondend)
+bool RefineSV::isMatchRef(std::string chr, int32_t pos, int32_t end, std::string secondchr, int32_t secondpos, int32_t secondend)
 {
     std::string referenceSeq = fastareader.getSeqbyPosition(chr, pos, end);
     // std::cout << "referenceSeq :" << referenceSeq << std::endl;
@@ -306,7 +306,7 @@ bool RefiningSV::isMatchRef(std::string chr, int32_t pos, int32_t end, std::stri
     return false;
 }
 
-bool RefiningSV::haveIndel(std::vector<ReadParser::Cigar> cigar)
+bool RefineSV::haveIndel(std::vector<ReadParser::Cigar> cigar)
 {
     for (auto n : cigar)
     {
@@ -324,7 +324,7 @@ bool RefiningSV::haveIndel(std::vector<ReadParser::Cigar> cigar)
     return false;
 }
 
-void RefiningSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition)
+void RefineSV::calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition)
 {
 
     int32_t bPos = 0;

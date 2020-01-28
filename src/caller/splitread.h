@@ -3,7 +3,7 @@
 #include <string>
 #include "readparser.h"
 #include "samplestat.h"
-#include "refiningsv.h"
+#include "refinesv.h"
 #include "evidence.h"
 #include "filemanager.h"
 
@@ -16,13 +16,13 @@ private:
   std::vector<ReadParser::SATag> satag;
   FileManager *filepath;
 
-  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDUP;
-  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapDEL;
-   std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallDEL;
-  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINV;
-  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapSmallINS;
-  std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapINS;
-    std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> mapTRA;
+  std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapDUP;
+  std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapDEL;
+   std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapSmallDEL;
+  std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapINV;
+  std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapSmallINS;
+  std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapINS;
+    std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> mapTRA;
 
   std::vector<Evidence> vecINV;
 
@@ -47,7 +47,7 @@ public:
   void printDuplication();
   void printInversion();
   void printInsertion();
-  std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype,std::string mark);
+  std::vector<Evidence> convertMapToEvidenceList(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *mapSV, std::string svtype, std::string mark);
   void mergeEvidence(std::vector<Evidence> *elist);
   void setAllCIEvidence(std::vector<Evidence> *elist,int32_t rangePos);
   void filterEvidenceList(std::vector<Evidence> *elist);
@@ -59,7 +59,7 @@ public:
     int getDivider(int value, int top, int down, int minimum);
     void findTranslocation();
     void printTranslocation();
-    std::vector<Evidence> convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *mapSV, std::string svtype, std::string mark);
+    std::vector<Evidence> convertMapToEvidenceListTRA(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *mapSV, std::string svtype, std::string mark);
 
   
 };

@@ -1,9 +1,9 @@
 #ifndef SPECIFYINGEVIDENCETRANSLOCATION_H
 #define SPECIFYINGEVIDENCETRANSLOCATION_H
-#include "specifyingevidence.h"
+#include "specifyevidence.h"
 #include "evidence.h"
 
-class SpecifyingEvidenceTranslocation : public SpecifyingEvidence
+class SpecifyEvidenceTranslocation : public SpecifyEvidence
 {
 private:
   void checkRange();
@@ -19,7 +19,7 @@ private:
   
 protected:
 public:
-  SpecifyingEvidenceTranslocation();
+  SpecifyEvidenceTranslocation();
   void updateRead();
   void done();
 };

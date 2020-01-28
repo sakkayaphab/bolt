@@ -4,7 +4,7 @@
 #include "evidence.h"
 #include "readdepthhelper.h"
 
-class SpecifyingEvidence
+class SpecifyEvidence
 {
 protected:
     int maxRemainBufferWriteEvidenceFile = 10;
@@ -28,7 +28,7 @@ protected:
   std::vector<Evidence> finalEvidence;
   
 public:
-  SpecifyingEvidence();
+  SpecifyEvidence();
   bool checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped);
   int findOverlapped(int32_t overlapped, int32_t pos, int32_t mpos);
   int findOverlappedOnlyPos(uint32_t overlapped, uint32_t pos);

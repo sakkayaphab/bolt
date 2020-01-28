@@ -28,11 +28,11 @@
 #include "refinedepthblock.h"
 #include "depthblockfile.h"
 #include <fasta/fastareader.h>
-#include "refiningtandemduplication.h"
-#include "refiningtranslocation.h"
-#include "refininginversion.h"
-#include "refininginsertion.h"
-#include "refiningdeletion.h"
+#include "refinetandemduplication.h"
+#include "refinetranslocation.h"
+#include "refineinversion.h"
+#include "refineinsertion.h"
+#include "refinedeletion.h"
 #include <tbb/tbb.h>
 
 class Caller

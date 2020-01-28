@@ -6,10 +6,10 @@
 #include <vector>
 #include <iterator>
 #include <algorithm>
-#include "specifyingevidencedeletion.h"
-#include "specifyingevidenceinsertion.h"
-#include "specifyingevidenceinversion.h"
-#include "specifyingevidencetandemduplication.h"
+#include "specifyevidencedeletion.h"
+#include "specifyevidenceinsertion.h"
+#include "specifyevidenceinversion.h"
+#include "specifyevidencetandemduplication.h"
 #include "specifyingevidencetranslocation.h"
 #include <unistd.h>
 #include "readdepthhelper.h"
@@ -59,27 +59,27 @@ void EvidenceFinder::findEvidence()
 
     int svtype;
 
-    SpecifyingEvidenceDeletion seDeletion;
+    SpecifyEvidenceDeletion seDeletion;
     seDeletion.setSampleStat(samplestat);
     seDeletion.setRead(read, bam_header);
     seDeletion.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".DEL.txt");
 
-    SpecifyingEvidenceInsertion seInsertion;
+    SpecifyEvidenceInsertion seInsertion;
     seInsertion.setSampleStat(samplestat);
     seInsertion.setRead(read, bam_header);
     seInsertion.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".INS.txt");
 
-    SpecifyingEvidenceInversion seInversion;
+    SpecifyEvidenceInversion seInversion;
     seInversion.setSampleStat(samplestat);
     seInversion.setRead(read, bam_header);
     seInversion.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".INV.txt");
 
-    SpecifyingEvidenceTandemDuplication seTandemDuplication;
+    SpecifyEvidenceTandemDuplication seTandemDuplication;
     seTandemDuplication.setSampleStat(samplestat);
     seTandemDuplication.setRead(read, bam_header);
     seTandemDuplication.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".DUP.txt");
 
-    SpecifyingEvidenceTranslocation seTranslocation;
+    SpecifyEvidenceTranslocation seTranslocation;
     seTranslocation.setSampleStat(samplestat);
     seTranslocation.setRead(read, bam_header);
     seTranslocation.setOutputPath(filepath->getTempEvidencePath() + "/" + *target_chromosome + ".TRA.txt");

@@ -465,7 +465,7 @@ int Caller::findBreakPoint()
             // EvidenceFilter ef;
             // if (ef.passFilterEvidence(&thisEvidence))
             // {
-            RefiningDeletion rfd;
+            RefineDeletion rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
             rfd.setEvidence(thisEvidence);
@@ -478,7 +478,7 @@ int Caller::findBreakPoint()
         }
         else if (thisEvidence.getVariantType() == "DUP")
         {
-            RefiningTandemDuplication rfd;
+            RefineTandemDuplication rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
             rfd.setEvidence(thisEvidence);
@@ -491,7 +491,7 @@ int Caller::findBreakPoint()
         else if (thisEvidence.getVariantType() == "INS")
         {
 
-            RefiningInsertion rfd;
+            RefineInsertion rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
             rfd.setEvidence(thisEvidence);
@@ -503,7 +503,7 @@ int Caller::findBreakPoint()
         }
         else if (thisEvidence.getVariantType() == "INV")
         {
-            RefiningInversion rfd;
+            RefineInversion rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
             rfd.setEvidence(thisEvidence);
@@ -515,7 +515,7 @@ int Caller::findBreakPoint()
         }
         else if (thisEvidence.getVariantType() == "BND")
         {
-            RefiningTranslocation rfd;
+            RefineTranslocation rfd;
             rfd.setHtsIndex(bam_index);
             rfd.setFilePath(&filepath);
             rfd.setEvidence(thisEvidence);
