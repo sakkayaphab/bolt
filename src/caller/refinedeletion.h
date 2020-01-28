@@ -5,12 +5,12 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 #include "readparser.h"
 #include <iostream>
 #include <queue>
 
-class RefiningDeletion : public RefiningSV
+class RefineDeletion : public RefineSV
 {
 private:
 
@@ -23,11 +23,11 @@ private:
   Evidence resultSecond;
 
 public:
-  RefiningDeletion();
-  ~RefiningDeletion();
+  RefineDeletion();
+  ~RefineDeletion();
   void execute();
   void approximate();
-  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition);
   int getNumberMapQ(std::vector<uint8_t> mapqlist,uint8_t start,uint8_t end);
   Evidence getBestResult(Evidence r1, Evidence r2);
 };

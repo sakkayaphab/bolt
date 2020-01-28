@@ -5,9 +5,9 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 
-class RefiningInversion : public RefiningSV
+class RefineInversion : public RefineSV
 {
 private:
   int minimum = 2;
@@ -21,9 +21,9 @@ private:
   Evidence resultSecond;
 
 public:
-  RefiningInversion();
+  RefineInversion();
   void execute();
-  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  Evidence calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition);
   Evidence getBestResult(Evidence r1, Evidence r2);
 };
 

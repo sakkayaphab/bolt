@@ -5,18 +5,18 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "refiningsv.h"
+#include "refinesv.h"
 
-class RefiningTranslocation : public RefiningSV
+class RefineTranslocation : public RefineSV
 {
 private:
   void first();
   void refineStartToEnd(const char *range);
 
 public:
-  RefiningTranslocation();
+  RefineTranslocation();
   void execute();
-  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefiningSV::MatchRead> *listPosition);
+  void calculateFinalBreakpoint(std::map<std::pair<int32_t, int32_t>, RefineSV::MatchRead> *listPosition);
 };
 
 #endif

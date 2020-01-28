@@ -1,11 +1,11 @@
-#include "specifyingevidenceinversion.h"
+#include "specifyevidenceinversion.h"
 
-SpecifyingEvidenceInversion::SpecifyingEvidenceInversion()
+SpecifyEvidenceInversion::SpecifyEvidenceInversion()
 {
     svtype = "INV";
 }
 
-void SpecifyingEvidenceInversion::updateRead()
+void SpecifyEvidenceInversion::updateRead()
 {
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
@@ -48,7 +48,7 @@ void SpecifyingEvidenceInversion::updateRead()
     return;
 }
 
-bool SpecifyingEvidenceInversion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+bool SpecifyEvidenceInversion::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
@@ -84,7 +84,7 @@ bool SpecifyingEvidenceInversion::incrementSVFreq(int32_t overlappedpos, int32_t
     return added;
 }
 
-void SpecifyingEvidenceInversion::checkRange()
+void SpecifyEvidenceInversion::checkRange()
 {
     bool added = false;
     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
@@ -117,7 +117,7 @@ void SpecifyingEvidenceInversion::checkRange()
     }
 }
 
-void SpecifyingEvidenceInversion::proveEvidence(int index)
+void SpecifyEvidenceInversion::proveEvidence(int index)
 {
     int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
@@ -140,7 +140,7 @@ void SpecifyingEvidenceInversion::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
+void SpecifyEvidenceInversion::calculateVCF(Evidence *evidence)
 {
     int32_t firstPos = 0;
     int32_t lastPos = 0;
@@ -173,7 +173,7 @@ void SpecifyingEvidenceInversion::calculateVCF(Evidence *evidence)
     evidence->setCiEndRight(difflengthEnd);
 }
 
-bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
+bool SpecifyEvidenceInversion::filterEvidence(Evidence *evidence)
 {
     int32_t svLength = evidence->getEndDiscordantRead() - evidence->getPosDiscordantRead() - samplestat->getAverageSampleStat();
 
@@ -190,7 +190,7 @@ bool SpecifyingEvidenceInversion::filterEvidence(Evidence *evidence)
     return true;
 }
 
-void SpecifyingEvidenceInversion::checkProveEvidence()
+void SpecifyEvidenceInversion::checkProveEvidence()
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -198,7 +198,7 @@ void SpecifyingEvidenceInversion::checkProveEvidence()
     }
 }
 
-void SpecifyingEvidenceInversion::done()
+void SpecifyEvidenceInversion::done()
 {
     checkProveEvidence();
     writeFinalEvidenceAndClear();

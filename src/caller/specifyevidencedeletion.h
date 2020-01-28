@@ -1,9 +1,9 @@
 #ifndef SPECIFYINGEVIDENCEDELETION_H
 #define SPECIFYINGEVIDENCEDELETION_H
-#include "specifyingevidence.h"
+#include "specifyevidence.h"
 #include "evidence.h"
 
-class SpecifyingEvidenceDeletion : public SpecifyingEvidence
+class SpecifyEvidenceDeletion : public SpecifyEvidence
 {
 private:
   int32_t currentPos = 0;
@@ -18,7 +18,7 @@ private:
   bool incrementSVFreq(int32_t overlappedpos,int32_t overlappedsvlength, int32_t pos, int32_t mpos);
 protected:
 public:
-  SpecifyingEvidenceDeletion();
+  SpecifyEvidenceDeletion();
   void updateRead();
   void done();
   void checkProveEvidence();

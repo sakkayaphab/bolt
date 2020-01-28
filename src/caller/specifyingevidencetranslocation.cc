@@ -1,11 +1,11 @@
 #include "specifyingevidencetranslocation.h"
 
-SpecifyingEvidenceTranslocation::SpecifyingEvidenceTranslocation()
+SpecifyEvidenceTranslocation::SpecifyEvidenceTranslocation()
 {
     svtype = "BND";
 }
 
-void SpecifyingEvidenceTranslocation::updateRead()
+void SpecifyEvidenceTranslocation::updateRead()
 {
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
@@ -57,7 +57,7 @@ void SpecifyingEvidenceTranslocation::updateRead()
     checkRange();
 }
 
-bool SpecifyingEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+bool SpecifyEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
@@ -92,7 +92,7 @@ bool SpecifyingEvidenceTranslocation::incrementSVFreq(int32_t overlappedpos, int
     return added;
 }
 
-void SpecifyingEvidenceTranslocation::checkRange()
+void SpecifyEvidenceTranslocation::checkRange()
 {
     bool added;
     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
@@ -143,7 +143,7 @@ void SpecifyingEvidenceTranslocation::checkRange()
     }
 }
 
-void SpecifyingEvidenceTranslocation::proveEvidence(int index)
+void SpecifyEvidenceTranslocation::proveEvidence(int index)
 {
     int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
@@ -164,7 +164,7 @@ void SpecifyingEvidenceTranslocation::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
+void SpecifyEvidenceTranslocation::calculateVCF(Evidence *evidence)
 {
     int32_t firstPos = 0;
     int32_t lastPos = 0;
@@ -267,7 +267,7 @@ void SpecifyingEvidenceTranslocation::calculateVCF(Evidence *evidence)
     evidence->setCiEndRight(difflengthEnd);
 }
 
-bool SpecifyingEvidenceTranslocation::filterEvidence(Evidence *evidence)
+bool SpecifyEvidenceTranslocation::filterEvidence(Evidence *evidence)
 {
 
     // if (evidence->getMaxMapQ() == 0)
@@ -284,7 +284,7 @@ bool SpecifyingEvidenceTranslocation::filterEvidence(Evidence *evidence)
     return false;
 }
 
-void SpecifyingEvidenceTranslocation::checkProveEvidence()
+void SpecifyEvidenceTranslocation::checkProveEvidence()
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -292,7 +292,7 @@ void SpecifyingEvidenceTranslocation::checkProveEvidence()
     }
 }
 
-void SpecifyingEvidenceTranslocation::done()
+void SpecifyEvidenceTranslocation::done()
 {
     checkProveEvidence();
     writeFinalEvidenceAndClear();

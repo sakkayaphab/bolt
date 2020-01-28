@@ -1,11 +1,11 @@
-#include "specifyingevidence.h"
+#include "specifyevidence.h"
 
-SpecifyingEvidence::SpecifyingEvidence()
+SpecifyEvidence::SpecifyEvidence()
 {
     setMaxRemainBufferWriteEvidenceFile(10);
 }
 
-void SpecifyingEvidence::setRead(bam1_t *bam_read, bam_hdr_t *m_bam_header)
+void SpecifyEvidence::setRead(bam1_t *bam_read, bam_hdr_t *m_bam_header)
 {
     read = bam_read;
     bam_header = m_bam_header;
@@ -14,18 +14,18 @@ void SpecifyingEvidence::setRead(bam1_t *bam_read, bam_hdr_t *m_bam_header)
     readparser.setBamHeader(bam_header);
 }
 
-void SpecifyingEvidence::setSampleStat(SampleStat *m_samplestat)
+void SpecifyEvidence::setSampleStat(SampleStat *m_samplestat)
 {
     samplestat = m_samplestat;
 }
 
-void SpecifyingEvidence::showSizeFinalEvidence()
+void SpecifyEvidence::showSizeFinalEvidence()
 {
     std::cout << "--------+ " << svtype << " +--------" << std::endl;
     std::cout << "size evidence : " << finalEvidence.size() << std::endl;
 }
 
-bool SpecifyingEvidence::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
+bool SpecifyEvidence::checkBetween(int32_t pos, int32_t targetPos, int32_t overlapped)
 {
     if (targetPos - overlapped > pos)
     {
@@ -41,12 +41,12 @@ bool SpecifyingEvidence::checkBetween(int32_t pos, int32_t targetPos, int32_t ov
 }
 
 
-void SpecifyingEvidence::setReadDepthHelper(ReadDepthHelper *m_readdepthHelper) {
+void SpecifyEvidence::setReadDepthHelper(ReadDepthHelper *m_readdepthHelper) {
     readdepthHelper = m_readdepthHelper;
 }
 
 
-int SpecifyingEvidence::findOverlappedOnlyPos(uint32_t overlapped, uint32_t pos)
+int SpecifyEvidence::findOverlappedOnlyPos(uint32_t overlapped, uint32_t pos)
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -63,7 +63,7 @@ int SpecifyingEvidence::findOverlappedOnlyPos(uint32_t overlapped, uint32_t pos)
     return -1;
 }
 
-int SpecifyingEvidence::findOverlapped(int32_t overlapped, int32_t pos, int32_t mpos)
+int SpecifyEvidence::findOverlapped(int32_t overlapped, int32_t pos, int32_t mpos)
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -82,7 +82,7 @@ int SpecifyingEvidence::findOverlapped(int32_t overlapped, int32_t pos, int32_t 
     return -1;
 }
 
-void SpecifyingEvidence::showAllFinalEvidence()
+void SpecifyEvidence::showAllFinalEvidence()
 {
     for (auto n : finalEvidence)
     {
@@ -106,12 +106,12 @@ void SpecifyingEvidence::showAllFinalEvidence()
     }
 }
 
-void SpecifyingEvidence::setOutputPath(std::string path)
+void SpecifyEvidence::setOutputPath(std::string path)
 {
     outputpath = path;
 }
 
-void SpecifyingEvidence::writeFinalEvidenceAndClear()
+void SpecifyEvidence::writeFinalEvidenceAndClear()
 {
     std::ofstream myfile;
     myfile.open(outputpath, std::ios_base::app);
@@ -128,15 +128,15 @@ void SpecifyingEvidence::writeFinalEvidenceAndClear()
     }
 }
 
-int SpecifyingEvidence::getMaxRemainBufferWriteEvidenceFile() const {
+int SpecifyEvidence::getMaxRemainBufferWriteEvidenceFile() const {
     return maxRemainBufferWriteEvidenceFile;
 }
 
-void SpecifyingEvidence::setMaxRemainBufferWriteEvidenceFile(int32_t bufferWriteEvidenceFile) {
-    SpecifyingEvidence::maxRemainBufferWriteEvidenceFile = bufferWriteEvidenceFile;
+void SpecifyEvidence::setMaxRemainBufferWriteEvidenceFile(int32_t bufferWriteEvidenceFile) {
+    SpecifyEvidence::maxRemainBufferWriteEvidenceFile = bufferWriteEvidenceFile;
 }
 
-void SpecifyingEvidence::writeBufferEvidenceFile()
+void SpecifyEvidence::writeBufferEvidenceFile()
 {
     if (finalEvidence.size() > getMaxRemainBufferWriteEvidenceFile())
     {

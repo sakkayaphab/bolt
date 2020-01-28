@@ -1,9 +1,9 @@
 #ifndef SPECIFYINGEVIDENCETANDEMDUPLICATION_H
 #define SPECIFYINGEVIDENCETANDEMDUPLICATION_H
-#include "specifyingevidence.h"
+#include "specifyevidence.h"
 #include "evidence.h"
 
-class SpecifyingEvidenceTandemDuplication : public SpecifyingEvidence
+class SpecifyEvidenceTandemDuplication : public SpecifyEvidence
 {
 private:
   void checkRange();
@@ -17,7 +17,7 @@ private:
   bool incrementSVFreq(int32_t overlappedpos,int32_t overlappedsvlength, int32_t pos, int32_t mpos);
 protected:
 public:
-  SpecifyingEvidenceTandemDuplication();
+  SpecifyEvidenceTandemDuplication();
   void updateRead();
   void done();
 };

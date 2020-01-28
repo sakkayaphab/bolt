@@ -1,11 +1,11 @@
-#include "specifyingevidencetandemduplication.h"
+#include "specifyevidencetandemduplication.h"
 
-SpecifyingEvidenceTandemDuplication::SpecifyingEvidenceTandemDuplication()
+SpecifyEvidenceTandemDuplication::SpecifyEvidenceTandemDuplication()
 {
     svtype = "DUP";
 }
 
-void SpecifyingEvidenceTandemDuplication::updateRead()
+void SpecifyEvidenceTandemDuplication::updateRead()
 {
     currentPos = read->core.pos + 1;
     currentMPos = read->core.mpos + 1;
@@ -44,7 +44,7 @@ void SpecifyingEvidenceTandemDuplication::updateRead()
     checkRange();
 }
 
-bool SpecifyingEvidenceTandemDuplication::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
+bool SpecifyEvidenceTandemDuplication::incrementSVFreq(int32_t overlappedpos, int32_t overlappedsvlength, int32_t pos, int32_t mpos)
 {
     bool added = false;
     for (int positionOverlapped = 0; positionOverlapped < preCollectSV.size(); positionOverlapped++)
@@ -80,7 +80,7 @@ bool SpecifyingEvidenceTandemDuplication::incrementSVFreq(int32_t overlappedpos,
     return added;
 }
 
-void SpecifyingEvidenceTandemDuplication::checkRange()
+void SpecifyEvidenceTandemDuplication::checkRange()
 {
     bool added = false;
     int32_t merge = int32_t(samplestat->getAverageSampleStat()) + int32_t(samplestat->getSDSampleStat()) + (samplestat->getReadLength());
@@ -139,7 +139,7 @@ void SpecifyingEvidenceTandemDuplication::checkRange()
     }
 }
 
-void SpecifyingEvidenceTandemDuplication::proveEvidence(int index)
+void SpecifyEvidenceTandemDuplication::proveEvidence(int index)
 {
     int32_t plus = samplestat->getAverageSampleStat() + (samplestat->getSDSampleStat()) + samplestat->getReadLength();
     if (currentPos - plus > preCollectSV.at(index).getPosDiscordantRead())
@@ -158,7 +158,7 @@ void SpecifyingEvidenceTandemDuplication::proveEvidence(int index)
     }
 }
 
-void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
+void SpecifyEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
 {
 
     int32_t firstPos = 0;
@@ -257,7 +257,7 @@ void SpecifyingEvidenceTandemDuplication::calculateVCF(Evidence *evidence)
     evidence->setCiEndRight(difflengthEnd);
 }
 
-bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
+bool SpecifyEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
 {
     // if (evidence->getEndDiscordantRead() - evidence->getLastPosDiscordantRead() < 0)
     // {
@@ -295,7 +295,7 @@ bool SpecifyingEvidenceTandemDuplication::filterEvidence(Evidence *evidence)
     return true;
 }
 
-void SpecifyingEvidenceTandemDuplication::checkProveEvidence()
+void SpecifyEvidenceTandemDuplication::checkProveEvidence()
 {
     for (int i = 0; i < preCollectSV.size(); i++)
     {
@@ -303,7 +303,7 @@ void SpecifyingEvidenceTandemDuplication::checkProveEvidence()
     }
 }
 
-void SpecifyingEvidenceTandemDuplication::done()
+void SpecifyEvidenceTandemDuplication::done()
 {
     checkProveEvidence();
     writeFinalEvidenceAndClear();
