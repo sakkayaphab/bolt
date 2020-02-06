@@ -96,8 +96,6 @@ int Cli::callSV()
         return 1;
     }
 
-    // std::cout << "bam file = " << bamPath << std::endl;
-
     // Find Reference
     bool foundRef = false;
     std::string refPath;
@@ -161,10 +159,6 @@ int Cli::callSV()
         }
     }
 
-    std::cout << outThread << std::endl;
-    std::cout << outPath << std::endl;
-    std::cout << bamPath << std::endl;
-    std::cout << refPath << std::endl;
 
     unsigned int threads = std::thread::hardware_concurrency();
     if (outThread != "")
@@ -186,8 +180,6 @@ int Cli::callSV()
         }
     }
 
-
-     std::cout << "threads = " << threads << std::endl;
 
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
