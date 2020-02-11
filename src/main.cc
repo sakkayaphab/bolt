@@ -19,19 +19,19 @@ int main(int argc, char **argv)
     {
         std::cout << "VERSION:" << std::endl;
         std::cout << "\t0.3.0" << std::endl;
-        return 0;
+        return EXIT_SUCCESS;
     }
     else if (cli.getCommand()=="")
     {
         cli.ShowHelp();
-        return 0;
+        return EXIT_SUCCESS;
     }
     else
     {
         std::cout << cli.getCommand() <<" : command not found" << std::endl;
         std::cout << std::endl;
         cli.ShowHelp();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     return 0;
