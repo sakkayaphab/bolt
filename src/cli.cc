@@ -7,6 +7,7 @@
 #include "caller/editdistance.h"
 #include <thread>
 #include <cstdlib>
+#include <gatb/debruijn/impl/Graph.hpp>
 
 Cli::Cli(int m_argc, char **m_argv)
 {
@@ -64,13 +65,13 @@ int Cli::callSV()
     if (args_lists.size() < 2)
     {
         showHelpCallSV();
-        return 1;
+        return EXIT_FAILURE;
     }
 
     if (args_lists.at(1) == "-h" || args_lists.at(1) == "-help")
     {
         showHelpCallSV();
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     // Find BAM
@@ -93,7 +94,7 @@ int Cli::callSV()
     if (bamPath == "")
     {
         std::cout << "not found bam file path" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Find Reference
@@ -116,7 +117,7 @@ int Cli::callSV()
     if (refPath == "")
     {
         std::cout << "not found reference file path" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Find output
@@ -139,7 +140,7 @@ int Cli::callSV()
     if (outPath == "")
     {
         std::cout << "not found output file path" << std::endl;
-        return 1;
+        return EXIT_FAILURE;
     }
 
     // Find threads
@@ -171,12 +172,12 @@ int Cli::callSV()
         catch (std::invalid_argument const &e)
         {
             std::cout << "Bad input: std::invalid_argument thrown" << '\n';
-            return 1;
+            return EXIT_FAILURE;
         }
         catch (std::out_of_range const &e)
         {
             std::cout << "Integer overflow: std::out_of_range thrown" << '\n';
-            return 1;
+            return EXIT_FAILURE;
         }
     }
 
@@ -189,11 +190,12 @@ int Cli::callSV()
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int Cli::debug()
 {
+    std::cout << "Hello world" << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
