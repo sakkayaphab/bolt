@@ -7,7 +7,6 @@
 #include "caller/editdistance.h"
 #include <thread>
 #include <cstdlib>
-#include <gatb/debruijn/impl/Graph.hpp>
 
 Cli::Cli(int m_argc, char **m_argv)
 {
