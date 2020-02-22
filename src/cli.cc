@@ -7,6 +7,7 @@
 #include "caller/editdistance.h"
 #include <thread>
 #include <cstdlib>
+#include "graph/graph.h"
 
 Cli::Cli(int m_argc, char **m_argv)
 {
@@ -194,7 +195,28 @@ int Cli::callSV()
 
 int Cli::debug()
 {
-    std::cout << "Hello world" << std::endl;
+    Graph graph;
+    graph.buildGraph("AAAGGCGTTGAGGTTAAAG",4);
 
+//    graph.addNodeToNode("1","2");
+//    graph.addNodeToNode("1","3");
+//    graph.addNodeToNode("2","2");
+//    graph.addNodeToNode("2","4");
+//    graph.addNodeToNode("2","4");
+//    graph.addNodeToNode("3","1");
+//    graph.addNodeToNode("3","2");
+//    graph.addNodeToNode("3","5");
+//    graph.addNodeToNode("4","3");
+//    graph.addNodeToNode("4","6");
+//    graph.addNodeToNode("5","6");
+//    graph.addNodeToNode("6","3");
+    graph.showGraph();
+    return EXIT_SUCCESS;
+//    graph.findDFS();
+
+    std::cout << "======================================" << std::endl;
+    graph.findDFS();
+//    std::cout << "in : "<< graph.getNumberEdgeInNode("6") << std::endl;
+//    std::cout << "out : " << graph.getNumberEdgeOutNode("6") << std::endl;
     return EXIT_SUCCESS;
 }
