@@ -1,22 +1,27 @@
 //
-// Created by Sakkayaphab Piwluang on 22/2/20.
+// Created by Sakkayaphab Piwluang on 23/2/20.
 //
 
 #ifndef BOLT_EDGE_H
 #define BOLT_EDGE_H
 
 #include <string>
-#include <vector>
 
 class Edge {
-    int edgeto = -1;
-    bool marked = false;
+    bool masked = false;
+    long long fromNodeIndex;
+    long long toNodeIndex;
+
 public:
     Edge();
-    void setEdgeTo(int pos);
-    int getEdgeTo();
-    void setMarked(bool marked);
-    bool getMarked();
+    void setMasked(bool masked);
+    bool getMasked();
+    void setFromNodeIndex(long long fromNodeIndex);
+    void setToNodeIndex(long long toNodeIndex);
+    long long getFromNodeIndex();
+    long long getToNodeIndex();
+
 };
+
 
 #endif //BOLT_EDGE_H

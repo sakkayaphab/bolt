@@ -1,5 +1,5 @@
 //
-// Created by Sakkayaphab Piwluang on 22/2/20.
+// Created by Sakkayaphab Piwluang on 23/2/20.
 //
 
 #include "edge.h"
@@ -8,18 +8,27 @@ Edge::Edge() {
 
 }
 
-void Edge::setEdgeTo(int pos) {
-    edgeto = pos;
+void Edge::setMasked(bool masked) {
+    Edge::masked = masked;
 }
 
-int Edge::getEdgeTo() {
-    return edgeto;
+bool Edge::getMasked() {
+    return Edge::masked;
 }
 
-void Edge::setMarked(bool marked) {
-    Edge::marked = marked;
+void Edge::setFromNodeIndex(long long fromNodeIndex) {
+    Edge::fromNodeIndex = fromNodeIndex;
 }
 
-bool Edge::getMarked() {
-    return Edge::marked;
+void Edge::setToNodeIndex(long long toNodeIndex) {
+    Edge::toNodeIndex = toNodeIndex;
 }
+
+long long Edge::getFromNodeIndex() {
+    return Edge::fromNodeIndex;
+}
+
+long long Edge::getToNodeIndex() {
+    return Edge::toNodeIndex;
+}
+

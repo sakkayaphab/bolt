@@ -6,26 +6,35 @@
 #define BOLT_GRAPH_H
 
 #include <string>
-#include "node.h"
 #include <vector>
 #include <stack>
 #include <iostream>
+#include <map>
+#include "edge.h"
+#include "node.h"
 
 class Graph {
-    std::vector<Node> nodes;
+    std::vector<Node> vNode;
+    std::map<std::string,long long> mNode;
 
 public:
     Graph();
-    void addNodeToNode(std::string nodetext1,std::string nodetext2);
-    int addNodeText(std::string nodetext);
-    int getNodePosByText(std::string nodetext);
-    void showGraph();
-    void findDFS();
-    int getNumberEdgeInNode(std::string text);
-    int getNumberEdgeOutNode(std::string text);
-    void showstack(std::stack <std::string> s);
     void buildGraph(std::string text,int kmer);
-};
+    void addNode(std::string addText);
+    void addEdge(std::string fromText,std::string toText);
+    void addNodeToNode(std::string fromNodeName,std::string toNodeName);
+    std::string getNameNodeByIndex(long long index);
+    Node *getNodeByIndex(long long index);
+    void showAllNode();
+    std::stack<std::string> findDFS(std::string begin,std::string end);
+    void reverseVectorString(std::vector<std::string> *s);
+    void showVectorString(std::vector<std::string> *s);
+    std::string getTextFromVectorString(std::vector<std::string> *s);
+    bool RunNextNode(std::stack<std::string> *mStack,std::string *currentNodeName);
+    void clearMaskedEdges();
+    std::vector<std::string> covertStackToVector(std::stack<std::string> mStack);
+    void findEulerPath(std::stack<std::string> stackpath);
 
+};
 
 #endif //BOLT_GRAPH_H

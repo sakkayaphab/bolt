@@ -1,27 +1,30 @@
 //
-// Created by Sakkayaphab Piwluang on 21/2/20.
+// Created by Sakkayaphab Piwluang on 23/2/20.
 //
 
 #ifndef BOLT_NODE_H
 #define BOLT_NODE_H
 
 #include <string>
-#include <map>
+#include <vector>
 #include "edge.h"
 
 class Node {
-    std::string text;
-    std::vector<Edge> edges;
+    std::string name;
+    std::vector<Edge> vEdge;
 
 public:
     Node();
-    void setText(std::string text);
-    std::string getText();
-    void addEdge(Edge edge);
+    void setName(std::string name);
+    std::string getName();
+    void addEdgeOut(Edge edge);
     std::vector<Edge> *getEdges();
-    void clearEdges();
-    int getEdgeNumberUnmasked();
-    int getEdgeIndexWithUnmasked();
+    long long getNumberOfEdges();
+    long long getNumberOfUnmaskedEdges();
+    long long getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge();
+    void clearMaskedEdges();
+
 };
+
 
 #endif //BOLT_NODE_H

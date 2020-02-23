@@ -1,51 +1,56 @@
 //
-// Created by Sakkayaphab Piwluang on 21/2/20.
+// Created by Sakkayaphab Piwluang on 23/2/20.
 //
 
 #include "node.h"
-#include <vector>
 
 Node::Node() {
 
 }
 
-void Node::setText(std::string text) {
-    Node::text = text;
+void Node::setName(std::string name) {
+    Node::name = name;
 }
 
-std::string Node::getText() {
-    return text;
+std::string Node::getName() {
+    return name;
 }
 
-void Node::addEdge(Edge edge) {
-    edges.push_back(edge);
+void Node::addEdgeOut(Edge edge) {
+    vEdge.push_back(edge);
 }
 
 std::vector<Edge> *Node::getEdges() {
-    return &edges;
+    return &vEdge;
 }
 
-void Node::clearEdges() {
-    for (int i=0;i<edges.size();i++) {
-        edges.at(i).setMarked(false);
-    }
+long long Node::getNumberOfEdges() {
+    return vEdge.size();
 }
 
-int Node::getEdgeNumberUnmasked() {
-    int count = 0;
-    for (int i=0;i<edges.size();i++) {
-        if (edges.at(i).getMarked()== false) {
-            count += 1;
+long long Node::getNumberOfUnmaskedEdges() {
+    long long count = 0;
+    for (Edge e:vEdge) {
+        if (e.getMasked()==false) {
+            count++;
         }
     }
+
     return count;
 }
 
-int Node::getEdgeIndexWithUnmasked() {
-    for (int i=0;i<edges.size();i++) {
-        if (edges.at(i).getMarked()==false) {
-            return i;
+long long Node::getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge() {
+    for (int i=0;i<vEdge.size();i++) {
+        if (vEdge.at(i).getMasked()== false) {
+            vEdge.at(i).setMasked(true);
+            return vEdge.at(i).getToNodeIndex();
         }
     }
     return -1;
+}
+
+void Node::clearMaskedEdges() {
+    for (long long i=0;i<vEdge.size();i++) {
+        vEdge.at(i).setMasked(false);
+    }
 }

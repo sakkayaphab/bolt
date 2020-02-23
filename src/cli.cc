@@ -196,26 +196,47 @@ int Cli::callSV()
 int Cli::debug()
 {
     Graph graph;
-    graph.buildGraph("AAAGGCGTTGAGGTTAAAG",4);
+//    graph.buildGraph("GTAGAGCTGT",7);
+
+
+    graph.addNodeToNode("1","2");
+    graph.addNodeToNode("1","3");
+    graph.addNodeToNode("2","2");
+    graph.addNodeToNode("2","4");
+    graph.addNodeToNode("2","4");
+    graph.addNodeToNode("3","1");
+    graph.addNodeToNode("3","2");
+    graph.addNodeToNode("3","5");
+    graph.addNodeToNode("4","3");
+    graph.addNodeToNode("4","6");
+    graph.addNodeToNode("5","6");
+    graph.addNodeToNode("6","3");
 
 //    graph.addNodeToNode("1","2");
-//    graph.addNodeToNode("1","3");
-//    graph.addNodeToNode("2","2");
 //    graph.addNodeToNode("2","4");
-//    graph.addNodeToNode("2","4");
-//    graph.addNodeToNode("3","1");
-//    graph.addNodeToNode("3","2");
-//    graph.addNodeToNode("3","5");
 //    graph.addNodeToNode("4","3");
-//    graph.addNodeToNode("4","6");
-//    graph.addNodeToNode("5","6");
-//    graph.addNodeToNode("6","3");
-    graph.showGraph();
+//    graph.addNodeToNode("3","1");
+//    graph.addNodeToNode("4","5");
+
+    graph.showAllNode();
+    std::vector<std::string> result = graph.findDFS("1","6");
+    graph.clearMaskedEdges();
+
+
+//    std::vector<std::string> texts;
+//    texts.push_back("GTAGAGC");
+//    texts.push_back("TAGAGCT");
+//    texts.push_back("AGAGCTG");
+//    texts.push_back("GAGCTGT");
+    std::cout << "#############" << std::endl;
+    graph.reverseVectorString(&result);
+    graph.showVectorString(&result);
+//    graph.showAllNode();
     return EXIT_SUCCESS;
 //    graph.findDFS();
 
     std::cout << "======================================" << std::endl;
-    graph.findDFS();
+//    graph.findDFS();
 //    std::cout << "in : "<< graph.getNumberEdgeInNode("6") << std::endl;
 //    std::cout << "out : " << graph.getNumberEdgeOutNode("6") << std::endl;
     return EXIT_SUCCESS;
