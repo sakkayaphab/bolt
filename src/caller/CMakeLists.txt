@@ -11,6 +11,7 @@ if(APPLE)
     target_link_libraries(
             caller
             fasta
+            graph
             ${HTSLIB_LIBRARIES}
             ${ZLIB_LIBRARIES}
             ${TBB_IMPORTED_TARGETS}
@@ -19,6 +20,7 @@ elseif(UNIX AND NOT APPLE)
     target_link_libraries(
             caller
             fasta
+            graph
             ${HTSLIB_LIBRARIES}
             ${ZLIB_LIBRARIES}
             ${TBB_IMPORTED_TARGETS}

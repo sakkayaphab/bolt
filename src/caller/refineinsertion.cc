@@ -40,7 +40,6 @@ void RefineInsertion::first()
         return;
     }
 
-    // std::cout << "findRange : " << findRange << " " << evidence.getPos() + evidence.getCiPosLeft() - (evidence.getPos() + evidence.getCiPosRight()) << std::endl;
 
     const char *range = findRange.c_str();
     refineStartToEnd(range);
@@ -363,8 +362,6 @@ void RefineInsertion::convertMapSC()
 {
     vectorSCStart = convertMapSCToVector(mapSCStart);
     std::sort(vectorSCStart.begin(), vectorSCStart.end());
-    // std::cout << "vectorSC : " <<
-    // vectorSCStart.at(0).getSeqList()[0] << std::endl;
 
     vectorSCEnd = convertMapSCToVector(mapSCEnd);
     std::sort(vectorSCEnd.begin(), vectorSCEnd.end());

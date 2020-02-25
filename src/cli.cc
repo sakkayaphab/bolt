@@ -160,7 +160,6 @@ int Cli::callSV()
         }
     }
 
-
     unsigned int threads = std::thread::hardware_concurrency();
     if (outThread != "")
     {
