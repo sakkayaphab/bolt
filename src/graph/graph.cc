@@ -94,21 +94,23 @@ Node *Graph::getNodeByIndex(long long index) {
 
 std::vector<std::stack<std::string>> Graph::findDFS(std::string begin, std::string end) {
     long long indexNodeCurrent = mNode[begin];
+    std::vector<std::stack<std::string>> output;
+    if (vNode.size()==0) {
+        return output;
+    }
     std::string currentNodeName = getNodeByIndex(indexNodeCurrent)->getName();
 
-    std::vector<std::stack<std::string>> output;
     if (currentNodeName != begin) {
         return output;
     }
     std::stack<Edge *> stackEdgePath;
     std::stack<std::string> stackPath;
     stackPath.push(begin);
-    bool pop = false;
     for (;;) {
         bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
         if (currentNodeName == end) {
 //            showStack(stackPath);z
-//            std::cout << stackPath.size() << std::endl;
+            std::cout << stackPath.size() << std::endl;
             output.push_back(stackPath);
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {

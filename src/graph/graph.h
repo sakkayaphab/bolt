@@ -12,6 +12,7 @@
 #include <map>
 #include "edge.h"
 #include "node.h"
+#include <algorithm>
 
 class Graph {
     std::vector<Node> vNode;
