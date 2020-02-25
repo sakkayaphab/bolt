@@ -56,7 +56,7 @@ void Graph::addEdge(std::string fromText, std::string toText) {
     }
 
     Edge e;
-    e.setToNodeIndex(nodeFromIndex);
+    e.setFromNodeIndex(nodeFromIndex);
     e.setToNodeIndex(nodeToIndex);
     Node *n = getNodeByIndex(nodeFromIndex);
     n->addEdgeOut(e);
@@ -92,59 +92,54 @@ Node *Graph::getNodeByIndex(long long index) {
     return NULL;
 }
 
-std::stack<std::string> Graph::findDFS(std::string begin,std::string end) {
+std::vector<std::stack<std::string>> Graph::findDFS(std::string begin,std::string end) {
     long long indexNodeCurrent = mNode[begin];
     std::string currentNodeName = getNodeByIndex(indexNodeCurrent)->getName();
-    std::stack<std::string> stackPath;
+
+    std::vector<std::stack<std::string>> output;
     if (currentNodeName!=begin) {
-        return stackPath;
+        return output;
     }
-
-
+    std::stack<Edge*> stackEdgePath;
+    std::stack<std::string> stackPath;
     stackPath.push(begin);
-    bool linkNodeToNode = false;
+    bool pop = false;
     for (;;) {
-        bool stop = RunNextNode(&stackPath,&currentNodeName);
+        bool stop = RunNextNode(&stackPath,&stackEdgePath,&currentNodeName);
         if (currentNodeName==end) {
-            std::cout << "Finish" << std::endl;
-            linkNodeToNode = true;
-            break;
+            showStack(stackPath);
+            output.push_back(stackPath);
+            bool poppass = popAllStack(&stackPath,&stackEdgePath,&currentNodeName);
+            if (poppass== false) {
+                break;
+            }
         }
 
         if (stop== false) {
-            std::cout << "Pop => " << stackPath.top() << std::endl;
-            stackPath.pop();
-            if (stackPath.size()==0) {\
-                std::cout << "Cannot find node to node" << std::endl;
+            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
+            if (poppass == false) {
                 break;
             }
-            currentNodeName = stackPath.top();
         }
+
     }
 
-    if (linkNodeToNode== false) {
-        while (!stackPath.empty()) {
-            stackPath.pop();
-        }
-        return stackPath;
-    }
-
-    return stackPath;
+    return output;
 }
 
 
-bool Graph::RunNextNode(std::stack<std::string> *stackPath, std::string *currentNodeName) {
+bool Graph::RunNextNode(std::stack<std::string> *stackPath,std::stack<Edge*> *stackEdgePath, std::string *currentNodeName) {
     long long indexNodeCurrent = mNode[*currentNodeName];
     Node *currentNode = getNodeByIndex(indexNodeCurrent);
     if (currentNode->getNumberOfUnmaskedEdges()==0) {
         return false;
     }
 
-    long long nextNodeIndex = currentNode->getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge();
+    long long nextNodeIndex = currentNode->getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge(stackEdgePath);
     stackPath->push(getNodeByIndex(nextNodeIndex)->getName());
     *currentNodeName = getNodeByIndex(nextNodeIndex)->getName();
 
-    std::cout << "Next => " << *currentNodeName << std::endl;
+//    std::cout << "Next => " << *currentNodeName << std::endl;
 
     return true;
 }
@@ -185,15 +180,63 @@ void Graph::clearMaskedEdges() {
 }
 
 std::vector<std::string> Graph::covertStackToVector(std::stack<std::string> stackPath) {
+
     std::vector<std::string> vResult;
     while (!stackPath.empty()) {
         vResult.push_back(stackPath.top());
         stackPath.pop();
     }
-    
+
     return vResult;
 }
 
 void Graph::findEulerPath(std::stack<std::string> stackpath) {
 
+}
+
+void Graph::setEdgeByThisPath(std::vector<std::string> vPath) {
+    for (long long i=0;i<vPath.size()-1;i++) {
+        std::string beginNameNode = vPath.at(i);
+        std::string endNameNode = vPath.at(i+1);
+        Node *node = getNodeByIndex(mNode[beginNameNode]);
+//        std::cout << "-------------------" << std::endl;
+//        std::cout << beginNameNode << std::endl;
+//        std::cout << endNameNode << std::endl;
+        bool masked = node->setMaskedEdgeToNodeIndexWithUnmasked(mNode[endNameNode]);
+        if (masked == false) {
+            std::cout << "setEdgeByThisPath error" << std::endl;
+        }
+    }
+}
+
+void Graph::showStack(std::stack<std::string> stackPath) {
+    while (!stackPath.empty()) {
+        std::cout << stackPath.top() << " , ";
+        stackPath.pop();
+    }
+    std::cout << std::endl;
+}
+
+bool Graph::popAllStack(std::stack<std::string> *stackPath, std::stack<Edge *> *stackEdgePath,std::string *currentNodeName) {
+
+    stackPath->pop();
+    if (stackPath->size()==0) {
+        return false;
+    }
+
+    if (stackPath->top()==getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
+
+    } else {
+        while (!stackPath->empty()) {
+            if (stackPath->top()==getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
+                break;
+            }
+            stackEdgePath->top()->setMasked(false);
+            stackEdgePath->pop();
+        }
+    }
+
+    *currentNodeName = stackPath->top();
+
+    return true;
 }

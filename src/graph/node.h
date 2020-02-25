@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "edge.h"
+#include <stack>
 
 class Node {
     std::string name;
@@ -21,9 +22,9 @@ public:
     std::vector<Edge> *getEdges();
     long long getNumberOfEdges();
     long long getNumberOfUnmaskedEdges();
-    long long getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge();
+    long long getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge(std::stack<Edge*> *stackEdgePath);
     void clearMaskedEdges();
-
+    bool setMaskedEdgeToNodeIndexWithUnmasked(long long nodeindex);
 };
 
 

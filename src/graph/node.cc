@@ -39,10 +39,11 @@ long long Node::getNumberOfUnmaskedEdges() {
     return count;
 }
 
-long long Node::getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge() {
+long long Node::getNextNodeIndexWithUnmaskedEdgeAndSetMaskedEdge(std::stack<Edge*> *stackEdgePath) {
     for (int i=0;i<vEdge.size();i++) {
         if (vEdge.at(i).getMasked()== false) {
             vEdge.at(i).setMasked(true);
+            stackEdgePath->push(&vEdge.at(i));
             return vEdge.at(i).getToNodeIndex();
         }
     }
@@ -53,4 +54,19 @@ void Node::clearMaskedEdges() {
     for (long long i=0;i<vEdge.size();i++) {
         vEdge.at(i).setMasked(false);
     }
+}
+
+bool Node::setMaskedEdgeToNodeIndexWithUnmasked(long long nodeindex) {
+    for (long long i=0;i<vEdge.size();i++) {
+        if (vEdge.at(i).getMasked()== true) {
+            continue;
+        }
+
+        if (vEdge.at(i).getToNodeIndex()==nodeindex) {
+            vEdge.at(i).setMasked(true);
+            return true;
+        }
+    }
+
+    return false;
 }

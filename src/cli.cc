@@ -196,41 +196,58 @@ int Cli::callSV()
 int Cli::debug()
 {
     Graph graph;
-//    graph.buildGraph("GTAGAGCTGT",7);
-
-
-    graph.addNodeToNode("1","2");
-    graph.addNodeToNode("1","3");
-    graph.addNodeToNode("2","2");
-    graph.addNodeToNode("2","4");
-    graph.addNodeToNode("2","4");
-    graph.addNodeToNode("3","1");
-    graph.addNodeToNode("3","2");
-    graph.addNodeToNode("3","5");
-    graph.addNodeToNode("4","3");
-    graph.addNodeToNode("4","6");
-    graph.addNodeToNode("5","6");
-    graph.addNodeToNode("6","3");
+    graph.buildGraph("GTAGAGCTGT",3);
 
 //    graph.addNodeToNode("1","2");
+//    graph.addNodeToNode("1","3");
+//    graph.addNodeToNode("2","2");
 //    graph.addNodeToNode("2","4");
-//    graph.addNodeToNode("4","3");
+//    graph.addNodeToNode("2","4");
 //    graph.addNodeToNode("3","1");
+//    graph.addNodeToNode("3","2");
+//    graph.addNodeToNode("3","5");
+//    graph.addNodeToNode("4","3");
+//    graph.addNodeToNode("4","6");
+//    graph.addNodeToNode("5","6");
+//    graph.addNodeToNode("6","3");
+
+//    graph.addNodeToNode("0","1");
+//    graph.addNodeToNode("0","2");
+//    graph.addNodeToNode("1","2");
+//    graph.addNodeToNode("1","3");
+//    graph.addNodeToNode("2","3");
+//    graph.addNodeToNode("3","4");
+//    graph.addNodeToNode("4","0");
+//    graph.addNodeToNode("4","1");
 //    graph.addNodeToNode("4","5");
 
     graph.showAllNode();
-    std::vector<std::string> result = graph.findDFS("1","6");
+    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("GTA","TGT");
     graph.clearMaskedEdges();
+    for (std::stack<std::string> ss:vStackResult) {
+        std::cout << ss.size() << std::endl;
+        std::vector<std::string> vResult = graph.covertStackToVector(ss);
+        std::cout << vResult.size() << std::endl;
+        graph.reverseVectorString(&vResult);
+        graph.showVectorString(&vResult);
+    }
 
+//    std::stack<std::string> stackResult = graph.findDFS("1","6");
+//    graph.clearMaskedEdges();
+//    std::vector<std::string> vResult = graph.covertStackToVector(stackResult);
+//    graph.reverseVectorString(&vResult);
+//    graph.setEdgeByThisPath(vResult);
+//    graph.findEulerPath(stackResult);
 
 //    std::vector<std::string> texts;
 //    texts.push_back("GTAGAGC");
 //    texts.push_back("TAGAGCT");
 //    texts.push_back("AGAGCTG");
 //    texts.push_back("GAGCTGT");
-    std::cout << "#############" << std::endl;
-    graph.reverseVectorString(&result);
-    graph.showVectorString(&result);
+//    std::cout << "#############" << std::endl;
+//    std::vector<std::string> vResult = graph.covertStackToVector(stackResult);
+//    graph.reverseVectorString(&vResult);
+//    graph.showVectorString(&vResult);
 //    graph.showAllNode();
     return EXIT_SUCCESS;
 //    graph.findDFS();
