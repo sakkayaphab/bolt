@@ -196,7 +196,8 @@ int Cli::callSV()
 int Cli::debug()
 {
     Graph graph;
-    graph.buildGraph("GTAGAGCTGT",3);
+    graph.buildGraph("AGTCATATCACGCGACTAGCCTCTGCTTAATTTTT",9);
+    graph.buildGraph("TTAATTTTTGTGCTCAAGGGTTTTGGTCCGCCCGAGCGGTGCAGCCGATTAGGACCATGTAATACATTTGTTACAAGACTTCTTTTAAACACTTTCTTCCTGCCCAGTAGCGGATGATAATCGTTGTTGCCAGCCGGCGTGGAAGGTAACAGCACCGGTGCGAGCCTAATGTGCCGTCTCCACGAACACAAGGCTGTCCGATCGTATAATAGGATTCCGCAATGGGGTTAGCAAGTGGCAGCCTAAACGATATCGGGGACTTGCGATGTACATGCTTTGGTACAATACATACGTGATCCAGTTGTTATCCTGCATCGGAACATCAATTGTGCATCGGACCAGCATATTCATGTCATCTAGGAGGCGCGCGTAGGATAAATAATTCAATTAAGATGTCGTTTTGCTAGTATACGTCTAGGCGTCACCCGCCATCTGTGTGCAGGTGGGCCGACGAGACACTGTCCCTGATTTCTCCGCTTCTAATAGCACACACGGGGCAATACCAGCACAAGCCAGTCTCGCAGCAACGCTCGTCAGCAAACGAAAGAGCTTAAGGCTCGCCAATTCGCACTGTCAGGGTCGCTTGGGTGTTTTGCACTAGCGTCAGGTACGCTAGTATGCGTTCTTCCTTCCAGGGGTATGTGGCTGCGTGGTCAAATGTGCGGCATACGTATTTGCTCGACGTGTTTGCTCTCACGAACTTGACCTGGAGATCAAGGAGATGTTTCTTGTCGAACTGGACAGCGCTTCAACGGAACGGATCTACGTTACAGCCTGCATAATGAAAACGGAGTTGCCGACGACGAAAGCGACTTTGGGTTCTGTCTGTTGTCATTGGCGGAAAACTTCCGTTCAGGAGGCGGACACTGATTGACACGGTTTAGCAGAAGGTTTGAGGAATAGGTTAAATTGAGTGGTTTAATAACGGTATGTCTGGGATTAAAGTGTAGTATAGTGTGATTATCGGAGACGGT",9);
 
 //    graph.addNodeToNode("1","2");
 //    graph.addNodeToNode("1","3");
@@ -222,39 +223,13 @@ int Cli::debug()
 //    graph.addNodeToNode("4","5");
 
     graph.showAllNode();
-    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("GTA","TGT");
+    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("AGTCATATC","GGAGACGGT");
     graph.clearMaskedEdges();
     for (std::stack<std::string> ss:vStackResult) {
-        std::cout << ss.size() << std::endl;
         std::vector<std::string> vResult = graph.covertStackToVector(ss);
-        std::cout << vResult.size() << std::endl;
         graph.reverseVectorString(&vResult);
         graph.showVectorString(&vResult);
     }
 
-//    std::stack<std::string> stackResult = graph.findDFS("1","6");
-//    graph.clearMaskedEdges();
-//    std::vector<std::string> vResult = graph.covertStackToVector(stackResult);
-//    graph.reverseVectorString(&vResult);
-//    graph.setEdgeByThisPath(vResult);
-//    graph.findEulerPath(stackResult);
-
-//    std::vector<std::string> texts;
-//    texts.push_back("GTAGAGC");
-//    texts.push_back("TAGAGCT");
-//    texts.push_back("AGAGCTG");
-//    texts.push_back("GAGCTGT");
-//    std::cout << "#############" << std::endl;
-//    std::vector<std::string> vResult = graph.covertStackToVector(stackResult);
-//    graph.reverseVectorString(&vResult);
-//    graph.showVectorString(&vResult);
-//    graph.showAllNode();
-    return EXIT_SUCCESS;
-//    graph.findDFS();
-
-    std::cout << "======================================" << std::endl;
-//    graph.findDFS();
-//    std::cout << "in : "<< graph.getNumberEdgeInNode("6") << std::endl;
-//    std::cout << "out : " << graph.getNumberEdgeOutNode("6") << std::endl;
     return EXIT_SUCCESS;
 }

@@ -10,23 +10,23 @@ Graph::Graph() {
 
 void Graph::buildGraph(std::string text, int kmer) {
     std::vector<std::string> mString;
-    for (int i=0;i<text.size()-kmer+1;i++) {
+    for (int i = 0; i < text.size() - kmer + 1; i++) {
         std::string r = text.substr(i, kmer);
         mString.push_back(r);
     }
 
-    for (int i=0;i<mString.size()-1;i++) {
-        addNodeToNode(mString.at(i),mString.at(i+1));
+    for (int i = 0; i < mString.size() - 1; i++) {
+        addNodeToNode(mString.at(i), mString.at(i + 1));
     }
 }
 
 void Graph::addNode(std::string addText) {
     long long nodeindex = mNode[addText];
     long long vNodeIndexSize = vNode.size();
-    if (vNodeIndexSize==0) {
+    if (vNodeIndexSize == 0) {
 
     } else {
-        if (getNodeByIndex(nodeindex)->getName()==addText) {
+        if (getNodeByIndex(nodeindex)->getName() == addText) {
             return;
         }
     }
@@ -35,7 +35,7 @@ void Graph::addNode(std::string addText) {
     Node n;
     n.setName(addText);
     vNode.push_back(n);
-    mNode[addText] = vNode.size()-1;
+    mNode[addText] = vNode.size() - 1;
 
     return;
 }
@@ -43,14 +43,14 @@ void Graph::addNode(std::string addText) {
 void Graph::addEdge(std::string fromText, std::string toText) {
     long long nodeFromIndex = mNode[fromText];
     std::string nodeFromName = getNameNodeByIndex(nodeFromIndex);
-    if (nodeFromName=="") {
+    if (nodeFromName == "") {
         std::cerr << "nodeFrom is NULL" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     long long nodeToIndex = mNode[toText];
     std::string nodeToName = getNameNodeByIndex(nodeToIndex);
-    if (nodeToName=="") {
+    if (nodeToName == "") {
         std::cerr << "nodeTo is NULL" << std::endl;
         exit(EXIT_FAILURE);
     }
@@ -75,47 +75,49 @@ void Graph::showAllNode() {
 void Graph::addNodeToNode(std::string fromNodeName, std::string toNodeName) {
     Graph::addNode(fromNodeName);
     Graph::addNode(toNodeName);
-    Graph::addEdge(fromNodeName,toNodeName);
+    Graph::addEdge(fromNodeName, toNodeName);
 }
 
 std::string Graph::getNameNodeByIndex(long long index) {
-    if (vNode.size()>=index) {
+    if (vNode.size() >= index) {
         return vNode[index].getName();
     }
     return "";
 }
 
 Node *Graph::getNodeByIndex(long long index) {
-    if (vNode.size()>=index) {
+    if (vNode.size() >= index) {
         return &vNode[index];
     }
     return NULL;
 }
 
-std::vector<std::stack<std::string>> Graph::findDFS(std::string begin,std::string end) {
+std::vector<std::stack<std::string>> Graph::findDFS(std::string begin, std::string end) {
     long long indexNodeCurrent = mNode[begin];
     std::string currentNodeName = getNodeByIndex(indexNodeCurrent)->getName();
 
     std::vector<std::stack<std::string>> output;
-    if (currentNodeName!=begin) {
+    if (currentNodeName != begin) {
         return output;
     }
-    std::stack<Edge*> stackEdgePath;
+    std::stack<Edge *> stackEdgePath;
     std::stack<std::string> stackPath;
     stackPath.push(begin);
     bool pop = false;
     for (;;) {
-        bool stop = RunNextNode(&stackPath,&stackEdgePath,&currentNodeName);
-        if (currentNodeName==end) {
-            showStack(stackPath);
+        bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
+        if (currentNodeName == end) {
+//            showStack(stackPath);z
+//            std::cout << stackPath.size() << std::endl;
             output.push_back(stackPath);
-            bool poppass = popAllStack(&stackPath,&stackEdgePath,&currentNodeName);
-            if (poppass== false) {
+            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
+            if (poppass == false) {
                 break;
             }
+            break;
         }
 
-        if (stop== false) {
+        if (stop == false) {
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {
                 break;
@@ -128,10 +130,11 @@ std::vector<std::stack<std::string>> Graph::findDFS(std::string begin,std::strin
 }
 
 
-bool Graph::RunNextNode(std::stack<std::string> *stackPath,std::stack<Edge*> *stackEdgePath, std::string *currentNodeName) {
+bool Graph::RunNextNode(std::stack<std::string> *stackPath, std::stack<Edge *> *stackEdgePath,
+                        std::string *currentNodeName) {
     long long indexNodeCurrent = mNode[*currentNodeName];
     Node *currentNode = getNodeByIndex(indexNodeCurrent);
-    if (currentNode->getNumberOfUnmaskedEdges()==0) {
+    if (currentNode->getNumberOfUnmaskedEdges() == 0) {
         return false;
     }
 
@@ -154,19 +157,28 @@ void Graph::showVectorString(std::vector<std::string> *s) {
 
 std::string Graph::getTextFromVectorString(std::vector<std::string> *s) {
     std::string output = "";
-    for (long long i=0;i<s->size();i++) {
-        if ((*s).at(i).size()==1) {
-            output += (*s).at(i);
-        } else {
+    if (s->size() == 0) {
+        return "";
+    }
+
+    if (s->size() != 0) {
+
+    }
+
+    if (s->at(0).size() == 1) {
+        for (long long i = 0; i < s->size(); i++) {
+                output += (*s).at(i);
+        }
+        return output;
+    }
+
+    if (s->at(0).size() > 1) {
+        for (long long i = 0; i < s->size(); i++) {
             if (output=="") {
                 output += (*s).at(i);
             } else {
                 output += (*s).at(i).substr((*s).at(i).size()-1);
             }
-
-           if (i+1>(*s).at(i).size()) {
-               break;
-           }
         }
     }
 
@@ -174,7 +186,7 @@ std::string Graph::getTextFromVectorString(std::vector<std::string> *s) {
 }
 
 void Graph::clearMaskedEdges() {
-    for (long long i=0;i<vNode.size();i++) {
+    for (long long i = 0; i < vNode.size(); i++) {
         vNode.at(i).clearMaskedEdges();
     }
 }
@@ -195,9 +207,9 @@ void Graph::findEulerPath(std::stack<std::string> stackpath) {
 }
 
 void Graph::setEdgeByThisPath(std::vector<std::string> vPath) {
-    for (long long i=0;i<vPath.size()-1;i++) {
+    for (long long i = 0; i < vPath.size() - 1; i++) {
         std::string beginNameNode = vPath.at(i);
-        std::string endNameNode = vPath.at(i+1);
+        std::string endNameNode = vPath.at(i + 1);
         Node *node = getNodeByIndex(mNode[beginNameNode]);
 //        std::cout << "-------------------" << std::endl;
 //        std::cout << beginNameNode << std::endl;
@@ -217,18 +229,19 @@ void Graph::showStack(std::stack<std::string> stackPath) {
     std::cout << std::endl;
 }
 
-bool Graph::popAllStack(std::stack<std::string> *stackPath, std::stack<Edge *> *stackEdgePath,std::string *currentNodeName) {
+bool Graph::popAllStack(std::stack<std::string> *stackPath, std::stack<Edge *> *stackEdgePath,
+                        std::string *currentNodeName) {
 
     stackPath->pop();
-    if (stackPath->size()==0) {
+    if (stackPath->size() == 0) {
         return false;
     }
 
-    if (stackPath->top()==getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
+    if (stackPath->top() == getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
 
     } else {
         while (!stackPath->empty()) {
-            if (stackPath->top()==getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
+            if (stackPath->top() == getNodeByIndex(stackEdgePath->top()->getFromNodeIndex())->getName()) {
                 break;
             }
             stackEdgePath->top()->setMasked(false);
