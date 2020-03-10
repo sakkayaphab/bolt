@@ -13,10 +13,14 @@
 #include "edge.h"
 #include "node.h"
 #include <algorithm>
+#include "graphresult.h"
 
 class Graph {
     std::vector<Node> vNode;
     std::map<std::string,long long> mNode;
+    std::string maxSeqLeft = "";
+    std::string maxSeqRigth = "";
+
 
 public:
     Graph();
@@ -35,9 +39,14 @@ public:
     void clearMaskedEdges();
     std::vector<std::string> covertStackToVector(std::stack<std::string> mStack);
     void setEdgeByThisPath(std::vector<std::string> vPath);
-    void findEulerPath(std::stack<std::string> stackpath);
     void showStack(std::stack<std::string> mStack);
     bool popAllStack(std::stack<std::string> *stackPath,std::stack<Edge*> *stackEdgePath, std::string *currentNodeName);
+    void setMaxSeqLeft(std::string seq);
+    void setMaxSeqRigth(std::string seq);
+    std::string getMaxSeqLeft();
+    std::string getMaxSeqRigth();
+
+    GraphResult findCustom(std::string begin, std::string end);
 };
 
 #endif //BOLT_GRAPH_H

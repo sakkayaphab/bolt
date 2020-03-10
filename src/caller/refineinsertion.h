@@ -18,6 +18,8 @@ private:
   std::map<int32_t, InsertionPositionDetail> mapSCStart;
   std::map<int32_t, InsertionPositionDetail> mapSCEnd;
 
+  std::vector<std::string> vUnMappedRead;
+
 
   std::vector<InsertionPositionDetail> vectorSCStart;
   std::vector<InsertionPositionDetail> vectorSCEnd;

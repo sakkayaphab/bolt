@@ -31,7 +31,6 @@ void Graph::addNode(std::string addText) {
         }
     }
 
-
     Node n;
     n.setName(addText);
     vNode.push_back(n);
@@ -110,13 +109,13 @@ std::vector<std::stack<std::string>> Graph::findDFS(std::string begin, std::stri
         bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
         if (currentNodeName == end) {
 //            showStack(stackPath);z
-            std::cout << stackPath.size() << std::endl;
+//            std::cout << stackPath.size() << std::endl;
             output.push_back(stackPath);
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {
                 break;
             }
-            break;
+//            break;
         }
 
         if (stop == false) {
@@ -204,10 +203,6 @@ std::vector<std::string> Graph::covertStackToVector(std::stack<std::string> stac
     return vResult;
 }
 
-void Graph::findEulerPath(std::stack<std::string> stackpath) {
-
-}
-
 void Graph::setEdgeByThisPath(std::vector<std::string> vPath) {
     for (long long i = 0; i < vPath.size() - 1; i++) {
         std::string beginNameNode = vPath.at(i);
@@ -254,4 +249,62 @@ bool Graph::popAllStack(std::stack<std::string> *stackPath, std::stack<Edge *> *
     *currentNodeName = stackPath->top();
 
     return true;
+}
+
+void Graph::setMaxSeqLeft(std::string seq) {
+    Graph::maxSeqLeft = seq;
+}
+
+void Graph::setMaxSeqRigth(std::string seq) {
+    Graph::maxSeqRigth = seq;
+}
+
+std::string Graph::getMaxSeqLeft() {
+    return Graph::maxSeqLeft;
+}
+
+std::string Graph::getMaxSeqRigth() {
+    return Graph::maxSeqRigth;
+}
+
+GraphResult Graph::findCustom(std::string begin, std::string end) {
+    GraphResult gr;
+
+    long long indexNodeCurrent = mNode[begin];
+
+    if (vNode.size()==0) {
+        return gr;
+    }
+    std::string currentNodeName = getNodeByIndex(indexNodeCurrent)->getName();
+
+    if (currentNodeName != begin) {
+        return gr;
+    }
+    std::stack<Edge *> stackEdgePath;
+    std::stack<std::string> stackPath;
+    stackPath.push(begin);
+    for (;;) {
+        bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
+        if (currentNodeName == end) {
+//            showStack(stackPath);
+            std::cout << stackPath.size() << std::endl;
+//            gr.setMaxConcordant(stackPath.);
+//            gr.f
+            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
+            if (poppass == false) {
+                break;
+            }
+//            break;
+        }
+
+        if (stop == false) {
+            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
+            if (poppass == false) {
+                break;
+            }
+        }
+
+    }
+
+    return gr;
 }

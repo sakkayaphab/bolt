@@ -194,10 +194,11 @@ int Cli::callSV()
 int Cli::debug()
 {
     Graph graph;
-    int kmer = 3;
-    graph.buildGraph("ABC",kmer);
-    graph.buildGraph("BCD",kmer);
-    graph.buildGraph("DEF",kmer);
+//    int kmer = 3;
+//    graph.buildGraph("abcdefabcdef",kmer);
+//    graph.buildGraph("bcd",kmer);
+//    graph.buildGraph("cde",kmer);
+//    graph.buildGraph("def",kmer);
 
 //    graph.addNodeToNode("1","2");
 //    graph.addNodeToNode("1","3");
@@ -212,21 +213,19 @@ int Cli::debug()
 //    graph.addNodeToNode("5","6");
 //    graph.addNodeToNode("6","3");
 
-//    graph.addNodeToNode("0","1");
-//    graph.addNodeToNode("0","2");
-//    graph.addNodeToNode("1","2");
-//    graph.addNodeToNode("1","3");
-//    graph.addNodeToNode("2","3");
-//    graph.addNodeToNode("3","4");
-//    graph.addNodeToNode("4","0");
-//    graph.addNodeToNode("4","1");
-//    graph.addNodeToNode("4","5");
+    graph.addNodeToNode("0","1");
+    graph.addNodeToNode("0","2");
+    graph.addNodeToNode("1","2");
+    graph.addNodeToNode("1","3");
+    graph.addNodeToNode("2","3");
+    graph.addNodeToNode("3","4");
+    graph.addNodeToNode("4","0");
+    graph.addNodeToNode("4","1");
+    graph.addNodeToNode("4","5");
 
     graph.showAllNode();
 
-//    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("AGTCATATC","GGAGACGGT");
-    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("AGATCAGTGAGTTCACCACAGCCGCGCAAGGCACAGGCTCTCCACGGTCCTGCAGCCTCAGTTCCTGGGAAGCTCACAAGCAGGGGGCTGGCGTGTGAACT","ACAGCCGCGCAAGGCACAGGCTCTCCACGGTCCTGCAGCCTCAGTTCCTGGGAAGCTCACAAGCAGGGGGCTGGCGTGTGAACTCCGGTCCCGCTGTGGTC");
-    return EXIT_SUCCESS;
+    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("0","5");
     graph.clearMaskedEdges();
     if (vStackResult.size()==0) {
         return EXIT_SUCCESS;
@@ -236,6 +235,12 @@ int Cli::debug()
         graph.reverseVectorString(&vResult);
         graph.showVectorString(&vResult);
     }
+
+//    GraphResult gr = graph.findCustom("abc","def");
+//    std::cout << "GR LEFT : "  << gr.getMaxLeft() << std::endl;
+//    std::cout << "GR RIGTH : "  << gr.getMaxRight() << std::endl;
+//    std::cout << "GR CONCORDANT : "  << gr.getMaxConcordant() << std::endl;
+
 
     return EXIT_SUCCESS;
 }

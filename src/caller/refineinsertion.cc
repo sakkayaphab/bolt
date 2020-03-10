@@ -1,6 +1,7 @@
 #include "refineinsertion.h"
 #include <stdlib.h>
 #include "smithwaterman.h"
+#include <graph/graph.h>
 
 RefineInsertion::RefineInsertion()
 {
@@ -46,12 +47,14 @@ void RefineInsertion::first()
 
     RefineInsertion::convertMapSC();
     RefineInsertion::clearMapSC();
-    RefineInsertion::findBreakpoint();
-    RefineInsertion::filterBreakpoint();
+
 
     if (variantresult.isQuailtyPass() == false && evidence.getMark() != "MATEUNMAPPED")
     {
         evidence.setMark("UNMERGE");
+        RefineInsertion::findBreakpoint();
+        RefineInsertion::filterBreakpoint();
+    } else {
         RefineInsertion::findBreakpoint();
         RefineInsertion::filterBreakpoint();
     }
@@ -81,6 +84,7 @@ void RefineInsertion::refineStartToEnd(const char *range)
 
         if (readparser.isUnmapped())
         {
+            vUnMappedRead.push_back(readparser.getSequence());
             continue;
         }
 
@@ -265,9 +269,11 @@ void RefineInsertion::filterBreakpoint()
 void RefineInsertion::findBreakpoint()
 {
 
+    std::cout << "Unmapped size: " << vUnMappedRead.size() << std::endl;
+
     for (InsertionPositionDetail n : vectorSCStart)
     {
-        if (n.getLongMapping() < 15)
+        if (n.getLongMapping() < 30)
         {
             continue;
         }
@@ -284,14 +290,59 @@ void RefineInsertion::findBreakpoint()
         // if ((evidence.getMark() != "MATEUNMAPPED"))
         // {
         mergeStart = mergeString(n, false);
+
         // }
 
         for (InsertionPositionDetail m : vectorSCEnd)
         {
 
-            if (m.getLongMapping() < 15)
+            if (m.getLongMapping() < 30)
             {
                 continue;
+            }
+
+            std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
+
+
+            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
+            {
+
+            }
+            else {
+                continue;
+            }
+
+            int kmer = 14;
+
+            std::cout << "n : "
+                      << n.getPosition() << " "
+                      << " size : " << mergeStart.size()
+                      << " seq : "  << mergeStart.at(0).seq << " "
+                      << std::endl;
+
+            std::string seqSource = mergeStart.at(0).seq.substr(mergeStart.at(0).seq.size()-kmer);
+            std::cout << seqSource << " " << seqSource.size() << std::endl;
+
+            std::cout << "m : "
+                      << m.getPosition() << " "
+                      << " size : " << mergeEnd.size()
+                      << " seq : "  << mergeEnd.at(0).seq << " "
+                      << std::endl;
+
+            std::string seqtarget = mergeEnd.at(0).seq.substr(0,kmer);
+            std::cout << seqtarget << " " << seqtarget.size() << std::endl;
+
+            Graph graph;
+
+            graph.buildGraph(mergeStart.at(0).seq,kmer);
+            graph.buildGraph(mergeEnd.at(0).seq,kmer);
+
+            std::vector<std::stack<std::string>> vStackResult = graph.findDFS(seqSource,seqtarget);
+            for (std::stack<std::string> ss:vStackResult) {
+                std::cout << "####" << std::endl;
+                std::vector<std::string> vResult = graph.covertStackToVector(ss);
+                graph.reverseVectorString(&vResult);
+                graph.showVectorString(&vResult);
             }
 
             // if (m.getFrequency() <= 1)
@@ -299,46 +350,46 @@ void RefineInsertion::findBreakpoint()
             //     continue;
             // }
 
-            int frequency = 0;
-            std::vector<uint8_t> mapq;
-            int32_t longmatch = 0;
-            // if ((evidence.getMark() != "MATEUNMAPPED"))
-            // {
-            std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
-            std::vector<uint8_t> tempmapq;
-            std::string seq1;
-            std::string seq2;
-            bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &longmatch, &tempmapq, &seq1, &seq2);
-            mapq = tempmapq;
-
-            if (!passoverlapped)
-            {
-                continue;
-            }
-
-            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
-            {
-                BreakpointPosition tempBP;
-                tempBP.pos = n.getPosition();
-                tempBP.end = m.getPosition();
-                tempBP.frequency = frequency;
-                tempBP.longmatch = longmatch;
-                tempBP.seq1 = seq1;
-                tempBP.seq2 = seq2;
-
-                tempBP.score = n.getFrequency() + m.getFrequency();
-                tempBP.longmapstart = n.getLongMapping();
-                tempBP.longmapend = m.getLongMapping();
-                tempBP.mappingqualitylist = mapq;
-
-                if (tempBP.frequency <= 2)
-                {
-                    continue;
-                }
-
-                added = true;
-                vectorBP.push_back(tempBP);
-            }
+//            int frequency = 0;
+//            std::vector<uint8_t> mapq;
+//            int32_t longmatch = 0;
+//            // if ((evidence.getMark() != "MATEUNMAPPED"))
+//            // {
+//            std::vector<CountRefineSeq> mergeEnd = mergeString(m, true);
+//            std::vector<uint8_t> tempmapq;
+//            std::string seq1;
+//            std::string seq2;
+//            bool passoverlapped = getOverlappedSeq(mergeStart, mergeEnd, &frequency, &longmatch, &tempmapq, &seq1, &seq2);
+//            mapq = tempmapq;
+//
+//            if (!passoverlapped)
+//            {
+//                continue;
+//            }
+//
+//            if (checkBetween(n.getPosition(), m.getPosition(), -samplestat->getReadLength(), samplestat->getReadLength()))
+//            {
+//                BreakpointPosition tempBP;
+//                tempBP.pos = n.getPosition();
+//                tempBP.end = m.getPosition();
+//                tempBP.frequency = frequency;
+//                tempBP.longmatch = longmatch;
+//                tempBP.seq1 = seq1;
+//                tempBP.seq2 = seq2;
+//
+//                tempBP.score = n.getFrequency() + m.getFrequency();
+//                tempBP.longmapstart = n.getLongMapping();
+//                tempBP.longmapend = m.getLongMapping();
+//                tempBP.mappingqualitylist = mapq;
+//
+//                if (tempBP.frequency <= 2)
+//                {
+//                    continue;
+//                }
+//
+//                added = true;
+//                vectorBP.push_back(tempBP);
+//            }
         }
     }
 }
