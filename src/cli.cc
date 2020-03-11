@@ -8,20 +8,18 @@
 #include <thread>
 #include <cstdlib>
 #include "graph/graph.h"
+#include "graph/dynamicgraph.h"
 
-Cli::Cli(int m_argc, char **m_argv)
-{
+Cli::Cli(int m_argc, char **m_argv) {
     argc = m_argc;
     argv = m_argv;
 
-    if (argc > 1)
-    {
+    if (argc > 1) {
         args_lists.assign(argv + 1, argv + argc);
     }
 }
 
-void Cli::ShowHelp()
-{
+void Cli::ShowHelp() {
     std::cout << std::endl;
     std::cout << "NAME:" << std::endl;
     std::cout << "\tBolt - a bioinformatics tool" << std::endl;
@@ -35,8 +33,7 @@ void Cli::ShowHelp()
     std::cout << std::endl;
 }
 
-void Cli::showHelpCallSV()
-{
+void Cli::showHelpCallSV() {
     std::cout << std::endl;
     std::cout << "USAGE:" << std::endl;
     std::cout << "\tbolt call [command options] [arguments...]" << std::endl;
@@ -50,26 +47,21 @@ void Cli::showHelpCallSV()
     std::cout << std::endl;
 }
 
-std::string Cli::getCommand()
-{
-    if (args_lists.size() > 0)
-    {
+std::string Cli::getCommand() {
+    if (args_lists.size() > 0) {
         return args_lists.at(0);
     }
     return "";
 }
 
-int Cli::callSV()
-{
+int Cli::callSV() {
 
-    if (args_lists.size() < 2)
-    {
+    if (args_lists.size() < 2) {
         showHelpCallSV();
         return EXIT_FAILURE;
     }
 
-    if (args_lists.at(1) == "-h" || args_lists.at(1) == "-help")
-    {
+    if (args_lists.at(1) == "-h" || args_lists.at(1) == "-help") {
         showHelpCallSV();
         return EXIT_SUCCESS;
     }
@@ -77,22 +69,18 @@ int Cli::callSV()
     // Find BAM
     bool foundBam = false;
     std::string bamPath;
-    for (auto n : args_lists)
-    {
-        if (foundBam)
-        {
+    for (auto n : args_lists) {
+        if (foundBam) {
             bamPath = n;
             break;
         }
 
-        if (n == "-b")
-        {
+        if (n == "-b") {
             foundBam = true;
         }
     }
 
-    if (bamPath == "")
-    {
+    if (bamPath == "") {
         std::cout << "not found bam file path" << std::endl;
         return EXIT_FAILURE;
     }
@@ -100,22 +88,18 @@ int Cli::callSV()
     // Find Reference
     bool foundRef = false;
     std::string refPath;
-    for (auto n : args_lists)
-    {
-        if (foundRef)
-        {
+    for (auto n : args_lists) {
+        if (foundRef) {
             refPath = n;
             break;
         }
 
-        if (n == "-r")
-        {
+        if (n == "-r") {
             foundRef = true;
         }
     }
 
-    if (refPath == "")
-    {
+    if (refPath == "") {
         std::cout << "not found reference file path" << std::endl;
         return EXIT_FAILURE;
     }
@@ -123,22 +107,18 @@ int Cli::callSV()
     // Find output
     bool foundOut = false;
     std::string outPath;
-    for (auto n : args_lists)
-    {
-        if (foundOut)
-        {
+    for (auto n : args_lists) {
+        if (foundOut) {
             outPath = n;
             break;
         }
 
-        if (n == "-o")
-        {
+        if (n == "-o") {
             foundOut = true;
         }
     }
 
-    if (outPath == "")
-    {
+    if (outPath == "") {
         std::cout << "not found output file path" << std::endl;
         return EXIT_FAILURE;
     }
@@ -146,35 +126,28 @@ int Cli::callSV()
     // Find threads
     bool foundThread = false;
     std::string outThread;
-    for (auto n : args_lists)
-    {
-        if (foundThread)
-        {
+    for (auto n : args_lists) {
+        if (foundThread) {
             outThread = n;
             break;
         }
 
-        if (n == "-t")
-        {
+        if (n == "-t") {
             foundThread = true;
         }
     }
 
     unsigned int threads = std::thread::hardware_concurrency();
-    if (outThread != "")
-    {
-        try
-        {
+    if (outThread != "") {
+        try {
             std::cout << outThread << std::endl;
             threads = std::stoi(outThread);
         }
-        catch (std::invalid_argument const &e)
-        {
+        catch (std::invalid_argument const &e) {
             std::cout << "Bad input: std::invalid_argument thrown" << '\n';
             return EXIT_FAILURE;
         }
-        catch (std::out_of_range const &e)
-        {
+        catch (std::out_of_range const &e) {
             std::cout << "Integer overflow: std::out_of_range thrown" << '\n';
             return EXIT_FAILURE;
         }
@@ -191,9 +164,8 @@ int Cli::callSV()
     return EXIT_SUCCESS;
 }
 
-int Cli::debug()
-{
-    Graph graph;
+int Cli::debug() {
+//    Graph graph;
 //    int kmer = 3;
 //    graph.buildGraph("abcdefabcdef",kmer);
 //    graph.buildGraph("bcd",kmer);
@@ -213,34 +185,47 @@ int Cli::debug()
 //    graph.addNodeToNode("5","6");
 //    graph.addNodeToNode("6","3");
 
-    graph.addNodeToNode("0","1");
-    graph.addNodeToNode("0","2");
-    graph.addNodeToNode("1","2");
-    graph.addNodeToNode("1","3");
-    graph.addNodeToNode("2","3");
-    graph.addNodeToNode("3","4");
-    graph.addNodeToNode("4","0");
-    graph.addNodeToNode("4","1");
-    graph.addNodeToNode("4","5");
+//    graph.addNodeToNode("0","1");
+//    graph.addNodeToNode("0","2");
+//    graph.addNodeToNode("1","2");
+//    graph.addNodeToNode("1","3");
+//    graph.addNodeToNode("2","3");
+//    graph.addNodeToNode("3","4");
+//    graph.addNodeToNode("4","0");
+//    graph.addNodeToNode("4","1");
+//    graph.addNodeToNode("4","5");
 
-    graph.showAllNode();
+//    graph.showAllNode();
+//
+//    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("0","5");
+//    graph.clearMaskedEdges();
+//    if (vStackResult.size()==0) {
+//        return EXIT_SUCCESS;
+//    }
+//    for (std::stack<std::string> ss:vStackResult) {
+//        std::vector<std::string> vResult = graph.covertStackToVector(ss);
+//        graph.reverseVectorString(&vResult);
+//        graph.showVectorString(&vResult);
+//    }
 
-    std::vector<std::stack<std::string>> vStackResult = graph.findDFS("0","5");
-    graph.clearMaskedEdges();
-    if (vStackResult.size()==0) {
-        return EXIT_SUCCESS;
-    }
-    for (std::stack<std::string> ss:vStackResult) {
-        std::vector<std::string> vResult = graph.covertStackToVector(ss);
-        graph.reverseVectorString(&vResult);
-        graph.showVectorString(&vResult);
-    }
+//    GraphResult gr = graph.findCustom("1","6");
+//    GraphResult gr = graph.findCustom("0","5");
+//    std::cout << "> GR LEFT : "  << gr.getMaxLeft() << std::endl;
+//    std::cout << "> GR RIGTH : "  << gr.getMaxRight() << std::endl;
+//    std::cout << "> GR CONCORDANT : "  << gr.getMaxConcordant() << std::endl;
 
-//    GraphResult gr = graph.findCustom("abc","def");
-//    std::cout << "GR LEFT : "  << gr.getMaxLeft() << std::endl;
-//    std::cout << "GR RIGTH : "  << gr.getMaxRight() << std::endl;
-//    std::cout << "GR CONCORDANT : "  << gr.getMaxConcordant() << std::endl;
+//    gr = graph.findCustom("6","1");
+//    GraphResult gr = graph.findCustom("0","5");
+//    std::cout << "< GR LEFT : "  << gr.getMaxLeft() << std::endl;
+//    std::cout << "< GR RIGTH : "  << gr.getMaxRight() << std::endl;
+//    std::cout << "< GR CONCORDANT : "  << gr.getMaxConcordant() << std::endl;
 
-
+    DynamicGraph dynGraph;
+    dynGraph.setKmer(14);
+    dynGraph.buildGraph("GTGGGATAACTCCGTAACTGACTACGGCCTTCTCTAGACTTTACTTGACCAGATACGCTGTCTTTGGCACGTGGATGGTTTAGAGGAATCACATCCAAGACTGGCTAAGCACGAAGCAACTCTTGAGTGTAAAATTGTTGTCTCCTGTATTCGGGATGCGGGTACTAGATGACTGCAGGGACTCCGACGTTAAGTACATTACCCCGTCATAGGCGCCGTTCAGGATCACGTTACCGCCATAAGATGGGAGCATGACTTCTTCTCCGCTGCGCCCACGCCAGTAGTGATTACTCCTATAACCCTTCTGAGAGTCCGGAGGCGGAAATCCGCCACGAATGAGAATGTATTTCCCCGACAATCATTATGGGGCGCTCCTAAGCTTTTCCACTCGGTTGAGCCGGCTAGGCCTCTCTGCCCGGAGTTTCGACGGACTGCTGCCGACACCCGGGCATTGTTTTAGGGGGGTTATTCGAGGGCACTCGCAGCCAACTTGTCGGGACCAGCCGGGCTGGTCATCGGGCTTATATAGCGAAATGCCGAGGACCCGGCCCCACGCTATGGAACGTCTTTAGCTCCGGCAGGCAATTAAGGACAACGTAAGTATGGCGGATATAAACAGAGAAACGGGCGAATATACCTATTCGTATCGTATCGGTAAATAGCCTCGCGGAGGCATGTGCCATGCTAGCCTGCGGAGCACTCTAGTTATGCATATGGTCCACAGGACACTCGTCGCTTTCGGATTTGCCCTCTATGTGACGGTTTTTAGGCGCACTTATGCTCAGCACCGTTTAAACCAGACCGACACTAGATCTATAAGGTCCGCCACGCAGACGAGAGCGCACGGAGATCACCGAGCGATCTATCTGATCGGCGACCATTTGTGTGGTACTGGGGCCGAGAGGTAACTACGGTGCCGCTAACAACCTCTCGGTCGTCGCTGACGTTTGTAGTCTAGTCTCATTATGATCGTACGCTATTCAGGGATTGACTGATACCG");
+    GraphResult gr = dynGraph.getGraphResult("GTGGGATAACTCCG", "ATTGACTGATACCG");
+    std::cout << "GR LEFT : " << gr.getMaxLeft() << std::endl;
+    std::cout << "GR RIGTH : " << gr.getMaxRight() << std::endl;
+    std::cout << "GR CONCORDANT : " << gr.getMaxConcordant() << std::endl;
     return EXIT_SUCCESS;
 }

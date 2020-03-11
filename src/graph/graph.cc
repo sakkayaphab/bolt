@@ -109,7 +109,8 @@ std::vector<std::stack<std::string>> Graph::findDFS(std::string begin, std::stri
         bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
         if (currentNodeName == end) {
 //            showStack(stackPath);z
-//            std::cout << stackPath.size() << std::endl;
+            std::cout << stackPath.size() << std::endl;
+
             output.push_back(stackPath);
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {
@@ -285,19 +286,30 @@ GraphResult Graph::findCustom(std::string begin, std::string end) {
     stackPath.push(begin);
     for (;;) {
         bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
+//        if (currentNodeName == end) {
+////            showStack(stackPath);
+//            std::cout << stackPath.size() << std::endl;
+////            gr.setMaxConcordant(stackPath.);
+////            gr.f
+//            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
+//            if (poppass == false) {
+//                break;
+//            }
+////            break;
+//        }
+
         if (currentNodeName == end) {
-//            showStack(stackPath);
-            std::cout << stackPath.size() << std::endl;
-//            gr.setMaxConcordant(stackPath.);
-//            gr.f
-            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
-            if (poppass == false) {
-                break;
-            }
-//            break;
+            std::vector<std::string> vResult = covertStackToVector(stackPath);
+            reverseVectorString(&vResult);
+            gr.setMaxConcordant(getTextFromVectorString(&vResult));
+//            std::cout << "> " << getTextFromVectorString(&vResult) << std::endl;
         }
 
         if (stop == false) {
+            std::vector<std::string> vResult = covertStackToVector(stackPath);
+            reverseVectorString(&vResult);
+            gr.setMaxLeft(getTextFromVectorString(&vResult));
+//            std::cout << "stop" << std::endl;
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {
                 break;
