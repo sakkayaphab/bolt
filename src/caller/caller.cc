@@ -255,10 +255,10 @@ void Caller::catEvidenceFile() {
         if (myfile.is_open()) {
             std::string svtype = n.substr(n.size() - 7, 3);
 
-            // if (svtype != "INS")
-            // {
-            //     continue;
-            // }
+             if (svtype != "INS")
+             {
+                 continue;
+             }
 
             while (getline(myfile, line)) {
                 Evidence e;
@@ -499,7 +499,9 @@ int Caller::findBreakPoint()
             rfd.setFastaReader(fastaReader);
             rfd.execute();
             variantresult = rfd.getVariantResult();
-            // std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//             std::cout << variantresult.getResultVcfFormatString() << std::endl;
+//            std::cout << " , " << i;
+
         }
         else if (thisEvidence.getVariantType() == "INV")
         {

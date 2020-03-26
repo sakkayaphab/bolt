@@ -17,6 +17,7 @@ private:
     std::string cachechr;
     int avgReadDepthFocus=0;
     int avgReadDepth = 0;
+
     std::map<int32_t, ReadDepthHelper::ReadDepthVector> mapReadDepthLineSegment;
     // std::vector<ReadDepthHelper::ReadDepthVector> cacheReadDepthFile;
     std::vector<ReadDepthHelper::ReadDepthVector> startFocusReadDepth;
@@ -64,7 +65,8 @@ public:
     void loadDataToCache(std::string filepath);
     void loadEvidenceFromFile();
     int getAvgReadDepth();
-    void setFocusReadDepth(int32_t pos, int32_t end,std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
+    void setFocusReadDepth(int32_t pos, int32_t end, std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
+
     int getNumberReadDepthVector(std::vector<ReadDepthHelper::ReadDepthVector> focus,int blocknumber);
     bool filterDeletion(Evidence e);
     bool filterInversion(Evidence e);
@@ -76,6 +78,7 @@ public:
 
     int getSCFFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
     int getSCLFocusArea(std::vector<ReadDepthHelper::ReadDepthVector> *focusReadDepth);
+    bool isDepthMoreThan(int depth);
 };
 
 #endif

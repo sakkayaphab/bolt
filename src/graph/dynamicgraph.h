@@ -23,6 +23,7 @@ public:
     void setKmer(int kmer);
     int getKmer();
     GraphResult getGraphResult(std::string begin,std::string end);
+    GraphResult ReverseStringGraphResult(GraphResult *gr);
 };
 
 #endif //BOLT_DYNAMICGRAPH_H

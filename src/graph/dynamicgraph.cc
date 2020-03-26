@@ -48,9 +48,20 @@ GraphResult DynamicGraph::getGraphResult(std::string begin,std::string end) {
     GraphResult ResultGR;
 
     Graph graph1;
+//    int countread = 0;
     for (int i=0;i<vRawTextFirst.size();i++) {
         graph1.addNodeToNode(vRawTextFirst.at(i),vRawTextSecond.at(i));
+//        countread++;
+
     }
+
+
+//    std::cout << "countread : " << countread << std::endl;
+
+//    std::cout << "add node to node" << std::endl;
+//    std::cout << "begin : " << begin << std::endl;
+//    std::cout << "end : " << end << std::endl;
+//    graph1.showAllNode();
 
     GraphResult gr1 = graph1.findCustom(begin,end);
 
@@ -68,6 +79,15 @@ GraphResult DynamicGraph::getGraphResult(std::string begin,std::string end) {
         ResultGR.setMaxConcordant(reverseString(gr2.getMaxConcordant()));
     }
 
-
     return ResultGR;
+}
+
+GraphResult DynamicGraph::ReverseStringGraphResult(GraphResult *gr) {
+    GraphResult outGR;
+//    std::cout << " > " << gr->getMaxLeft() << std::endl;
+    outGR.setMaxLeft(reverseString(gr->getMaxLeft()));
+//    std::cout << " > " << reverseString(gr->getMaxLeft()) << std::endl;
+    outGR.setMaxRight(reverseString(gr->getMaxRight()));
+    outGR.setMaxConcordant(reverseString(gr->getMaxConcordant()));
+    return outGR;
 }

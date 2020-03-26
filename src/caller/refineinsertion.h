@@ -34,8 +34,9 @@ private:
     int score = 0;
     int32_t longmatch=0;
     std::vector<uint8_t> mappingqualitylist;
-    std::string seq1;
-    std::string seq2;
+    std::string seqLeft;
+    std::string seqRight;
+    std::string seqMatch;
 
 
     bool operator<(const BreakpointPosition &rhs) const
@@ -64,8 +65,6 @@ private:
   bool compareEditDistance(std::string s1,std::string s2,bool fromstart);
   void substringSeq(std::string *s1,std::string *s2,bool fromstart);
   bool getOverlappedSeq(std::vector<CountRefineSeq> startSeq,std::vector<CountRefineSeq> endSeq,int *frequency,int *longmatch,std::vector<uint8_t> *mapq,std::string *seq1,std::string *seq2);
-  void refinewithReference();
-uint8_t getMaxVector();
 public:
   RefineInsertion();
   void execute();

@@ -59,6 +59,7 @@ void ReadDepthAnalysis::setFocusReadDepth(int32_t pos, int32_t end, std::vector<
 
         // std::cout << data.SCF << " " << data.SCL << " > " << data.pos << " " << data.depth << std::endl;
 
+
         focusReadDepth->push_back(datamodel);
     }
 }
@@ -188,6 +189,11 @@ bool ReadDepthAnalysis::filterInsertion(Evidence e)
     // {
     //     return false;
     // }
+
+    if (isDepthMoreThan(readDepthStat.getReadDepthByChr(e.getChr())*3)) {
+        return false;
+    }
+
 
     if ((e.getMark() == "MATEUNMAPPED"))
     {
@@ -320,6 +326,8 @@ bool ReadDepthAnalysis::analyzeByEvidence(Evidence e)
             return false;
         }
 
+
+
         return filterInsertion(e);
     }
 
@@ -438,6 +446,16 @@ bool ReadDepthAnalysis::filterTranslocation(Evidence e)
     // }
 
     return true;
+}
+
+bool ReadDepthAnalysis::isDepthMoreThan(int depth) {
+    for (auto n : startFocusReadDepth) {
+        if (n.depth>depth) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void ReadDepthAnalysis::collectNewData()

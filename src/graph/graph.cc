@@ -54,10 +54,22 @@ void Graph::addEdge(std::string fromText, std::string toText) {
         exit(EXIT_FAILURE);
     }
 
+
+
+
     Edge e;
     e.setFromNodeIndex(nodeFromIndex);
     e.setToNodeIndex(nodeToIndex);
     Node *n = getNodeByIndex(nodeFromIndex);
+
+    //prevent duplicate
+    for (Edge edgeX : *n->getEdges()) {
+        if (edgeX.getToNodeIndex()==nodeToIndex) {
+            return;
+        }
+    }
+    //end prevent duplicate
+
     n->addEdgeOut(e);
 }
 
@@ -270,6 +282,7 @@ std::string Graph::getMaxSeqRigth() {
 
 GraphResult Graph::findCustom(std::string begin, std::string end) {
     GraphResult gr;
+    int count = 0;
 
     long long indexNodeCurrent = mNode[begin];
 
@@ -281,42 +294,61 @@ GraphResult Graph::findCustom(std::string begin, std::string end) {
     if (currentNodeName != begin) {
         return gr;
     }
+
     std::stack<Edge *> stackEdgePath;
     std::stack<std::string> stackPath;
     stackPath.push(begin);
+
+
+//    if (vNode.size()>200) {
+//        return gr;
+//    }
+//    if (mNode.size()>200) {
+//        return gr;
+//    }
+//
+//    std::cout << "vNode : " << vNode.size() << std::endl;
+//    std::cout << "mNode : " << mNode.size() << std::endl;
+
+
     for (;;) {
         bool stop = RunNextNode(&stackPath, &stackEdgePath, &currentNodeName);
 //        if (currentNodeName == end) {
-////            showStack(stackPath);
-//            std::cout << stackPath.size() << std::endl;
-////            gr.setMaxConcordant(stackPath.);
-////            gr.f
+//            std::vector<std::string> vResult = covertStackToVector(stackPath);
+//            reverseVectorString(&vResult);
+//            gr.setMaxLeft(getTextFromVectorString(&vResult));
 //            bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
 //            if (poppass == false) {
 //                break;
 //            }
-////            break;
 //        }
 
         if (currentNodeName == end) {
             std::vector<std::string> vResult = covertStackToVector(stackPath);
             reverseVectorString(&vResult);
             gr.setMaxConcordant(getTextFromVectorString(&vResult));
-//            std::cout << "> " << getTextFromVectorString(&vResult) << std::endl;
+//            break;
         }
 
         if (stop == false) {
             std::vector<std::string> vResult = covertStackToVector(stackPath);
             reverseVectorString(&vResult);
             gr.setMaxLeft(getTextFromVectorString(&vResult));
-//            std::cout << "stop" << std::endl;
             bool poppass = popAllStack(&stackPath, &stackEdgePath, &currentNodeName);
             if (poppass == false) {
                 break;
             }
+            count++;
+            if (count>200) {
+                break;
+            }
         }
-
     }
+
+//    if (count>500) {
+//        std::cout << "Count : " << count << std::endl;
+//    }
+
 
     return gr;
 }
