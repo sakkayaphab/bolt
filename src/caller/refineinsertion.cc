@@ -54,14 +54,16 @@ void RefineInsertion::first() {
 
     RefineInsertion::convertMapSC();
     RefineInsertion::clearMapSC();
+    RefineInsertion::findBreakpoint();
+    RefineInsertion::filterBreakpoint();
 
 //    if (variantresult.isQuailtyPass() == false && evidence.getMark() != "MATEUNMAPPED") {
 //        evidence.setMark("UNMERGE");
 //        RefineInsertion::findBreakpoint();
 //        RefineInsertion::filterBreakpoint();
 //    } else {
-        RefineInsertion::findBreakpoint();
-        RefineInsertion::filterBreakpoint();
+//        RefineInsertion::findBreakpoint();
+//        RefineInsertion::filterBreakpoint();
 //    }
 }
 
@@ -203,20 +205,33 @@ void RefineInsertion::filterBreakpoint() {
                 continue;
             }
 
-            if (n.longmapstart <= getDivider(samplestat->getReadLength(), 30, 100, 15)) {
-                continue;
-            }
+//            if (n.longmapstart <= getDivider(samplestat->getReadLength(), 30, 100, 15)) {
+//                continue;
+//            }
+//
+//            if (n.longmapend <= getDivider(samplestat->getReadLength(), 30, 100, 15)) {
+//                continue;
+//            }
+            variantresult.setPos(averagePos);
+            variantresult.setEnd(averagePos);
+            variantresult.setFrequency(n.frequency);
+            variantresult.setRPMapQ(*evidence.getMapQVector());
+            variantresult.LNGMATCH = n.longmatch;
 
-            if (n.longmapend <= getDivider(samplestat->getReadLength(), 30, 100, 15)) {
-                continue;
-            }
+            variantresult.setMapQList(n.mappingqualitylist);
+            variantresult.setChr(evidence.getChr());
+            variantresult.setEndChr(evidence.getEndChr());
+            variantresult.setQuailtyPass(true);
+            variantresult.setMark(evidence.getMark());
+            continue;
         }
 //
 //        if (n.longmatch < getDivider(samplestat->getReadLength(), 15, 100, 15)) {
 //            continue;
 //        }
 
-        int score = (n.frequency) * (2 * n.longmatch);
+        int score = (n.frequency);
+//        int score = n.longmatch;
 
         if (score <= maxscore) {
             continue;
@@ -235,6 +250,8 @@ void RefineInsertion::filterBreakpoint() {
         variantresult.setEndChr(evidence.getEndChr());
         variantresult.setQuailtyPass(true);
         variantresult.setMark(evidence.getMark());
+        variantresult.setAlt(n.seqMatch);
+
     }
 }
 
@@ -243,15 +260,18 @@ void RefineInsertion::findBreakpoint() {
 //    std::chrono::steady_clock sc;   // create an object of `steady_clock` class
 //    auto start = sc.now();     // start timer
 
+    for (std::string x:vUnMappedRead) {
+        std::cout << x << std::endl;
+    }
 
-    int kmer = 10;
+    int kmer = 12;
     std::vector<CountRefineSeq> mergeStart;
     std::vector<CountRefineSeq> mergeEnd;
 
-    std::cout << " SCS : " << vectorSCStart.size()
-              << " SCE : " << vectorSCEnd.size()
-              << " UNMAP : " << vUnMappedRead.size()
-              << std::endl;
+//    std::cout << " SCS : " << vectorSCStart.size()
+//              << " SCE : " << vectorSCEnd.size()
+//              << " UNMAP : " << vUnMappedRead.size()
+//              << std::endl;
 
 
     for (InsertionPositionDetail n : vectorSCStart) {
@@ -290,18 +310,18 @@ void RefineInsertion::findBreakpoint() {
             }
 
 
-            DynamicGraph dynGraph;
-            dynGraph.setKmer(kmer);
+
 
             for (int s = 0; s < mergeStart.size(); s++) {
                 if (mergeStart.at(s).seq.size() < 20) {
                     continue;
                 }
 
-                if (s>=5) {
-                    break;
-                }
+//                if (s>=5) {
+//                    break;
+//                }
 
+//                std::cout << "mergeStart : " << mergeStart.size() << std::endl;
                 for (int e = 0; e < mergeEnd.size(); e++) {
 
 
@@ -309,19 +329,37 @@ void RefineInsertion::findBreakpoint() {
                         continue;
                     }
 
-                    if (e>=5) {
-                        break;
+                    if (mergeEnd.at(e).seq.size()+mergeStart.at(s).seq.size() < 50) {
+                        continue;
                     }
+
+
+
+//                    std::cout << "mergeEnd : " << mergeEnd.size() << std::endl;
+//                    std::cout << "vUnMappedRead : " << vUnMappedRead.size() << std::endl;
+
+//                    if (e>=5) {
+//                        break;
+//                    }
+
 
                     std::string seqSource = mergeStart.at(s).seq.substr(mergeStart.at(s).seq.size() - kmer);
                     std::string seqtarget = mergeEnd.at(e).seq.substr(e, kmer);
-
+                    std::cout << mergeStart.at(s).seq << std::endl;
+                    std::cout << mergeEnd.at(e).seq << std::endl;
+                    DynamicGraph dynGraph;
+                    dynGraph.setKmer(kmer);
                     dynGraph.buildGraph(dynGraph.reverseString(mergeStart.at(s).seq));
                     dynGraph.buildGraph(dynGraph.reverseString(mergeEnd.at(e).seq));
 
-                    for (std::string x:vUnMappedRead) {
-                        dynGraph.buildGraph(dynGraph.reverseString(x));
-                    }
+//                    if (vUnMappedRead.size()<20) {
+//                        for (std::string x:vUnMappedRead) {
+//                            dynGraph.buildGraph(dynGraph.reverseString(x));
+//                        }
+//                    }
+//                    for (std::string x:vUnMappedRead) {
+//                        dynGraph.buildGraph(dynGraph.reverseString(x));
+//                    }
 
                     GraphResult gr = dynGraph.getGraphResult(dynGraph.reverseString(seqSource),
                                                              dynGraph.reverseString(seqtarget));
@@ -402,6 +440,35 @@ void RefineInsertion::findBreakpoint() {
 //                        std::cout << "GR CONCORDANT : " << gr.getMaxConcordant() << std::endl;
 //                        std::cout << "------------------" << std::endl;
 //
+                        BreakpointPosition tempBP;
+                        tempBP.pos = n.getPosition();
+                        tempBP.end = m.getPosition();
+                        tempBP.frequency = mergeStart.at(s).count + mergeEnd.at(e).count;
+
+                        tempBP.seqLeft = gr.getMaxLeft();
+                        tempBP.seqRight = gr.getMaxRight();
+                        tempBP.seqMatch = gr.getMaxConcordant();
+                        tempBP.longmatch = gr.getMaxConcordant().size();
+
+                        tempBP.score = n.getFrequency() + m.getFrequency();
+                        tempBP.longmapstart = n.getLongMapping();
+                        tempBP.longmapend = m.getLongMapping();
+
+                        std::vector<uint8_t> tempmapq;
+                        tempmapq.insert(tempmapq.end(), mergeStart.at(s).mapqlist.begin(),
+                                        mergeStart.at(s).mapqlist.end());
+                        tempmapq.insert(tempmapq.end(), mergeEnd.at(e).mapqlist.begin(), mergeEnd.at(e).mapqlist.end());
+
+                        tempBP.mappingqualitylist = tempmapq;
+
+//                        if (tempBP.frequency <= 2)
+//                        {
+//                            continue;
+//                        }
+
+                        added = true;
+                        vectorBP.push_back(tempBP);
+                    } else {
                         BreakpointPosition tempBP;
                         tempBP.pos = n.getPosition();
                         tempBP.end = m.getPosition();

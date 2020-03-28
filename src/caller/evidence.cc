@@ -794,7 +794,12 @@ std::string Evidence::convertToVcfString()
     //REF
     buf.append(".\t");
     //ALT
-    buf.append(".\t");
+    if (getAlt()=="") {
+        buf.append(".\t");
+    } else {
+        buf.append(getAlt());
+    }
+
     //QUAL
     buf.append(".\t");
     //FILTER
@@ -989,4 +994,8 @@ bool Evidence::haveSomeMapQLessThan(uint8_t qual)
     }
 
     return false;
+}
+
+void Evidence::setAlt(std::string seq) {
+    Evidence::alt = seq;
 }

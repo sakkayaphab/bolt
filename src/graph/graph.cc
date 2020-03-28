@@ -55,19 +55,17 @@ void Graph::addEdge(std::string fromText, std::string toText) {
     }
 
 
-
-
     Edge e;
     e.setFromNodeIndex(nodeFromIndex);
     e.setToNodeIndex(nodeToIndex);
     Node *n = getNodeByIndex(nodeFromIndex);
 
     //prevent duplicate
-    for (Edge edgeX : *n->getEdges()) {
-        if (edgeX.getToNodeIndex()==nodeToIndex) {
-            return;
-        }
-    }
+//    for (Edge edgeX : *n->getEdges()) {
+//        if (edgeX.getToNodeIndex()==nodeToIndex) {
+//            return;
+//        }
+//    }
     //end prevent duplicate
 
     n->addEdgeOut(e);
@@ -339,7 +337,7 @@ GraphResult Graph::findCustom(std::string begin, std::string end) {
                 break;
             }
             count++;
-            if (count>200) {
+            if (count>400) {
                 break;
             }
         }

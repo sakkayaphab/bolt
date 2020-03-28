@@ -39,6 +39,7 @@ private:
 public:
   void setRPMapQ(std::vector<uint8_t> rpmapq);
   std::vector<uint8_t> *getRPMapQ();
+  void setAlt(std::string seq);
 
   // void setMark(std::string mark);
   // std::string getMark();
@@ -134,8 +135,6 @@ public:
   Evidence();
 
   ~Evidence();
-
-  int getSizeErrorAssociateReadLists();
 
   std::string getVariantType();
 

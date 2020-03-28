@@ -45,18 +45,18 @@ int DynamicGraph::getKmer() {
 }
 
 GraphResult DynamicGraph::getGraphResult(std::string begin,std::string end) {
+//    std::cout << "start" << std::endl;
     GraphResult ResultGR;
 
     Graph graph1;
-//    int countread = 0;
+    int countread = 0;
     for (int i=0;i<vRawTextFirst.size();i++) {
         graph1.addNodeToNode(vRawTextFirst.at(i),vRawTextSecond.at(i));
-//        countread++;
-
+        countread++;
     }
 
-
 //    std::cout << "countread : " << countread << std::endl;
+//    graph1.showAllNode();
 
 //    std::cout << "add node to node" << std::endl;
 //    std::cout << "begin : " << begin << std::endl;

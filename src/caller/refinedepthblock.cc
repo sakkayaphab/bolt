@@ -270,10 +270,10 @@ std::vector<Evidence> RefineDepthBlock::getRefineResultInsertion(std::vector<Evi
                 continue;
             }
 
-            if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 30, 100, 15))
-            {
-                continue;
-            }
+//            if (n.LNGMATCH <= getDivider(samplestat->getReadLength(), 30, 100, 15))
+//            {
+//                continue;
+//            }
 
             if (n.getMaxMapQ() < 20)
             {

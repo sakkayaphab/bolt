@@ -156,8 +156,8 @@ int Cli::callSV() {
     Caller caller(bamPath, refPath, outPath);
     caller.showinfo();
     caller.setParallel(threads);
-    caller.execute();
-    caller.catfile();
+//    caller.execute();
+//    caller.catfile();
     caller.findBreakPoint();
     caller.refineDelpthBlock();
 
@@ -222,11 +222,9 @@ int Cli::debug() {
 
     DynamicGraph dynGraph;
     dynGraph.setKmer(3);
-    dynGraph.buildGraph("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-    dynGraph.buildGraph("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-    dynGraph.buildGraph("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-    dynGraph.buildGraph("NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-    GraphResult gr = dynGraph.getGraphResult("NNN", "NNN");
+    dynGraph.buildGraph("GGGGGCTCCTCACAGGGGGGGGACCCTGGGGAAGGTGGATCCTCACGGGGGGGAGGCTCCTCAGGGGGAG");
+    dynGraph.buildGraph("ATCCTCACGGGGAGGGGAGCCTCAGGGGGGGG");
+    GraphResult gr = dynGraph.getGraphResult("GGG", "GGG");
     std::cout << "GR LEFT : " << gr.getMaxLeft() << std::endl;
     std::cout << "GR RIGTH : " << gr.getMaxRight() << std::endl;
     std::cout << "GR CONCORDANT : " << gr.getMaxConcordant() << std::endl;
