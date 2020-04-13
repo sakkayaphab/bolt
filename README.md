@@ -9,6 +9,7 @@
 
 ## Installation
 
+
 ### 1. Installing Bolt from source
 
 Requirements
