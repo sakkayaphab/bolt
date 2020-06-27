@@ -40,11 +40,9 @@ bool SpecifyEvidence::checkBetween(int32_t pos, int32_t targetPos, int32_t overl
     return true;
 }
 
-
 void SpecifyEvidence::setReadDepthHelper(ReadDepthHelper *m_readdepthHelper) {
     readdepthHelper = m_readdepthHelper;
 }
-
 
 int SpecifyEvidence::findOverlappedOnlyPos(uint32_t overlapped, uint32_t pos)
 {
