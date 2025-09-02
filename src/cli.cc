@@ -1,12 +1,13 @@
 #include "cli.h"
 #include <iostream>
+#include <string>
+#include <thread>
+#include <cstdlib>
+#include <fstream>
 #include "caller/caller.h"
 #include "caller/evidence.h"
 #include "caller/readparser.h"
-#include <string>
 #include "caller/editdistance.h"
-#include <thread>
-#include <cstdlib>
 
 Cli::Cli(int m_argc, char **m_argv)
 {
@@ -19,7 +20,7 @@ Cli::Cli(int m_argc, char **m_argv)
     }
 }
 
-void Cli::ShowHelp()
+void Cli::ShowHelp() const
 {
     std::cout << std::endl;
     std::cout << "NAME:" << std::endl;
@@ -34,7 +35,7 @@ void Cli::ShowHelp()
     std::cout << std::endl;
 }
 
-void Cli::showHelpCallSV()
+void Cli::showHelpCallSV() const
 {
     std::cout << std::endl;
     std::cout << "USAGE:" << std::endl;
@@ -49,11 +50,23 @@ void Cli::showHelpCallSV()
     std::cout << std::endl;
 }
 
-std::string Cli::getCommand()
+std::string Cli::getCommand() const
 {
     if (args_lists.size() > 0)
     {
         return args_lists.at(0);
+    }
+    return "";
+}
+
+std::string Cli::getArgumentValue(const std::string& flag) const
+{
+    for (size_t i = 0; i < args_lists.size(); ++i)
+    {
+        if (args_lists[i] == flag && i + 1 < args_lists.size())
+        {
+            return args_lists[i + 1];
+        }
     }
     return "";
 }
@@ -73,109 +86,74 @@ int Cli::callSV()
         return EXIT_SUCCESS;
     }
 
-    // Find BAM
-    bool foundBam = false;
-    std::string bamPath;
-    for (auto n : args_lists)
-    {
-        if (foundBam)
-        {
-            bamPath = n;
-            break;
-        }
+    // Parse arguments using helper function
+    std::string bamPath = getArgumentValue("-b");
+    std::string refPath = getArgumentValue("-r");
+    std::string outPath = getArgumentValue("-o");
+    std::string threadStr = getArgumentValue("-t");
 
-        if (n == "-b")
-        {
-            foundBam = true;
-        }
-    }
-
-    if (bamPath == "")
+    // Validate required arguments
+    if (bamPath.empty())
     {
-        std::cout << "not found bam file path" << std::endl;
+        std::cout << "Error: BAM file path is required (-b)" << std::endl;
         return EXIT_FAILURE;
     }
 
-    // Find Reference
-    bool foundRef = false;
-    std::string refPath;
-    for (auto n : args_lists)
+    if (refPath.empty())
     {
-        if (foundRef)
-        {
-            refPath = n;
-            break;
-        }
-
-        if (n == "-r")
-        {
-            foundRef = true;
-        }
-    }
-
-    if (refPath == "")
-    {
-        std::cout << "not found reference file path" << std::endl;
+        std::cout << "Error: Reference file path is required (-r)" << std::endl;
         return EXIT_FAILURE;
     }
 
-    // Find output
-    bool foundOut = false;
-    std::string outPath;
-    for (auto n : args_lists)
+    if (outPath.empty())
     {
-        if (foundOut)
-        {
-            outPath = n;
-            break;
-        }
-
-        if (n == "-o")
-        {
-            foundOut = true;
-        }
-    }
-
-    if (outPath == "")
-    {
-        std::cout << "not found output file path" << std::endl;
+        std::cout << "Error: Output path is required (-o)" << std::endl;
         return EXIT_FAILURE;
     }
 
-    // Find threads
-    bool foundThread = false;
-    std::string outThread;
-    for (auto n : args_lists)
+    // Basic file existence checks
     {
-        if (foundThread)
+        std::ifstream bamFile(bamPath);
+        if (!bamFile.good())
         {
-            outThread = n;
-            break;
+            std::cout << "Error: Cannot access BAM file: " << bamPath << std::endl;
+            return EXIT_FAILURE;
         }
-
-        if (n == "-t")
+    }
+    
+    {
+        std::ifstream refFile(refPath);
+        if (!refFile.good())
         {
-            foundThread = true;
+            std::cout << "Error: Cannot access reference file: " << refPath << std::endl;
+            return EXIT_FAILURE;
         }
     }
 
 
+    // Parse thread count
     unsigned int threads = std::thread::hardware_concurrency();
-    if (outThread != "")
+    if (!threadStr.empty())
     {
         try
         {
-            std::cout << outThread << std::endl;
-            threads = std::stoi(outThread);
+            int threadCount = std::stoi(threadStr);
+            if (threadCount <= 0)
+            {
+                std::cout << "Error: Thread count must be positive" << std::endl;
+                return EXIT_FAILURE;
+            }
+            threads = static_cast<unsigned int>(threadCount);
+            std::cout << "Using " << threads << " threads" << std::endl;
         }
-        catch (std::invalid_argument const &e)
+        catch (const std::invalid_argument& e)
         {
-            std::cout << "Bad input: std::invalid_argument thrown" << '\n';
+            std::cout << "Error: Invalid thread count format" << std::endl;
             return EXIT_FAILURE;
         }
-        catch (std::out_of_range const &e)
+        catch (const std::out_of_range& e)
         {
-            std::cout << "Integer overflow: std::out_of_range thrown" << '\n';
+            std::cout << "Error: Thread count out of range" << std::endl;
             return EXIT_FAILURE;
         }
     }
@@ -192,7 +170,7 @@ int Cli::callSV()
     return EXIT_SUCCESS;
 }
 
-int Cli::debug()
+int Cli::debug() const
 {
     std::cout << "Hello world" << std::endl;
 

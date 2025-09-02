@@ -13,6 +13,7 @@ Makefile
 cmake-build-debug
 .idea
 *.a
+*.o
 
 # execute
 run.sh
@@ -23,6 +24,7 @@ run2.sh
 boltq4
 run4.sh
 
-
+# Precompiled headers
+*.gch
 
 CTestTestfile.cmake
