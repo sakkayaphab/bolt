@@ -16,11 +16,14 @@ class Cli
 
   public:
     Cli(int argc, char **argv);
-    std::string getCommand();
+    std::string getCommand() const;
     int callSV();
-    void showHelpCallSV();
-    int debug();
-    void ShowHelp();
+    void showHelpCallSV() const;
+    int debug() const;
+    void ShowHelp() const;
+
+private:
+    std::string getArgumentValue(const std::string& flag) const;
 
 };
 

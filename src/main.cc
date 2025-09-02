@@ -1,34 +1,34 @@
 #include <iostream>
-#include <stdio.h>
 #include "cli.h"
+#include "version.h"
 
 int main(int argc, char **argv)
 {
     
     Cli cli(argc, argv);
 
-    if (cli.getCommand()=="call")
+    if (cli.getCommand() == "call")
     {
         return cli.callSV();
     }
-    else if (cli.getCommand()=="debug")
+    else if (cli.getCommand() == "debug")
     {
         return cli.debug();
     }
-    else if (cli.getCommand()=="version")
+    else if (cli.getCommand() == "version")
     {
         std::cout << "VERSION:" << std::endl;
-        std::cout << "\t0.3.0" << std::endl;
+        std::cout << "\t" << BOLT_VERSION << std::endl;
         return EXIT_SUCCESS;
     }
-    else if (cli.getCommand()=="")
+    else if (cli.getCommand().empty())
     {
         cli.ShowHelp();
         return EXIT_SUCCESS;
     }
     else
     {
-        std::cout << cli.getCommand() <<" : command not found" << std::endl;
+        std::cout << "'" << cli.getCommand() << "': command not found" << std::endl;
         std::cout << std::endl;
         cli.ShowHelp();
         return EXIT_FAILURE;
