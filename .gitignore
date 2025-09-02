@@ -23,6 +23,7 @@ run2.sh
 boltq4
 run4.sh
 
-
+# Precompiled headers
+*.gch
 
 CTestTestfile.cmake

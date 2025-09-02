@@ -1,12 +1,13 @@
 #include "cli.h"
 #include <iostream>
+#include <string>
+#include <thread>
+#include <cstdlib>
+#include <fstream>
 #include "caller/caller.h"
 #include "caller/evidence.h"
 #include "caller/readparser.h"
-#include <string>
 #include "caller/editdistance.h"
-#include <thread>
-#include <cstdlib>
 
 Cli::Cli(int m_argc, char **m_argv)
 {
@@ -108,6 +109,25 @@ int Cli::callSV()
     {
         std::cout << "Error: Output path is required (-o)" << std::endl;
         return EXIT_FAILURE;
+    }
+
+    // Basic file existence checks
+    {
+        std::ifstream bamFile(bamPath);
+        if (!bamFile.good())
+        {
+            std::cout << "Error: Cannot access BAM file: " << bamPath << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
+    
+    {
+        std::ifstream refFile(refPath);
+        if (!refFile.good())
+        {
+            std::cout << "Error: Cannot access reference file: " << refPath << std::endl;
+            return EXIT_FAILURE;
+        }
     }
 
 
