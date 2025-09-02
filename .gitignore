@@ -13,6 +13,7 @@ Makefile
 cmake-build-debug
 .idea
 *.a
+*.o
 
 # execute
 run.sh
